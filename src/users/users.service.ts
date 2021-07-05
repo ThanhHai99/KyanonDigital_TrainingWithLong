@@ -1,41 +1,31 @@
-import { HttpException, Injectable } from '@nestjs/common';
-import { USERS } from './users.mock';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './users.entity';
 
 @Injectable()
 export class UsersService {
-    users = USERS;
+    constructor(
+        @InjectRepository(User)
+        private userRepository: Repository<User>,
+    ) {};
 
     getAll(): Promise<any> {
-        return new Promise(resolve => {
-            resolve(this.users);
-        });
+        return this.userRepository.find();
     };
 
-    getById(id): Promise<any> {
-        return new Promise(resolve => {
-            const user = this.users.find(user => user.id === Number(id));
-            if (!user) {
-                throw new HttpException("User does not exist on system", 404);
-            };
-            resolve(user);
-        });
+    getById(id: string): Promise<any> {
+        return this.userRepository.findOne(id);
     };
 
-    create(user): Promise<any> {
-        return new Promise(resolve => {
-            this.users.push(user);
-            resolve(this.users);
-        });
+    async create(user: User): Promise<any> {
+        await this.userRepository.save(user);
+        return this.userRepository.find();
     };
 
-    delete(id): Promise<any> {
-        return new Promise(resolve => {
-            let index = this.users.findIndex(user => user.id === Number(id));
-            if (index === -1) {
-                throw new HttpException("User does not exist on system", 404);
-            };
-            this.users.splice(index, 1);
-            resolve(this.users);
-        });
+    async delete(id: string): Promise<any> {
+        let userToRemove = await this.userRepository.findOne(id);
+        await this.userRepository.remove(userToRemove);
+        return this.userRepository.find();
     };
 };
