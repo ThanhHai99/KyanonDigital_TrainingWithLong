@@ -8,6 +8,8 @@
 		* [Get user by id](#Get-user-by-id)
 		* [Create a new user](#Create-a-new-user)
 		* [Delete a user](#Delete-a-user)
+		* [Sign Up](#Sign-Up)
+		* [Sign In](#Sign-In)
 * [Thông tin liên lạc](#Thông-tin-liên-lạc)
 
 ## Giới thiệu
