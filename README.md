@@ -8,6 +8,8 @@
 		* [Get user by id](#Get-user-by-id)
 		* [Create a new user](#Create-a-new-user)
 		* [Delete a user](#Delete-a-user)
+		* [Sign Up](#Sign-Up)
+		* [Sign In](#Sign-In)
 * [Thông tin liên lạc](#Thông-tin-liên-lạc)
 
 ## Giới thiệu
@@ -53,6 +55,18 @@ Cài đặt Insomnia <https://insomnia.rest/download>
 `Route (DELETE) /users?id=`
 <p align="left">
 	<img src="./doc/image/deleteUser.png" width="800" />
+</p>
+
+#### Sign Up
+`Route (POST) /signUp`
+<p align="left">
+	<img src="./doc/image/signUp.png" width="800" />
+</p>
+
+#### Sign In
+`Route (POST) /signIn`
+<p align="left">
+	<img src="./doc/image/signIn.png" width="800" />
 </p>
 
 ## Thông tin liên lạc

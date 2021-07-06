@@ -6,6 +6,8 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { Authenticate } from './users/authenticate.middleware';
 import { User } from './users/users.entity';
+import { SignUpModule } from './sign-up/sign-up.module';
+import { SignInModule } from './sign-in/sign-in.module';
 
 @Module({
   imports: [
@@ -18,7 +20,7 @@ import { User } from './users/users.entity';
       database: "test",
       entities: [User],
       synchronize: true
-    }), UsersModule],
+   }), UsersModule, SignUpModule, SignInModule],
   controllers: [AppController],
   providers: [AppService],
 })
