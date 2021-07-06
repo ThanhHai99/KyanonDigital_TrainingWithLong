@@ -8,6 +8,8 @@
 		* [Get user by id](#Get-user-by-id)
 		* [Create a new user](#Create-a-new-user)
 		* [Delete a user](#Delete-a-user)
+		* [Sign Up](#Sign-Up)
+		* [Sign In](#Sign-In)
 * [Thông tin liên lạc](#Thông-tin-liên-lạc)
 
 ## Giới thiệu
@@ -16,10 +18,10 @@
 ## Điều kiện tiên quyết
 Đã cài đặt nodejs <https://nodejs.org/en/download/>
 
-
 ## Cách cài đặt
 * **Bước 1**: Cài đặt những thư viện cần thiết cho dự án
 ```console
+$ npm install nest -g
 $ npm install
 ```
 * **Bước 2**: Thiết lập thông tin tại file `./.env`
@@ -31,8 +33,31 @@ $ npm start
 ## Cách sử dụng
 ### Hướng dẫn sử dụng ứng dụng bằng Insomnia
 Cài đặt Insomnia <https://insomnia.rest/download>
+
+#### Sign Up
+`Route (POST) /signUp`
+<p align="left">
+	<img src="./doc/image/signUp.png" width="800" />
+</p>
+
+#### Sign In
+`Route (POST) /signIn`
+<p align="left">
+	<img src="./doc/image/signIn.png" width="800" />
+</p>
+Hệ thống sẽ trả về biến auth trong Header
+<p align="left">
+	<img src="./doc/image/_auth.png" width="800" />
+</p>
+
 #### Get all users
 `Route (GET) /users`
+Thêm biến auth vào Header trong những route tiếp theo
+Chú ý: Nếu dùng bằng browser, bạn không phải thực hiện bước mày mà hệ thống sẽ tự động ghi vào browser.
+<p align="left">
+	<img src="./doc/image/__auth.png" width="800" />
+</p>
+Tiếp tục
 <p align="left">
 	<img src="./doc/image/getAllUsers.png" width="800" />
 </p>
@@ -55,17 +80,6 @@ Cài đặt Insomnia <https://insomnia.rest/download>
 	<img src="./doc/image/deleteUser.png" width="800" />
 </p>
 
-#### Sign Up
-`Route (POST) /signUp`
-<p align="left">
-	<img src="./doc/image/signUp.png" width="800" />
-</p>
-
-#### Sign In
-`Route (POST) /signIn`
-<p align="left">
-	<img src="./doc/image/signIn.png" width="800" />
-</p>
 
 ## Thông tin liên lạc
 Rất mong nhận được nhận được ý kiến, nhận xét của bạn đọc.

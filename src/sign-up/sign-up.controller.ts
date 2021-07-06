@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Response } from '@nestjs/common';
 import { CreateUserDto } from './../users/create-user.dto';
 import { User } from './../users/users.entity';
 import { SignUpService } from './sign-up.service';
@@ -8,24 +8,23 @@ export class SignUpController {
     constructor(private signUpService: SignUpService) {};
     
     @Post()
-    async index(@Body() createUserDto: CreateUserDto) {
-        let user = new User();
-        user.username = createUserDto.username;
-        user.password = createUserDto.password;
-        user.name = createUserDto.name;
-
-        user.hashPassword();
+    async index(@Body() createUserDto: CreateUserDto, @Response() res) {
+        let user0 = new User();
+        user0.username = createUserDto.username;
+        user0.password = createUserDto.password;
+        user0.name = createUserDto.name;
+        user0.hashPassword();
         
         try {
-            const u = await this.signUpService.checkNotExist(user);
-            if (u === false) {
-                return "User already in use";
+            const user = await this.signUpService.checkNotExist(user0);
+            if (user === false) {
+                return res.status(409).send("The account already in use");
             } else {
-                const users = await this.signUpService.create(user);
-                return users;
+                await this.signUpService.create(user0);
+                return res.status(201).send("Sign up successfully");
             };
         } catch (error) {
-            return "Error";
+            return res.status(500).send("Server occurred an error");
         };
     };
 };
