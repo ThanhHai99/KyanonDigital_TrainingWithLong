@@ -55,6 +55,18 @@ Cài đặt Insomnia <https://insomnia.rest/download>
 	<img src="./doc/image/deleteUser.png" width="800" />
 </p>
 
+#### Sign Up
+`Route (POST) /signUp`
+<p align="left">
+	<img src="./doc/image/signUp.png" width="800" />
+</p>
+
+#### Sign In
+`Route (POST) /signIn`
+<p align="left">
+	<img src="./doc/image/signIn.png" width="800" />
+</p>
+
 ## Thông tin liên lạc
 Rất mong nhận được nhận được ý kiến, nhận xét của bạn đọc.
 Nếu có bất kì thắc mắc gì, vui lòng liên hệ địa chỉ email sau:
