@@ -1,9 +1,9 @@
 import { Controller, Post, Body, Response } from '@nestjs/common';
-import { CreateUserDto } from './../users/create-user.dto';
+import { CreateUserDto } from './../users/create_user.dto';
 import { User } from './../users/users.entity';
-import { SignUpService } from './sign-up.service';
+import { SignUpService } from './sign_up.service';
 
-@Controller('signUp')
+@Controller('sign')
 export class SignUpController {
     constructor(private signUpService: SignUpService) {};
     

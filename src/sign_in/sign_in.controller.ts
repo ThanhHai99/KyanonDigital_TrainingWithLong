@@ -1,11 +1,11 @@
 import { Controller, Post, Body, Response } from '@nestjs/common';
 import * as jwt from "jsonwebtoken";
-import { CreateUserDto } from './../users/create-user.dto';
+import { CreateUserDto } from './../users/create_user.dto';
 import { User } from './../users/users.entity';
-import { SignInService } from './sign-in.service';
+import { SignInService } from './sign_in.service';
 require("dotenv").config();
 
-@Controller('signIn')
+@Controller('sign_in')
 export class SignInController {
     constructor(private signInService: SignInService) {};
 
