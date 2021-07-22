@@ -7,14 +7,16 @@ import { User } from './../users/users.entity';
 export class SignInService {
     constructor(
         @InjectRepository(User)
-        private userRepository: Repository<User>,
-    ) {};
+        private userRepository: Repository<User>
+    ) {}
 
     isExist(user: User): Promise<any> {
-        return this.userRepository.findOneOrFail({ where: { username: user.username } });
-    };
+        return this.userRepository.findOneOrFail({
+            where: { username: user.username }
+        });
+    }
 
     checkPassword(user: User): Promise<any> {
         return user.checkIfUnencryptedPasswordIsValid(user.password);
-    };
-};
+    }
+}

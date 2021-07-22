@@ -5,8 +5,8 @@ import { SignUpService } from './sign_up.service';
 
 @Controller('sign')
 export class SignUpController {
-    constructor(private signUpService: SignUpService) {};
-    
+    constructor(private signUpService: SignUpService) {}
+
     @Post()
     async index(@Body() createUserDto: CreateUserDto, @Response() res) {
         let user0 = new User();
@@ -14,17 +14,17 @@ export class SignUpController {
         user0.password = createUserDto.password;
         user0.name = createUserDto.name;
         user0.hashPassword();
-        
+
         try {
             const user = await this.signUpService.checkNotExist(user0);
             if (user === false) {
-                return res.status(409).send("The account already in use");
+                return res.status(409).send('The account already in use');
             } else {
                 await this.signUpService.create(user0);
-                return res.status(201).send("Sign up successfully");
-            };
+                return res.status(201).send('Sign up successfully');
+            }
         } catch (error) {
-            return res.status(500).send("Server occurred an error");
-        };
-    };
-};
+            return res.status(500).send('Server occurred an error');
+        }
+    }
+}
