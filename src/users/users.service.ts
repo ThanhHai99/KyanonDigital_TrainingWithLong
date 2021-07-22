@@ -23,9 +23,9 @@ export class UsersService {
         return this.userRepository.find();
     }
 
-    async delete(id: string): Promise<any> {
-        let userToRemove = await this.userRepository.findOne(id);
-        await this.userRepository.remove(userToRemove);
-        return this.userRepository.find();
-    }
+    // async delete(id: string): Promise<any> {
+    //     let userToRemove = await this.userRepository.findOne(id);
+    //     await this.userRepository.remove(userToRemove);
+    //     return this.userRepository.find();
+    // }
 }

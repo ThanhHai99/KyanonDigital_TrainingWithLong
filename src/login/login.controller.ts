@@ -1,11 +1,11 @@
 import { Controller, Post, Body, Response } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
-import { CreateUserDto } from './../users/create_user.dto';
-import { User } from './../users/users.entity';
-import { SignInService } from './sign_in.service';
+import { CreateUserDto } from '../users/create_user.dto';
+import { User } from '../users/users.entity';
+import { SignInService } from './login.service';
 require('dotenv').config();
 
-@Controller('sign_in')
+@Controller('login')
 export class SignInController {
     constructor(private signInService: SignInService) {}
 
@@ -42,6 +42,9 @@ export class SignInController {
 
         // Send the jwt in the response
         res.setHeader('auth', token);
-        return res.status(200).send('Sign in successfully');
+        return res.status(200).json({
+            error: 0,
+            message: "Sign In successfully"
+        });
     }
 }
