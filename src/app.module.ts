@@ -5,8 +5,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { User } from './users/users.entity';
-import { SignUpModule } from './sign-up/sign-up.module';
-import { SignInModule } from './sign-in/sign-in.module';
+import { SignUpModule } from './sign_up/sign_up.module';
+import { SignInModule } from './sign_in/sign_in.module';
 import { checkJwt } from './middlewares/checkJwt';
 require("dotenv").config();
 
