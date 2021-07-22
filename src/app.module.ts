@@ -5,9 +5,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { User } from './users/users.entity';
-import { SignUpModule } from './sign_up/sign_up.module';
-import { SignInModule } from './sign_in/sign_in.module';
+import { SignUpModule } from './register/register.module';
+import { SignInModule } from './login/login.module';
 import { checkJwt } from './middlewares/checkJwt';
+import { LogoutModule } from './logout/logout.module';
+import { RolesModule } from './roles/roles.module';
 require('dotenv').config();
 
 @Module({
@@ -24,7 +26,9 @@ require('dotenv').config();
         }),
         UsersModule,
         SignUpModule,
-        SignInModule
+        SignInModule,
+        LogoutModule,
+        RolesModule
     ],
     controllers: [AppController],
     providers: [AppService]
