@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '../users/users.entity';
+import { User } from '../../users/users.entity';
 
 @Injectable()
-export class SignUpService {
+export class RegisterService {
     constructor(
         @InjectRepository(User)
         private userRepository: Repository<User>
@@ -15,7 +15,7 @@ export class SignUpService {
         return this.userRepository.find();
     }
 
-    async checkNotExist(user: User): Promise<any> {
+    async isNotExisting(user: User): Promise<any> {
         let u = await User.find({ where: { username: user.username } });
         return u.length === 0;
     }
