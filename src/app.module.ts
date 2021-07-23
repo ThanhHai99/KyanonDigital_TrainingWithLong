@@ -5,11 +5,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { User } from './users/users.entity';
-import { SignUpModule } from './register/register.module';
-import { SignInModule } from './login/login.module';
+import { RegisterModule } from './authenticate/register/register.module';
+import { LoginModule } from './authenticate/login/login.module';
 import { checkJwt } from './middlewares/checkJwt';
-import { LogoutModule } from './logout/logout.module';
+import { LogoutModule } from './authenticate/logout/logout.module';
 import { RolesModule } from './roles/roles.module';
+import { Role } from './roles/roles.entity';
 require('dotenv').config();
 
 @Module({
@@ -21,14 +22,14 @@ require('dotenv').config();
             username: process.env.DB_USERNAME,
             password: process.env.DB_PASSWORD,
             database: process.env.DB_DATABASE,
-            entities: [User],
+            entities: [Role, User],
             synchronize: true
         }),
+        RolesModule,
         UsersModule,
-        SignUpModule,
-        SignInModule,
-        LogoutModule,
-        RolesModule
+        RegisterModule,
+        LoginModule,
+        LogoutModule
     ],
     controllers: [AppController],
     providers: [AppService]
@@ -37,6 +38,6 @@ export class AppModule implements NestModule {
     constructor(private connection: Connection) {}
 
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(checkJwt).forRoutes('users');
+        // consumer.apply(checkJwt).forRoutes('users');
     }
 }
