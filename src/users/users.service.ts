@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './users.entity';
+import { EntityId } from 'typeorm/repository/EntityId';
 
 @Injectable()
 export class UsersService {
@@ -10,12 +11,91 @@ export class UsersService {
         private userRepository: Repository<User>
     ) {}
 
-    getAll(): Promise<any> {
-        return this.userRepository.find();
+    readAll(): Promise<any> {
+        return this.userRepository.find({
+            select: [
+                'id',
+                'username',
+                'name',
+                'phone',
+                'address',
+                'created_at',
+                'updated_at'
+            ],
+            join: {
+                alias: 'users',
+                leftJoinAndSelect: {
+                    role: 'users.role'
+                }
+            }
+        });
     }
 
-    getById(id: string): Promise<any> {
-        return this.userRepository.findOne(id);
+    readOne(name: string, phone: string): Promise<any> {
+        if (name !== undefined && phone === undefined)
+            return this.userRepository.findOne({
+                select: [
+                    'id',
+                    'username',
+                    'name',
+                    'phone',
+                    'address',
+                    'created_at',
+                    'updated_at'
+                ],
+                where: {
+                    name: name
+                },
+                join: {
+                    alias: 'users',
+                    leftJoinAndSelect: {
+                        role: 'users.role'
+                    }
+                }
+            });
+        else if (name === undefined && phone !== undefined)
+            return this.userRepository.findOne({
+                select: [
+                    'id',
+                    'username',
+                    'name',
+                    'phone',
+                    'address',
+                    'created_at',
+                    'updated_at'
+                ],
+                where: {
+                    phone: phone
+                },
+                join: {
+                    alias: 'users',
+                    leftJoinAndSelect: {
+                        role: 'users.role'
+                    }
+                }
+            });
+        else
+            return this.userRepository.findOne({
+                select: [
+                    'id',
+                    'username',
+                    'name',
+                    'phone',
+                    'address',
+                    'created_at',
+                    'updated_at'
+                ],
+                where: {
+                    name: name,
+                    phone: phone
+                },
+                join: {
+                    alias: 'users',
+                    leftJoinAndSelect: {
+                        role: 'users.role'
+                    }
+                }
+            });
     }
 
     async create(user: User): Promise<any> {
@@ -23,9 +103,30 @@ export class UsersService {
         return this.userRepository.find();
     }
 
-    // async delete(id: string): Promise<any> {
-    //     let userToRemove = await this.userRepository.findOne(id);
-    //     await this.userRepository.remove(userToRemove);
-    //     return this.userRepository.find();
+    // async update(id: EntityId, data: any): Promise<any> {
+    //     console.log(data);
+    // await this.userRepository.update(id, data);
+    // const status = await this.userRepository.update(id, data);
+    // return status;
+    // return this.userRepository.findOne(id);
     // }
+
+    async isSuperAdmin(id: EntityId): Promise<any> {
+        const user = await this.userRepository.findOne({
+            where: {
+                id: id
+            },
+            join: {
+                alias: 'users',
+                leftJoinAndSelect: {
+                    role: 'users.role'
+                }
+            }
+        });
+        return user.role;
+    }
+
+    async lock(id: EntityId): Promise<any> {
+        await this.userRepository.update(id, { is_locked: true });
+    }
 }

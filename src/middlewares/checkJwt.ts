@@ -14,7 +14,10 @@ export const checkJwt = (req: Request, res: Response, next: NextFunction) => {
         res.locals.jwtPayload = jwtPayload;
     } catch (error) {
         // If token is not valid, response with 401 (unauthorized)
-        return res.status(401).send();
+        return res.status(401).json({
+            error: 1,
+            message: 'Token is invalid'
+        });
     }
 
     // We want to send a new token on every request
