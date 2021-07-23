@@ -3,14 +3,11 @@ import {
     Controller,
     Delete,
     Get,
-    Param,
     Patch,
     Post,
-    Put,
     Query,
     Response
 } from '@nestjs/common';
-import { EntityId } from 'typeorm/repository/EntityId';
 import { UserDto } from './user.dto';
 import { User } from './users.entity';
 import { UsersService } from './users.service';
@@ -22,10 +19,10 @@ export class UsersController {
     constructor(private usersService: UsersService) {}
 
     @Get()
-    async read(@Response() res, @Query() query) {
+    async read(@Response() res, @Query() query): Promise<any> {
         try {
-            let { phone, name } = query;
-            let user: User;
+            const { phone, name } = query;
+            let user: any;
             if (phone === undefined && name === undefined) {
                 user = await this.usersService.readAll();
             } else {
@@ -51,14 +48,15 @@ export class UsersController {
     }
 
     @Post()
-    async create(@Body() userDto: UserDto, @Response() res) {
-        let newUser = new User();
+    async create(@Body() userDto: UserDto, @Response() res): Promise<any> {
+        let newUser: User = new User();
         newUser.username = userDto.username;
         newUser.password = userDto.password;
         newUser.name = userDto.name;
         newUser.phone = userDto.phone;
         newUser.address = userDto.address;
         newUser.role = <any>userDto.role;
+        newUser.is_locked = false;
         newUser.created_at = moment().format('YYYY/MM/DD HH:mm');
         newUser.updated_at = moment().format('YYYY/MM/DD HH:mm');
 
@@ -99,18 +97,40 @@ export class UsersController {
         }
     }
 
-    // @Patch()
-    // async update(@Query() query, @Body() userData: UserDto): Promise<User> {
-    //     const { id } = query;
-    //     const status = this.usersService.update(id, userData);
-    //     return status;
-    // }
+    @Patch()
+    async update(@Body() userDto: UserDto, @Response() res): Promise<any> {
+        let _user: User = await this.usersService.findOne(userDto.id);
+        _user.name = userDto.name || _user.name;
+        _user.phone = userDto.phone || _user.phone;
+        _user.address = userDto.address || _user.address;
+
+        const errors = await validate(_user);
+        if (errors.length > 0) {
+            return res.status(400).json({
+                error: 1,
+                data: errors
+            });
+        }
+
+        try {
+            const user: User = await this.usersService.update(_user);
+            return res.status(200).json({
+                error: 0,
+                data: user
+            });
+        } catch (error) {
+            return res.status(500).json({
+                error: 1,
+                message: 'Server occurred an error'
+            });
+        }
+    }
 
     @Delete()
     async lock(@Query() query, @Response() res): Promise<any> {
-        const { id } = query;
         try {
-            const isSuperAdmin = await this.usersService.isSuperAdmin(id);
+            const { id } = query;
+            const isSuperAdmin: any = await this.usersService.isSuperAdmin(id);
             if (isSuperAdmin === null || isSuperAdmin.id !== 0) {
                 await this.usersService.lock(id);
                 return res.status(200).json({

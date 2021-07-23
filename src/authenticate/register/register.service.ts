@@ -16,7 +16,7 @@ export class RegisterService {
     }
 
     async isNotExisting(user: User): Promise<any> {
-        let u = await User.find({ where: { username: user.username } });
-        return u.length === 0;
+        const _user = await User.find({ where: { username: user.username } });
+        return _user.length === 0;
     }
 }

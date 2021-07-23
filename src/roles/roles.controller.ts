@@ -1,6 +1,6 @@
 import { Controller, Get, Response } from '@nestjs/common';
+import { Role } from './roles.entity';
 import { RolesService } from './roles.service';
-
 
 @Controller('roles')
 export class RolesController {
@@ -9,7 +9,7 @@ export class RolesController {
     @Get()
     async findAll(@Response() res) {
         try {
-            const roles = await this.rolesService.findAll();
+            const roles: Role[] = await this.rolesService.findAll();
             if (!roles) {
                 return res.status(200).json({
                     error: 0,
