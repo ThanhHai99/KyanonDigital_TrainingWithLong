@@ -38,6 +38,7 @@ export class AppModule implements NestModule {
     constructor(private connection: Connection) {}
 
     configure(consumer: MiddlewareConsumer) {
-        // consumer.apply(checkJwt).forRoutes('users');
+        consumer.apply(checkJwt).forRoutes('users');
+        consumer.apply(checkJwt).forRoutes('roles');
     }
 }

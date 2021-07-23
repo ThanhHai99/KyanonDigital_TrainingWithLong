@@ -15,7 +15,7 @@ export class LogInController {
         _user.username = userDto.username;
         _user.password = userDto.password;
 
-        // Check if username and password are set
+        // Check if username and password are not set
         if (!(_user.username && _user.password)) {
             return res.status(400).json({
                 error: 1,

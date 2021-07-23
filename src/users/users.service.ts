@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { User } from './users.entity';
 import { EntityId } from 'typeorm/repository/EntityId';
 
@@ -11,7 +11,11 @@ export class UsersService {
         private userRepository: Repository<User>
     ) {}
 
-    readAll(): Promise<any> {
+    async findOne(id: EntityId): Promise<User> {
+        return await this.userRepository.findOne(id);
+    }
+
+    readAll(): Promise<User[]> {
         return this.userRepository.find({
             select: [
                 'id',
@@ -19,6 +23,7 @@ export class UsersService {
                 'name',
                 'phone',
                 'address',
+                'is_locked',
                 'created_at',
                 'updated_at'
             ],
@@ -31,7 +36,7 @@ export class UsersService {
         });
     }
 
-    readOne(name: string, phone: string): Promise<any> {
+    readOne(name: string, phone: string): Promise<User> {
         if (name !== undefined && phone === undefined)
             return this.userRepository.findOne({
                 select: [
@@ -40,6 +45,7 @@ export class UsersService {
                     'name',
                     'phone',
                     'address',
+                    'is_locked',
                     'created_at',
                     'updated_at'
                 ],
@@ -61,6 +67,7 @@ export class UsersService {
                     'name',
                     'phone',
                     'address',
+                    'is_locked',
                     'created_at',
                     'updated_at'
                 ],
@@ -82,6 +89,7 @@ export class UsersService {
                     'name',
                     'phone',
                     'address',
+                    'is_locked',
                     'created_at',
                     'updated_at'
                 ],
@@ -98,18 +106,14 @@ export class UsersService {
             });
     }
 
-    async create(user: User): Promise<any> {
-        await this.userRepository.save(user);
-        return this.userRepository.find();
+    async create(user: User): Promise<User> {
+        return await this.userRepository.save(user);
     }
 
-    // async update(id: EntityId, data: any): Promise<any> {
-    //     console.log(data);
-    // await this.userRepository.update(id, data);
-    // const status = await this.userRepository.update(id, data);
-    // return status;
-    // return this.userRepository.findOne(id);
-    // }
+    async update(user: User): Promise<User> {
+        await this.userRepository.save(user);
+        return await this.findOne(user.id);
+    }
 
     async isSuperAdmin(id: EntityId): Promise<any> {
         const user = await this.userRepository.findOne({
