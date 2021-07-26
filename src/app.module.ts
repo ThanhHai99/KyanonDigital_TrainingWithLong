@@ -3,14 +3,14 @@ import { Connection } from 'typeorm';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
-import { User } from './users/users.entity';
-import { RegisterModule } from './authenticate/register/register.module';
-import { LoginModule } from './authenticate/login/login.module';
+import { UsersModule } from './modules/users.module';
+import { User } from './entities/users.entity';
+import { RegisterModule } from './modules/register.module';
+import { LoginModule } from './modules/login.module';
 import { checkJwt } from './middlewares/checkJwt';
-import { LogoutModule } from './authenticate/logout/logout.module';
-import { RolesModule } from './roles/roles.module';
-import { Role } from './roles/roles.entity';
+import { LogoutModule } from './modules/logout.module';
+import { RolesModule } from './modules/roles.module';
+import { Role } from './entities/roles.entity';
 require('dotenv').config();
 
 @Module({
