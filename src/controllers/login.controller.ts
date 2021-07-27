@@ -50,9 +50,12 @@ export class LogInController {
             });
         }
 
+        // Get roleId
+        const { id } = user.role;
+
         // Sing jwt
         const token = jwt.sign(
-            { userId: user.id, username: user.username },
+            { userId: user.id, username: user.username, roleId: id },
             process.env.jwtSecret,
             { expiresIn: process.env.tokenLifetime }
         );

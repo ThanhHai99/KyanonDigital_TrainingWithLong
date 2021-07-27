@@ -7,42 +7,40 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     ManyToOne,
-    JoinColumn
+    JoinColumn,
+    OneToMany
 } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { IsNotEmpty, MinLength, IsPhoneNumber } from 'class-validator';
 import { Role } from 'src/entities/roles.entity';
-import { ApiProperty } from '@nestjs/swagger';
+import { Category } from './categories.entity';
+import { Price } from './price.entity';
+import { Sale } from './sales.entity';
+import { Item } from './items.entity';
 
 @Entity({ name: 'users' })
 export class User extends BaseEntity {
-    @ApiProperty()
     @Column()
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ApiProperty()
     @Unique(['username'])
     @Column()
     @IsNotEmpty()
     username: string;
 
-    @ApiProperty()
     @Column()
     @MinLength(8)
     password: string;
 
-    @ApiProperty()
     @Column()
     @IsNotEmpty()
     name: string;
 
-    @ApiProperty()
     @Column()
     @IsPhoneNumber('VN')
     phone: string;
 
-    @ApiProperty()
     @Column()
     @IsNotEmpty()
     address: string;
@@ -51,19 +49,28 @@ export class User extends BaseEntity {
     @JoinColumn({ name: 'role_id' })
     role: Role;
 
-    @ApiProperty()
     @Column({ default: false })
     is_locked: boolean;
 
-    @ApiProperty()
     @Column()
     @CreateDateColumn()
     created_at: Date;
 
-    @ApiProperty()
     @Column()
     @UpdateDateColumn()
     updated_at: Date;
+
+    @OneToMany((type) => Category, (category) => category.user)
+    categories: Category[];
+
+    @OneToMany((type) => Price, (price) => price.user)
+    prices: Price[];
+
+    @OneToMany((type) => Sale, (sale) => sale.user)
+    sales: Sale[];
+
+    @OneToMany((type) => Item, (item) => item.user)
+    items: Item[];
 
     hashPassword() {
         this.password = bcrypt.hashSync(this.password, 8);

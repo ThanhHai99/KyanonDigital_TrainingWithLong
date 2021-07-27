@@ -11,6 +11,18 @@ import { checkJwt } from './middlewares/checkJwt';
 import { LogoutModule } from './modules/logout.module';
 import { RolesModule } from './modules/roles.module';
 import { Role } from './entities/roles.entity';
+import { Item } from './entities/items.entity';
+import { Price } from './entities/price.entity';
+import { Sale } from './entities/sales.entity';
+import { Order } from './entities/order.entity';
+import { ItemOrder } from './entities/item_order.entiy';
+import { Invoice } from './entities/invoice.entity';
+import { Importing } from './entities/importing.entity';
+import { Exporting } from './entities/exporting.entity';
+import { Category } from './entities/categories.entity';
+import { checkRole } from './middlewares/checkRole';
+import { Warehouse } from './entities/warehouses.entity';
+import { WarehouseModule } from './modules/warehouses.module';
 require('dotenv').config();
 
 @Module({
@@ -22,11 +34,25 @@ require('dotenv').config();
             username: process.env.DB_USERNAME,
             password: process.env.DB_PASSWORD,
             database: process.env.DB_DATABASE,
-            entities: [Role, User],
+            entities: [
+                Role,
+                User,
+                Category,
+                Item,
+                Price,
+                Sale,
+                Order,
+                ItemOrder,
+                Invoice,
+                Warehouse,
+                Importing,
+                Exporting
+            ],
             synchronize: true
         }),
         RolesModule,
         UsersModule,
+        WarehouseModule,
         RegisterModule,
         LoginModule,
         LogoutModule
@@ -38,7 +64,8 @@ export class AppModule implements NestModule {
     constructor(private connection: Connection) {}
 
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(checkJwt).forRoutes('users');
-        consumer.apply(checkJwt).forRoutes('roles');
+        consumer.apply(checkJwt, checkRole([0])).forRoutes('users');
+        consumer.apply(checkJwt, checkRole([0])).forRoutes('roles');
+        consumer.apply(checkJwt, checkRole([0, 1])).forRoutes('warehouses');
     }
 }
