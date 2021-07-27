@@ -12,7 +12,18 @@ export class LogInService {
 
     isExisting(user: User): Promise<any> {
         return this.userRepository.findOneOrFail({
-            where: { username: user.username }
+            select: [
+                'id',
+                'username',
+                'password'
+            ],
+            where: { username: user.username },
+            join: {
+                alias: 'users',
+                leftJoinAndSelect: {
+                    role: 'users.role'
+                }
+            }
         });
     }
 

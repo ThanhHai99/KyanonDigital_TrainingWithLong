@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, UpdateResult } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from '../entities/users.entity';
 import { EntityId } from 'typeorm/repository/EntityId';
 
@@ -15,7 +15,7 @@ export class UsersService {
         return await this.userRepository.findOne(id);
     }
 
-    readAll(): Promise<User[]> {
+    async readAll(): Promise<User[]> {
         return this.userRepository.find({
             select: [
                 'id',
@@ -36,7 +36,7 @@ export class UsersService {
         });
     }
 
-    readOne(name: string, phone: string): Promise<User> {
+    async readOne(name: string, phone: string): Promise<User> {
         if (name !== undefined && phone === undefined)
             return this.userRepository.findOne({
                 select: [
