@@ -1,5 +1,11 @@
 import { Controller, Get, Response } from '@nestjs/common';
-import { ApiBasicAuth, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBasicAuth,
+    ApiOkResponse,
+    ApiSecurity,
+    ApiTags,
+    getSchemaPath
+} from '@nestjs/swagger';
 import { Role } from '../entities/roles.entity';
 import { RolesService } from '../services/roles.service';
 
@@ -10,10 +16,15 @@ import { RolesService } from '../services/roles.service';
 export class RolesController {
     constructor(private rolesService: RolesService) {}
 
+    @ApiOkResponse({
+        schema: {
+            allOf: [{ $ref: getSchemaPath(Role) }]
+        }
+    })
     @Get()
-    async findAll(@Response() res) {
+    async read(@Response() res) {
         try {
-            const roles: Role[] = await this.rolesService.findAll();
+            const roles: Role[] = await this.rolesService.readAll();
             if (!roles) {
                 return res.status(200).json({
                     error: 0,

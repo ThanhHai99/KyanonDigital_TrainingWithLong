@@ -13,8 +13,8 @@ async function bootstrap() {
     const config = new DocumentBuilder()
         .setTitle('Shopping Online')
         .setDescription('The API Description')
-        .setVersion('0.0.1')
-        .addTag('v0.0.1')
+        .setVersion('1.0.0')
+        .addTag('v1.0.0')
         .addBasicAuth()
         .addSecurity('basic', {
             type: 'http',
@@ -22,19 +22,19 @@ async function bootstrap() {
         })
         .build();
 
-    const options: SwaggerDocumentOptions = {
-        operationIdFactory: (controllerKey: string, methodKey: string) =>
-            methodKey
-    };
+    // const options: SwaggerDocumentOptions = {
+    //     operationIdFactory: (controllerKey: string, methodKey: string) =>
+    //         methodKey
+    // };
 
-    const customOptions: SwaggerCustomOptions = {
-        swaggerOptions: {
-            persistAuthorization: true
-        },
-        customSiteTitle: 'My API Docs'
-    };
-    const document = SwaggerModule.createDocument(app, config, options);
-    SwaggerModule.setup('/', app, document, customOptions);
+    // const customOptions: SwaggerCustomOptions = {
+    //     swaggerOptions: {
+    //         persistAuthorization: true
+    //     },
+    //     customSiteTitle: 'My API Docs'
+    // };
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('/', app, document);
 
     let port = process.env.APP_PORT || 3000;
     await app.listen(port);

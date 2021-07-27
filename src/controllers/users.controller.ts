@@ -12,25 +12,28 @@ import { CreateUserDto } from '../dto/create_user.dto';
 import { User } from '../entities/users.entity';
 import { UsersService } from '../services/users.service';
 import { validate } from 'class-validator';
-import { ApiBasicAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiQuery, ApiResponse, ApiSecurity, ApiTags, getSchemaPath } from '@nestjs/swagger';
+import {
+    ApiBasicAuth,
+    ApiBody,
+    ApiCreatedResponse,
+    ApiOkResponse,
+    ApiResponse,
+    ApiSecurity,
+    ApiTags,
+    getSchemaPath
+} from '@nestjs/swagger';
 import { UpdateUserDto } from 'src/dto/update_user.dto';
 const moment = require('moment');
 
 @ApiTags('users')
 @ApiBasicAuth()
-@ApiSecurity('basic')
+// @ApiSecurity('basic')
 @Controller('users')
 export class UsersController {
     constructor(private usersService: UsersService) {}
 
-    @ApiOkResponse({
-        schema: {
-            allOf: [
-                {$ref: getSchemaPath(CreateUserDto)},
-            ]
-        }
-    })
     @Get()
+    @ApiOkResponse({ description: 'List users' })
     async read(@Response() res, @Query() query): Promise<any> {
         try {
             const { phone, name } = query;
@@ -67,7 +70,10 @@ export class UsersController {
         description: '0',
         type: User
     })
-    async create(@Body() createUserDto: CreateUserDto, @Response() res): Promise<any> {
+    async create(
+        @Body() createUserDto: CreateUserDto,
+        @Response() res
+    ): Promise<any> {
         let newUser: User = new User();
         newUser.username = createUserDto.username;
         newUser.password = createUserDto.password;
@@ -117,7 +123,10 @@ export class UsersController {
     }
 
     @Patch()
-    async update(@Body() createUserDto: UpdateUserDto, @Response() res): Promise<any> {
+    async update(
+        @Body() createUserDto: UpdateUserDto,
+        @Response() res
+    ): Promise<any> {
         let _user: User = await this.usersService.findOne(createUserDto.id);
         _user.name = createUserDto.name || _user.name;
         _user.phone = createUserDto.phone || _user.phone;
