@@ -53,11 +53,11 @@ export class User extends BaseEntity {
     is_locked: boolean;
 
     @Column()
-    @CreateDateColumn()
+    @CreateDateColumn({ type: 'timestamp' , default: () => 'CURRENT_TIMESTAMP(6)' })
     created_at: Date;
 
     @Column()
-    @UpdateDateColumn()
+    @UpdateDateColumn({ type: 'timestamp' , default: () => 'CURRENT_TIMESTAMP(6)', onUpdate: 'CURRENT_TIMESTAMP(6)' })
     updated_at: Date;
 
     @OneToMany((type) => Category, (category) => category.user)

@@ -1,4 +1,5 @@
 # compiled output
+txt.sql
 /dist
 /node_modules
 /mysql-data

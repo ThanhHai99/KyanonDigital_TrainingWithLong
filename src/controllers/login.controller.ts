@@ -51,14 +51,31 @@ export class LogInController {
         }
 
         // Get roleId
-        const { id } = user.role;
-
+        const { role } = user;
         // Sing jwt
-        const token = jwt.sign(
-            { userId: user.id, username: user.username, roleId: id },
-            process.env.jwtSecret,
-            { expiresIn: process.env.tokenLifetime }
-        );
+        let token: any;
+        if (role !== null) {
+            const { id } = role;
+            token = jwt.sign(
+                {
+                    userId: user.id,
+                    username: user.username,
+                    roleId: id
+                },
+                process.env.jwtSecret,
+                { expiresIn: process.env.tokenLifetime }
+            );
+        } else {
+            token = jwt.sign(
+                {
+                    userId: user.id,
+                    username: user.username,
+                    roleId: null
+                },
+                process.env.jwtSecret,
+                { expiresIn: process.env.tokenLifetime }
+            );
+        }
 
         // Send the jwt in the response
         res.setHeader('auth', token);
