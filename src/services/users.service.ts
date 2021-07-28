@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entities/users.entity';
-import { EntityId } from 'typeorm/repository/EntityId';
 
 @Injectable()
 export class UsersService {
@@ -11,7 +10,7 @@ export class UsersService {
         private userRepository: Repository<User>
     ) {}
 
-    async findOne(id: EntityId): Promise<User> {
+    async findOne(id: number): Promise<User> {
         return await this.userRepository.findOne(id);
     }
 
@@ -36,74 +35,76 @@ export class UsersService {
         });
     }
 
-    async readOne(name: string, phone: string): Promise<User> {
-        if (name !== undefined && phone === undefined)
-            return this.userRepository.findOne({
-                select: [
-                    'id',
-                    'username',
-                    'name',
-                    'phone',
-                    'address',
-                    'is_locked',
-                    'created_at',
-                    'updated_at'
-                ],
-                where: {
-                    name: name
-                },
-                join: {
-                    alias: 'users',
-                    leftJoinAndSelect: {
-                        role: 'users.role'
-                    }
+    async readById(id: number): Promise<User> {
+        return this.userRepository.findOne({
+            select: [
+                'id',
+                'username',
+                'name',
+                'phone',
+                'address',
+                'is_locked',
+                'created_at',
+                'updated_at'
+            ],
+            where: {
+                id: id
+            },
+            join: {
+                alias: 'users',
+                leftJoinAndSelect: {
+                    role: 'users.role'
                 }
-            });
-        else if (name === undefined && phone !== undefined)
-            return this.userRepository.findOne({
-                select: [
-                    'id',
-                    'username',
-                    'name',
-                    'phone',
-                    'address',
-                    'is_locked',
-                    'created_at',
-                    'updated_at'
-                ],
-                where: {
-                    phone: phone
-                },
-                join: {
-                    alias: 'users',
-                    leftJoinAndSelect: {
-                        role: 'users.role'
-                    }
+            }
+        });
+    }
+
+    async readByName(name: string): Promise<User> {
+        return this.userRepository.findOne({
+            select: [
+                'id',
+                'username',
+                'name',
+                'phone',
+                'address',
+                'is_locked',
+                'created_at',
+                'updated_at'
+            ],
+            where: {
+                name: name
+            },
+            join: {
+                alias: 'users',
+                leftJoinAndSelect: {
+                    role: 'users.role'
                 }
-            });
-        else
-            return this.userRepository.findOne({
-                select: [
-                    'id',
-                    'username',
-                    'name',
-                    'phone',
-                    'address',
-                    'is_locked',
-                    'created_at',
-                    'updated_at'
-                ],
-                where: {
-                    name: name,
-                    phone: phone
-                },
-                join: {
-                    alias: 'users',
-                    leftJoinAndSelect: {
-                        role: 'users.role'
-                    }
+            }
+        });
+    }
+
+    async readByPhone(phone: string): Promise<User> {
+        return this.userRepository.findOne({
+            select: [
+                'id',
+                'username',
+                'name',
+                'phone',
+                'address',
+                'is_locked',
+                'created_at',
+                'updated_at'
+            ],
+            where: {
+                phone: phone
+            },
+            join: {
+                alias: 'users',
+                leftJoinAndSelect: {
+                    role: 'users.role'
                 }
-            });
+            }
+        });
     }
 
     async create(user: User): Promise<User> {
@@ -115,7 +116,7 @@ export class UsersService {
         return await this.findOne(user.id);
     }
 
-    async isSuperAdmin(id: EntityId): Promise<any> {
+    async isSuperAdmin(id: number): Promise<any> {
         const user = await this.userRepository.findOne({
             where: {
                 id: id
@@ -130,7 +131,7 @@ export class UsersService {
         return user.role;
     }
 
-    async lock(id: EntityId): Promise<any> {
+    async lock(id: number): Promise<any> {
         await this.userRepository.update(id, { is_locked: true });
     }
 }

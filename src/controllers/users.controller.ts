@@ -5,8 +5,9 @@ import {
     Get,
     Patch,
     Post,
-    Query,
-    Response
+    Param,
+    Response,
+    Query
 } from '@nestjs/common';
 import { CreateUserDto } from '../dto/create_user.dto';
 import { User } from '../entities/users.entity';
@@ -18,31 +19,92 @@ import {
     ApiCreatedResponse,
     ApiOkResponse,
     ApiResponse,
-    ApiSecurity,
-    ApiTags,
-    getSchemaPath
+    ApiTags
 } from '@nestjs/swagger';
 import { UpdateUserDto } from 'src/dto/update_user.dto';
-const moment = require('moment');
 
 @ApiTags('users')
 @ApiBasicAuth()
-// @ApiSecurity('basic')
 @Controller('users')
 export class UsersController {
     constructor(private usersService: UsersService) {}
 
+    @ApiOkResponse({ description: 'Get all users' })
     @Get()
-    @ApiOkResponse({ description: 'List users' })
-    async read(@Response() res, @Query() query): Promise<any> {
+    async readAll(@Response() res) {
         try {
-            const { phone, name } = query;
-            let user: any;
-            if (phone === undefined && name === undefined) {
-                user = await this.usersService.readAll();
-            } else {
-                user = await this.usersService.readOne(name, phone);
+            let users: User[] = await this.usersService.readAll();
+
+            if (!users) {
+                return res.status(200).json({
+                    error: 0,
+                    data: 0
+                });
             }
+            return res.status(200).json({
+                errors: 0,
+                data: users
+            });
+        } catch (error) {
+            return res.status(500).json({
+                error: 1,
+                message: 'Server occurred an error'
+            });
+        }
+    }
+
+    @ApiOkResponse({ description: "Get a user by user's id" })
+    @Get(':id')
+    async readById(@Response() res, @Param('id') id: number) {
+        try {
+            let user: User = await this.usersService.readById(id);
+            if (!user) {
+                return res.status(200).json({
+                    error: 0,
+                    data: 0
+                });
+            }
+            return res.status(200).json({
+                errors: 0,
+                data: user
+            });
+        } catch (error) {
+            return res.status(500).json({
+                error: 1,
+                message: 'Server occurred an error'
+            });
+        }
+    }
+
+    @ApiOkResponse({ description: "Get a user by user's name" })
+    @Get(':name')
+    async readByName(@Response() res, @Param('name') name: string) {
+        try {
+            let user: User = await this.usersService.readByName(name);
+
+            if (!user) {
+                return res.status(200).json({
+                    error: 0,
+                    data: 0
+                });
+            }
+            return res.status(200).json({
+                errors: 0,
+                data: user
+            });
+        } catch (error) {
+            return res.status(500).json({
+                error: 1,
+                message: 'Server occurred an error'
+            });
+        }
+    }
+
+    @ApiOkResponse({ description: "Get a user by user's phone" })
+    @Get(':phone')
+    async readByPhone(@Response() res, @Param('phone') phone: string) {
+        try {
+            let user: User = await this.usersService.readByPhone(phone);
 
             if (!user) {
                 return res.status(200).json({
@@ -82,8 +144,6 @@ export class UsersController {
         newUser.address = createUserDto.address;
         newUser.role = <any>createUserDto.role;
         newUser.is_locked = false;
-        newUser.created_at = moment().format('YYYY/MM/DD HH:mm');
-        newUser.updated_at = moment().format('YYYY/MM/DD HH:mm');
 
         if (newUser.role === undefined) {
             return res.status(400).json({
