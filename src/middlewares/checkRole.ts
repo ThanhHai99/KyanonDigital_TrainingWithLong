@@ -30,7 +30,7 @@ export const checkRole = (roles: Array<number>) => {
         }
 
         //Check if array of authorized roles includes the user's role
-        if (roles.indexOf(<number>user.role.id) > -1) {
+        if (user.role !== null && roles.indexOf(<number>user.role.id) > -1) {
             next();
         } else {
             res.status(403).json({
