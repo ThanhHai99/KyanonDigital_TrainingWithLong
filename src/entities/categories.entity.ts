@@ -14,6 +14,7 @@ import { Length, IsNotEmpty } from 'class-validator';
 import { Item } from './items.entity';
 import { User } from './users.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { now } from 'moment';
 
 @Entity({ name: 'categories' })
 export class Category extends BaseEntity {
@@ -36,13 +37,13 @@ export class Category extends BaseEntity {
     @ApiProperty()
     @Column()
     @IsNotEmpty()
-    @CreateDateColumn()
+    @CreateDateColumn({ type: 'timestamp' , default: () => 'CURRENT_TIMESTAMP(6)' })
     created_at: Date;
 
     @ApiProperty()
     @Column()
     @IsNotEmpty()
-    @UpdateDateColumn()
+    @UpdateDateColumn({ type: 'timestamp' , default: () => 'CURRENT_TIMESTAMP(6)', onUpdate: 'CURRENT_TIMESTAMP(6)' })
     updated_at: Date;
 
     @OneToMany((type) => Item, (item) => item.category)

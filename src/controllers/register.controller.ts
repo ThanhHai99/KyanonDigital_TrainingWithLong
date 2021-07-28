@@ -3,7 +3,6 @@ import { CreateUserDto } from '../dto/create_user.dto';
 import { User } from '../entities/users.entity';
 import { RegisterService } from '../services/register.service';
 import { validate } from 'class-validator';
-const moment = require('moment');
 
 @Controller('register')
 export class RegisterController {
@@ -18,9 +17,7 @@ export class RegisterController {
         newUser.phone = createUserDto.phone;
         newUser.address = createUserDto.address;
         newUser.role = null;
-        newUser.created_at = moment().format('YYYY/MM/DD HH:mm');
-        newUser.updated_at = moment().format('YYYY/MM/DD HH:mm');
-        
+
         const errors = await validate(newUser);
         if (errors.length > 0) {
             return res.status(400).json({
@@ -28,7 +25,7 @@ export class RegisterController {
                 data: errors
             });
         }
-        
+
         try {
             newUser.hashPassword();
             const user = await this.registerService.isNotExisting(newUser);

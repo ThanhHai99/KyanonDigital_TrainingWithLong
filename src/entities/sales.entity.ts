@@ -24,12 +24,10 @@ export class Sale extends BaseEntity {
 
     @Column()
     @IsNotEmpty()
-    @CreateDateColumn()
     start_date: Date;
 
     @Column()
     @IsNotEmpty()
-    @CreateDateColumn()
     end_date: Date;
 
     @Column()
@@ -46,12 +44,19 @@ export class Sale extends BaseEntity {
 
     @Column()
     @IsNotEmpty()
-    @CreateDateColumn()
+    @CreateDateColumn({
+        type: 'timestamp',
+        default: () => 'CURRENT_TIMESTAMP(6)'
+    })
     created_at: Date;
 
     @Column()
     @IsNotEmpty()
-    @UpdateDateColumn()
+    @UpdateDateColumn({
+        type: 'timestamp',
+        default: () => 'CURRENT_TIMESTAMP(6)',
+        onUpdate: 'CURRENT_TIMESTAMP(6)'
+    })
     updated_at: Date;
 
     @ManyToOne((type) => Item, (item) => item.sales)
