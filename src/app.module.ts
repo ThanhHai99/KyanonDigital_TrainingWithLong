@@ -23,6 +23,7 @@ import { Category } from './entities/categories.entity';
 import { checkRole } from './middlewares/checkRole';
 import { Warehouse } from './entities/warehouses.entity';
 import { WarehouseModule } from './modules/warehouses.module';
+import { SaleModule } from './modules/sales.module';
 require('dotenv').config();
 
 @Module({
@@ -53,6 +54,7 @@ require('dotenv').config();
         RolesModule,
         UsersModule,
         WarehouseModule,
+        SaleModule,
         RegisterModule,
         LoginModule,
         LogoutModule
@@ -64,8 +66,9 @@ export class AppModule implements NestModule {
     constructor(private connection: Connection) {}
 
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(checkJwt, checkRole([0])).forRoutes('users');
-        consumer.apply(checkJwt, checkRole([0])).forRoutes('roles');
-        consumer.apply(checkJwt, checkRole([0, 1])).forRoutes('warehouses');
+        consumer.apply(checkJwt, checkRole([1])).forRoutes('users');
+        consumer.apply(checkJwt, checkRole([1])).forRoutes('roles');
+        consumer.apply(checkJwt, checkRole([1, 2])).forRoutes('warehouses');
+        consumer.apply(checkJwt, checkRole([1, 3])).forRoutes('sales');
     }
 }
