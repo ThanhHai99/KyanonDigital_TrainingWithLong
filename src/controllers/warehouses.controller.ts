@@ -1,10 +1,9 @@
-import { Controller, Query, Get, Response } from '@nestjs/common';
+import { Controller, Get, Response } from '@nestjs/common';
 import {
     ApiBasicAuth,
     ApiOkResponse,
     ApiSecurity,
     ApiTags,
-    getSchemaPath
 } from '@nestjs/swagger';
 import { Warehouse } from 'src/entities/warehouses.entity';
 import { WarehouseService } from '../services/warehouses.service';
@@ -16,24 +15,13 @@ import { WarehouseService } from '../services/warehouses.service';
 export class WarehouseController {
     constructor(private warehouseService: WarehouseService) {}
 
-    @ApiOkResponse({
-        schema: {
-            oneOf: [{ $ref: getSchemaPath(Warehouse) }]
-        }
-    })
+    @ApiOkResponse({ description: 'Get all item in warehouses' })
     @Get()
-    async read(@Response() res, @Query() query) {
+    async readAll(@Response() res) {
         try {
-            const { id } = query;
-            let warehouse: any;
+            let warehouses: Warehouse[] = await this.warehouseService.readAll();
 
-            if (id === undefined) {
-                warehouse = await this.warehouseService.readAll();
-            } else {
-                warehouse = await this.warehouseService.readOne(id);
-            }
-
-            if (!warehouse) {
+            if (!warehouses) {
                 return res.status(200).json({
                     error: 0,
                     data: 0
@@ -41,7 +29,7 @@ export class WarehouseController {
             }
             return res.status(200).json({
                 errors: 0,
-                data: warehouse
+                data: warehouses
             });
         } catch (error) {
             return res.status(500).json({
