@@ -13,4 +13,8 @@ export class RolesService {
     readAll(): Promise<Role[]> {
         return this.roleRepository.find();
     }
+
+    readOne(id: number): Promise<Role> {
+        return this.roleRepository.findOne(id);
+    }
 }
