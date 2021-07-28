@@ -3,7 +3,7 @@ import {
     ApiBasicAuth,
     ApiOkResponse,
     ApiSecurity,
-    ApiTags,
+    ApiTags
 } from '@nestjs/swagger';
 import { Warehouse } from 'src/entities/warehouses.entity';
 import { WarehouseService } from '../services/warehouses.service';
