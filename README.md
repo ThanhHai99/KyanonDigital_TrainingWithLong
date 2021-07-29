@@ -107,17 +107,21 @@ Hệ thống sẽ trả về biến auth trong Header
 </p>
 
 Hệ thống sẽ làm rỗng biến auth trong Header
+
 <p align="left">
 	<img src="./doc/image/_jwt.png" width="800" />
 </p>
 
 Thêm biến auth vào Header trong những route tiếp theo
 Chú ý: Nếu dùng browser, bạn không phải thực hiện bước mày mà hệ thống sẽ tự động ghi vào browser.
+
 <p align="left">
 	<img src="./doc/image/jwt_.png" width="800" />
 </p>
 
-### Get all users
+### User
+
+#### Get all users
 
 `Route (GET) /users`
 
@@ -125,32 +129,31 @@ Chú ý: Nếu dùng browser, bạn không phải thực hiện bước mày mà
 	<img src="./doc/image/getAllUsers.png" width="800" />
 </p>
 
-### Get user by user's id
+#### Get user by user's id
 
-`Route (GET) /users/:id`
-
-<p align="left">
-	<img src="./doc/image/getUserById.png" width="800" />
-</p>
-
-### Get user by user's name
-
-`Route (GET) /users/:name`
+`Route (GET) /users/id/:id`
 
 <p align="left">
 	<img src="./doc/image/getUserById.png" width="800" />
 </p>
 
-### Get user by user's phone
+#### Get user by user's name
 
-`Route (GET) /users/:phone`
+`Route (GET) /users/name/:name`
 
 <p align="left">
-	<img src="./doc/image/getUserById.png" width="800" />
+	<img src="./doc/image/getUserByName.png" width="800" />
 </p>
 
+#### Get user by user's phone
 
-### Create a new user
+`Route (GET) /users/phone/:phone`
+
+<p align="left">
+	<img src="./doc/image/getUserByPhone.png" width="800" />
+</p>
+
+#### Create a new user
 
 `Route (POST) /users`
 
@@ -158,13 +161,31 @@ Chú ý: Nếu dùng browser, bạn không phải thực hiện bước mày mà
 	<img src="./doc/image/createUser.png" width="800" />
 </p>
 
-### Delete a user
+#### Lock a user
 
 `Route (DELETE) /users?id=`
 
 <p align="left">
-	<img src="./doc/image/deleteUser.png" width="800" />
+	<img src="./doc/image/lockUser.png" width="800" />
 </p>
+
+#### Update a user
+
+`Route (PATCH) /users`
+
+<p align="left">
+	<img src="./doc/image/updateUser.png" width="800" />
+</p>
+
+### Sale
+
+### Item
+
+### Warehouse
+
+### Importing
+
+### Exporting
 
 # Thông tin liên lạc
 
