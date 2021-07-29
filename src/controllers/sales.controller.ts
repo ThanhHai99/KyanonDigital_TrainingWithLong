@@ -19,7 +19,7 @@ export class SaleController {
     @Get()
     async readAll(@Response() res) {
         try {
-            let sales: Sale[] = await this.saleService.readAll();
+            let sales: Sale[] = await this.saleService.getAll();
             if (!sales) {
                 return res.status(200).json({
                     error: 0,
@@ -42,7 +42,7 @@ export class SaleController {
     @Get(':id')
     async readById(@Response() res, @Param('id') id: number) {
         try {
-            let sale: Sale = await this.saleService.readById(id);
+            let sale: Sale = await this.saleService.getById(id);
 
             if (!sale) {
                 return res.status(200).json({

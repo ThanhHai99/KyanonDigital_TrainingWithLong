@@ -33,7 +33,7 @@ export class UsersController {
     @Get()
     async readAll(@Response() res) {
         try {
-            let users: User[] = await this.usersService.readAll();
+            let users: User[] = await this.usersService.getAll();
 
             if (!users) {
                 return res.status(200).json({
@@ -57,7 +57,7 @@ export class UsersController {
     @Get('/id/:id')
     async readById(@Response() res, @Param('id') id: number) {
         try {
-            let user: User = await this.usersService.readById(id);
+            let user: User = await this.usersService.getById(id);
             if (!user) {
                 return res.status(200).json({
                     error: 0,
@@ -80,7 +80,7 @@ export class UsersController {
     @Get('/name/:name')
     async readByName(@Response() res, @Param('name') name: string) {
         try {
-            let user: User = await this.usersService.readByName(name);
+            let user: User = await this.usersService.getByName(name);
 
             if (!user) {
                 return res.status(200).json({
@@ -104,7 +104,7 @@ export class UsersController {
     @Get('/phone/:phone')
     async readByPhone(@Response() res, @Param('phone') phone: string) {
         try {
-            let user: User = await this.usersService.readByPhone(phone);
+            let user: User = await this.usersService.getByPhone(phone);
 
             if (!user) {
                 return res.status(200).json({
@@ -187,7 +187,7 @@ export class UsersController {
         @Body() updateUserDto: UpdateUserDto,
         @Response() res
     ): Promise<any> {
-        let _user: User = await this.usersService.findOne(updateUserDto.id);
+        let _user: User = await this.usersService.getById(updateUserDto.id);
         _user.name = updateUserDto.name || _user.name;
         _user.phone = updateUserDto.phone || _user.phone;
         _user.address = updateUserDto.address || _user.address;

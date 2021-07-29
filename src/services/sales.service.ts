@@ -10,11 +10,11 @@ export class SaleService {
         private itemRepository: Repository<Sale>,
     ) {};
 
-    readAll(): Promise<Sale[]> {
+    getAll(): Promise<Sale[]> {
         return this.itemRepository.find();
     };
 
-    readById(id: number): Promise<Sale> {
+    getById(id: number): Promise<Sale> {
         return this.itemRepository.findOne(id);
     };
 };

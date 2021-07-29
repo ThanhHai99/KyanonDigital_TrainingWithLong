@@ -10,7 +10,7 @@ export class WarehouseService {
         private warehouseRepository: Repository<Warehouse>
     ) {}
 
-    readAll(): Promise<Warehouse[]> {
+    getAll(): Promise<Warehouse[]> {
         return this.warehouseRepository.find({
             select: [
                 'id',

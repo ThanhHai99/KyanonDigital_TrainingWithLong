@@ -10,11 +10,11 @@ export class RolesService {
         private roleRepository: Repository<Role>
     ) {}
 
-    readAll(): Promise<Role[]> {
+    getAll(): Promise<Role[]> {
         return this.roleRepository.find();
     }
 
-    readOne(id: number): Promise<Role> {
+    getById(id: number): Promise<Role> {
         return this.roleRepository.findOne(id);
     }
 }

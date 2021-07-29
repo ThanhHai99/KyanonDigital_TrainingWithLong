@@ -19,7 +19,7 @@ export class RolesController {
     @Get()
     async readAll(@Response() res) {
         try {
-            const roles: Role[] = await this.rolesService.readAll();
+            const roles: Role[] = await this.rolesService.getAll();
             if (!roles) {
                 return res.status(200).json({
                     error: 0,
@@ -42,7 +42,7 @@ export class RolesController {
     @Get(':id')
     async readOne(@Response() res, @Param('id') id: number) {
         try {
-            const role: Role = await this.rolesService.readOne(id);
+            const role: Role = await this.rolesService.getById(id);
             if (!role) {
                 return res.status(200).json({
                     error: 0,

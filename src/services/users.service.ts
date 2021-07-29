@@ -10,11 +10,11 @@ export class UsersService {
         private userRepository: Repository<User>
     ) {}
 
-    async findOne(id: number): Promise<User> {
+    async _findOne(id: number): Promise<User> {
         return await this.userRepository.findOne(id);
     }
 
-    async readAll(): Promise<User[]> {
+    async getAll(): Promise<User[]> {
         return this.userRepository.find({
             select: [
                 'id',
@@ -35,7 +35,7 @@ export class UsersService {
         });
     }
 
-    async readById(id: number): Promise<User> {
+    async getById(id: number): Promise<User> {
         return this.userRepository.findOne({
             select: [
                 'id',
@@ -59,7 +59,7 @@ export class UsersService {
         });
     }
 
-    async readByName(name: string): Promise<User> {
+    async getByName(name: string): Promise<User> {
         return this.userRepository.findOne({
             select: [
                 'id',
@@ -83,7 +83,7 @@ export class UsersService {
         });
     }
 
-    async readByPhone(phone: string): Promise<User> {
+    async getByPhone(phone: string): Promise<User> {
         return this.userRepository.findOne({
             select: [
                 'id',
@@ -113,7 +113,7 @@ export class UsersService {
 
     async update(user: User): Promise<User> {
         await this.userRepository.save(user);
-        return await this.findOne(user.id);
+        return await this._findOne(user.id);
     }
 
     async isSuperAdmin(id: number): Promise<any> {
