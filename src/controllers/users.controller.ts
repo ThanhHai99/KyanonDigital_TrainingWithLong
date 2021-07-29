@@ -54,7 +54,7 @@ export class UsersController {
     }
 
     @ApiOkResponse({ description: "Get a user by user's id" })
-    @Get(':id')
+    @Get('/id/:id')
     async readById(@Response() res, @Param('id') id: number) {
         try {
             let user: User = await this.usersService.readById(id);
@@ -77,7 +77,7 @@ export class UsersController {
     }
 
     @ApiOkResponse({ description: "Get a user by user's name" })
-    @Get(':name')
+    @Get('/name/:name')
     async readByName(@Response() res, @Param('name') name: string) {
         try {
             let user: User = await this.usersService.readByName(name);
@@ -101,7 +101,7 @@ export class UsersController {
     }
 
     @ApiOkResponse({ description: "Get a user by user's phone" })
-    @Get(':phone')
+    @Get('/phone/:phone')
     async readByPhone(@Response() res, @Param('phone') phone: string) {
         try {
             let user: User = await this.usersService.readByPhone(phone);
