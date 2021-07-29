@@ -1,10 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import {
-    SwaggerCustomOptions,
-    SwaggerDocumentOptions
-} from './configs/swagger.config';
 require('dotenv').config();
 
 async function bootstrap() {
@@ -22,17 +18,6 @@ async function bootstrap() {
         })
         .build();
 
-    // const options: SwaggerDocumentOptions = {
-    //     operationIdFactory: (controllerKey: string, methodKey: string) =>
-    //         methodKey
-    // };
-
-    // const customOptions: SwaggerCustomOptions = {
-    //     swaggerOptions: {
-    //         persistAuthorization: true
-    //     },
-    //     customSiteTitle: 'My API Docs'
-    // };
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('/', app, document);
 

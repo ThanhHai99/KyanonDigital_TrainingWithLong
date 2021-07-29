@@ -2,106 +2,72 @@
 
 -   [Giới thiệu](#Giới-thiệu)
 -   [Điều kiện tiên quyết](#Điều-kiện-tiên-quyết)
--   [Cách cài đặt](#Cách-cài-đặt)
--   [Cách sử dụng](#Cách-sử-dụng)
-    -   [Hướng dẫn sử dụng ứng dụng bằng Insomnia](#Hướng-dẫn-sử-dụng-ứng-dụng-bằng-Insomnia)
-        -   [Get all users](#Get-all-users)
-        -   [Get user by id](#Get-user-by-id)
-        -   [Create a new user](#Create-a-new-user)
-        -   [Delete a user](#Delete-a-user)
-        -   [Sign Up](#Sign-Up)
-        -   [Sign In](#Sign-In)
+-   [Cách thực thi](#Cách-thực-thi)
+    -   [Thực thi với npm](#Thực-thi-với-npm)
+    -   [Thực thi với docker](#Thực-thi-với-docker)
 -   [Thông tin liên lạc](#Thông-tin-liên-lạc)
 
-## Giới thiệu
+# Giới thiệu
 
-Ứng dụng quản lý danh sách công việc cần làm, được viết bằng JavaScript.
+Ứng dụng shopping online, được viết bằng JavaScript 😑😑
 
-## Điều kiện tiên quyết
+# Điều kiện tiên quyết
 
 Đã cài đặt nodejs <https://nodejs.org/en/download/>
 
-## Cách cài đặt
+Đã cài đặt thư viện `ts-node (v10.1.0)`
 
--   **Bước 1**: Cài đặt những thư viện cần thiết cho dự án
+```console
+$ npm install ts-node@10.1.0 -g
+```
+
+# Cách thực thi
+
+## Thực thi với npm
+
+-   **Bước 1**: Mở cmd tại source code
+
+-   **Bước 2**: Cài đặt những thư viện cần thiết cho dự án
 
 ```console
 $ npm install nest -g
 $ npm install
 ```
 
--   **Bước 2**: Thiết lập thông tin tại file `./.env`
--   **Bước 3**: Khởi chạy dự án
+-   **Bước 3**: Đổi tên file `./.env.example` thành `./.env`
+
+-   **Bước 4**: Thiết lập biến môi trường tại file `./.env`
+
+-   **Bước 5**: Khởi chạy dự án
 
 ```console
 $ npm start
 ```
 
-## Cách sử dụng
+## Thực thi với docker
 
-### Hướng dẫn sử dụng ứng dụng bằng Insomnia
+-   **Bước 0**: Cài đặt docker <https://www.docker.com/products/docker-desktop>
 
-Cài đặt Insomnia <https://insomnia.rest/download>
+-   **Bước 1**: Mở cmd tại source code
 
-#### Sign Up
+-   **Bước 2**: Cài đặt những thư viện cần thiết cho dự án
 
-`Route (POST) /register`
+```console
+$ npm install nest -g
+$ npm install
+```
 
-<p align="left">
-	<img src="./doc/image/register.png" width="800" />
-</p>
+-   **Bước 3**: Đổi tên file `./.env.example` thành `./.env`
 
-#### Sign In
+-   **Bước 4**: Thiết lập biến môi trường tại file `./.env`
 
-`Route (POST) /logIn`
+-   **Bước 5**: Khởi chạy dự án
 
-<p align="left">
-	<img src="./doc/image/logIn.png" width="800" />
-</p>
-Hệ thống sẽ trả về biến auth trong Header
-<p align="left">
-	<img src="./doc/image/_auth.png" width="800" />
-</p>
+```console
+$ docker-compose up
+```
 
-#### Get all users
-
-`Route (GET) /users`
-Thêm biến auth vào Header trong những route tiếp theo
-Chú ý: Nếu dùng bằng browser, bạn không phải thực hiện bước mày mà hệ thống sẽ tự động ghi vào browser.
-
-<p align="left">
-	<img src="./doc/image/__auth.png" width="800" />
-</p>
-Tiếp tục
-<p align="left">
-	<img src="./doc/image/getAllUsers.png" width="800" />
-</p>
-
-#### Get user by id
-
-`Route (GET) /users/:id`
-
-<p align="left">
-	<img src="./doc/image/getUserById.png" width="800" />
-</p>
-
-#### Create a new user
-
-`Route (POST) /users`
-
-<p align="left">
-	<img src="./doc/image/createUser.png" width="800" />
-</p>
-
-#### Delete a user
-
-`Route (DELETE) /users?id=`
-
-<p align="left">
-	<img src="./doc/image/deleteUser.png" width="800" />
-</p>
-
-## Thông tin liên lạc
+# Thông tin liên lạc
 
 Rất mong nhận được nhận được ý kiến, nhận xét của bạn đọc.
 Nếu có bất kì thắc mắc gì, vui lòng liên hệ địa chỉ email sau:

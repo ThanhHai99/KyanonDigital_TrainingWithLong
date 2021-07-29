@@ -1,41 +1,41 @@
-version: "3.5"
+version: '3.5'
 
 services:
-  kyanon:
-    build: ./
-    image: node:12
-    links:
-      - mysql
-    ports:
-      - "8888:3000"
-    networks:
-      - back-tier
-    volumes:
-      - .:/var/www/html/kyanon
-    environment:
-      - ALLOW_OVERRIDE=true
-    hostname: kyanon
-    depends_on:
-      - mysql
-    command: npm run start:dev
-    cpu_shares: 512
-    mem_limit: 536870912
+    kyanon:
+        build: ./
+        image: node:12
+        links:
+            - mysql
+        ports:
+            - '${APP_PORT}:${APP_PORT}'
+        networks:
+            - back-tier
+        volumes:
+            - .:/var/www/html/kyanon
+        environment:
+            - ALLOW_OVERRIDE=true
+        hostname: kyanon
+        depends_on:
+            - mysql
+        command: npm run start:dev
+        cpu_shares: 512
+        mem_limit: 536870912
 
-  mysql:
-    container_name: mysql
-    image: mysql
-    ports:
-      - "3306:3306"
-    networks:
-      - back-tier
-    volumes:
-      - ./mysql-data/:/var/lib/mysql/
-    environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=test
-    hostname: mysql
-    cpu_shares: 512
-    mem_limit: 536870912
-  
+    mysql:
+        container_name: mysql
+        image: mysql
+        ports:
+            - '${DB_PORT}:${DB_PORT}'
+        networks:
+            - back-tier
+        volumes:
+            - ./mysql-data/:/var/lib/mysql/
+        environment:
+            - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+            - MYSQL_DATABASE=${DB_DATABASE}
+        hostname: ${DB_HOST}
+        cpu_shares: 512
+        mem_limit: 536870912
+
 networks:
-  back-tier: 
+    back-tier:
