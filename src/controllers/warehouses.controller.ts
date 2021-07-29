@@ -19,7 +19,7 @@ export class WarehouseController {
     @Get()
     async readAll(@Response() res) {
         try {
-            let warehouses: Warehouse[] = await this.warehouseService.readAll();
+            let warehouses: Warehouse[] = await this.warehouseService.getAll();
 
             if (!warehouses) {
                 return res.status(200).json({
