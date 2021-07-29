@@ -152,7 +152,7 @@ export class UsersController {
             });
         }
 
-        if (newUser.role == <any>0) {
+        if (newUser.role == <any>1) {
             return res.status(400).json({
                 error: 1,
                 message: 'Not allowed to create another super admin'
@@ -184,13 +184,13 @@ export class UsersController {
 
     @Patch()
     async update(
-        @Body() createUserDto: UpdateUserDto,
+        @Body() updateUserDto: UpdateUserDto,
         @Response() res
     ): Promise<any> {
-        let _user: User = await this.usersService.findOne(createUserDto.id);
-        _user.name = createUserDto.name || _user.name;
-        _user.phone = createUserDto.phone || _user.phone;
-        _user.address = createUserDto.address || _user.address;
+        let _user: User = await this.usersService.findOne(updateUserDto.id);
+        _user.name = updateUserDto.name || _user.name;
+        _user.phone = updateUserDto.phone || _user.phone;
+        _user.address = updateUserDto.address || _user.address;
 
         const errors = await validate(_user);
         if (errors.length > 0) {
