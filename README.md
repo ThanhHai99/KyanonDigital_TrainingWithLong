@@ -6,11 +6,29 @@
     -   [Thực thi với npm](#Thực-thi-với-npm)
     -   [Thực thi với docker](#Thực-thi-với-docker)
 -   [Cách sử dụng](#Cách-sử-dụng)
+    -   [Hướng dẫn chung](#Hướng-dẫn-chung)
+    -   [Hướng dẫn sử dụng ứng dụng với Insomnia](#Hướng-dẫn-sử-dụng-ứng-dụng-với-Insomnia)
+        -   [Register]
+        -   [Login]
+        -   [Logout]
+        -   [User](#User)
+            -   [Get all users](Get-all-users)
+            -   [Get user by user's id](Get-user-by-user's-id)
+            -   [Get user by user's name](Get-user-by-user's-name)
+            -   [Get user by user's phone](Get-user-by-user's-phone)
+            -   [Create a new user](Create-a-new-user)
+            -   [Lock a user](Lock-a-user)
+            -   [Update a user](Update-a-user)
+        -   [Sale]
+        -   [Item]
+        -   [Warehouse]
+        -   [Importing]
+        -   [Exporting]
 -   [Thông tin liên lạc](#Thông-tin-liên-lạc)
 
 # Giới thiệu
 
-Ứng dụng shopping online, được viết bằng JavaScript 😑😑
+Ứng dụng shopping online, được viết bằng ngôn ngữ JavaScript 😑😑
 
 # Điều kiện tiên quyết
 
@@ -39,7 +57,19 @@ $ npm install
 
 -   **Bước 4**: Thiết lập biến môi trường tại file `./.env`
 
--   **Bước 5**: Khởi chạy dự án
+-   **Bước 5**: Khởi chạy ứng dụng | tự động tạo các bảng đã định nghĩa (nếu chưa có bảng đó)
+
+```console
+$ npm start
+```
+
+-   **Bước 6(Tùy chọn)**: Tạo dữ liệu mẫu
+
+```console
+$ npm run db:sync
+```
+
+-   **Bước 7**: Khởi chạy ứng dụng
 
 ```console
 $ npm start
@@ -74,7 +104,7 @@ $ docker-compose up
 
 Xem hướng dẫn tại http://your-hosts/#/
 
-## Hướng dẫn sử dụng ứng dụng bằng Insomnia
+## Hướng dẫn sử dụng ứng dụng với Insomnia
 
 Cài đặt Insomnia <https://insomnia.rest/download>
 

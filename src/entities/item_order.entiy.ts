@@ -6,15 +6,14 @@ import {
     Entity,
     PrimaryGeneratedColumn
 } from 'typeorm';
-import { IsNotEmpty, Length } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 import { Item } from '../entities/items.entity';
-import { Order } from '../entities/order.entity';
-import { ApiProperty } from '@nestjs/swagger';
+import { Order } from './orders.entity';
 
-@Entity({ name: 'item_orders' })
+@Entity({ name: 'item_order' })
 export class ItemOrder extends BaseEntity {
-    @ApiProperty()
     @Column()
+    @IsNotEmpty()
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -26,12 +25,10 @@ export class ItemOrder extends BaseEntity {
     @JoinColumn({ name: 'order_id' })
     order: Order;
 
-    @ApiProperty()
     @Column()
     @IsNotEmpty()
     price: number;
 
-    @ApiProperty()
     @Column()
     @IsNotEmpty()
     amount: number;

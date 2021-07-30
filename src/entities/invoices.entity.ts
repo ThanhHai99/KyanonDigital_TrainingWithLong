@@ -8,12 +8,13 @@ import {
     CreateDateColumn,
     UpdateDateColumn
 } from 'typeorm';
-import { Length, IsNotEmpty } from 'class-validator';
-import { Order } from '../entities/order.entity';
+import { IsNotEmpty, Length } from 'class-validator';
+import { Order } from './orders.entity';
 
 @Entity({ name: 'invoices' })
 export class Invoice extends BaseEntity {
     @Column()
+    @IsNotEmpty()
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -30,16 +31,19 @@ export class Invoice extends BaseEntity {
     phone: string;
 
     @Column()
-    @Length(11)
+    @IsNotEmpty()
     created_by: number;
 
-    @Column()
-    @IsNotEmpty()
-    @CreateDateColumn({ type: 'timestamp' , default: () => 'CURRENT_TIMESTAMP(6)' })
+    @CreateDateColumn({
+        type: 'timestamp',
+        default: () => 'CURRENT_TIMESTAMP(6)'
+    })
     created_at: Date;
 
-    @Column()
-    @IsNotEmpty()
-    @UpdateDateColumn({ type: 'timestamp' , default: () => 'CURRENT_TIMESTAMP(6)', onUpdate: 'CURRENT_TIMESTAMP(6)' })
+    @UpdateDateColumn({
+        type: 'timestamp',
+        default: () => 'CURRENT_TIMESTAMP(6)',
+        onUpdate: 'CURRENT_TIMESTAMP(6)'
+    })
     updated_at: Date;
 }

@@ -168,7 +168,6 @@ export class UsersController {
         }
 
         try {
-            newUser.hashPassword();
             const user = await this.usersService.create(newUser);
             return res.status(201).json({
                 error: 0,

@@ -1,4 +1,4 @@
-import { Controller, Query, Get, Response, Param } from '@nestjs/common';
+import { Controller, Query, Get, Response, Param, Post } from '@nestjs/common';
 import {
     ApiBasicAuth,
     ApiOkResponse,

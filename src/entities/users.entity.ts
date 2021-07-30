@@ -8,19 +8,22 @@ import {
     UpdateDateColumn,
     ManyToOne,
     JoinColumn,
-    OneToMany
+    OneToMany,
+    BeforeInsert,
+    BeforeUpdate
 } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { IsNotEmpty, MinLength, IsPhoneNumber } from 'class-validator';
 import { Role } from 'src/entities/roles.entity';
 import { Category } from './categories.entity';
-import { Price } from './price.entity';
+import { Price } from './prices.entity';
 import { Sale } from './sales.entity';
 import { Item } from './items.entity';
 
 @Entity({ name: 'users' })
 export class User extends BaseEntity {
     @Column()
+    @IsNotEmpty()
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -38,6 +41,7 @@ export class User extends BaseEntity {
     name: string;
 
     @Column()
+    @IsNotEmpty()
     @IsPhoneNumber('VN')
     phone: string;
 
@@ -52,12 +56,17 @@ export class User extends BaseEntity {
     @Column({ default: false })
     is_locked: boolean;
 
-    @Column()
-    @CreateDateColumn({ type: 'timestamp' , default: () => 'CURRENT_TIMESTAMP(6)' })
+    @CreateDateColumn({
+        type: 'timestamp',
+        default: () => 'CURRENT_TIMESTAMP(6)'
+    })
     created_at: Date;
 
-    @Column()
-    @UpdateDateColumn({ type: 'timestamp' , default: () => 'CURRENT_TIMESTAMP(6)', onUpdate: 'CURRENT_TIMESTAMP(6)' })
+    @UpdateDateColumn({
+        type: 'timestamp',
+        default: () => 'CURRENT_TIMESTAMP(6)',
+        onUpdate: 'CURRENT_TIMESTAMP(6)'
+    })
     updated_at: Date;
 
     @OneToMany((type) => Category, (category) => category.user)
@@ -72,6 +81,8 @@ export class User extends BaseEntity {
     @OneToMany((type) => Item, (item) => item.user)
     items: Item[];
 
+    @BeforeInsert()
+    @BeforeUpdate()
     hashPassword() {
         this.password = bcrypt.hashSync(this.password, 8);
     }

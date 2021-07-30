@@ -8,25 +8,28 @@ import {
     Entity,
     PrimaryGeneratedColumn
 } from 'typeorm';
-import { IsNotEmpty, Length } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 import { User } from './users.entity';
 import { Item } from './items.entity';
 
 @Entity({ name: 'sales' })
 export class Sale extends BaseEntity {
     @Column()
+    @IsNotEmpty()
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column()
-    @Length(11)
+    @IsNotEmpty()
     item_id: number;
 
-    @Column()
-    @IsNotEmpty()
+    @CreateDateColumn({
+        type: 'timestamp',
+        default: () => 'CURRENT_TIMESTAMP(6)'
+    })
     start_date: Date;
 
-    @Column()
+    @Column({ type: 'timestamp' })
     @IsNotEmpty()
     end_date: Date;
 
@@ -42,16 +45,12 @@ export class Sale extends BaseEntity {
     @JoinColumn({ name: 'created_by' })
     user: User;
 
-    @Column()
-    @IsNotEmpty()
     @CreateDateColumn({
         type: 'timestamp',
         default: () => 'CURRENT_TIMESTAMP(6)'
     })
     created_at: Date;
 
-    @Column()
-    @IsNotEmpty()
     @UpdateDateColumn({
         type: 'timestamp',
         default: () => 'CURRENT_TIMESTAMP(6)',

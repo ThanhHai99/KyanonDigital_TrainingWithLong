@@ -3,7 +3,9 @@ import { CreateUserDto } from '../dto/create_user.dto';
 import { User } from '../entities/users.entity';
 import { RegisterService } from '../services/register.service';
 import { validate } from 'class-validator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('roles')
 @Controller('register')
 export class RegisterController {
     constructor(private registerService: RegisterService) {}
@@ -27,7 +29,6 @@ export class RegisterController {
         }
 
         try {
-            newUser.hashPassword();
             const user = await this.registerService.isNotExisting(newUser);
             if (!user) {
                 return res.status(409).json({

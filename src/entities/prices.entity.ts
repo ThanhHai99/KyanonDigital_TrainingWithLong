@@ -8,13 +8,14 @@ import {
     CreateDateColumn,
     UpdateDateColumn
 } from 'typeorm';
-import { Length, IsNotEmpty } from 'class-validator';
-import { User } from '../entities/users.entity';
-import { Item } from '../entities/items.entity';
+import { IsNotEmpty, IsEmpty } from 'class-validator';
+import { User } from './users.entity';
+import { Item } from './items.entity';
 
 @Entity({ name: 'prices' })
 export class Price extends BaseEntity {
     @Column()
+    @IsNotEmpty()
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -26,24 +27,30 @@ export class Price extends BaseEntity {
     @JoinColumn({ name: 'item_id' })
     item: Item;
 
-    @Column()
-    @Length(6)
+    @CreateDateColumn({
+        type: 'timestamp',
+        default: () => 'CURRENT_TIMESTAMP(6)'
+    })
     start_date: Date;
 
-    @Column()
+    @Column({ type: 'timestamp' })
+    @IsEmpty()
     end_date: Date;
 
     @ManyToOne((type) => User, (user) => user.prices)
     @JoinColumn({ name: 'created_by' })
     user: User;
 
-    @Column()
-    @IsNotEmpty()
-    @CreateDateColumn({ type: 'timestamp' , default: () => 'CURRENT_TIMESTAMP(6)' })
+    @CreateDateColumn({
+        type: 'timestamp',
+        default: () => 'CURRENT_TIMESTAMP(6)'
+    })
     created_at: Date;
 
-    @Column()
-    @IsNotEmpty()
-    @UpdateDateColumn({ type: 'timestamp' , default: () => 'CURRENT_TIMESTAMP(6)', onUpdate: 'CURRENT_TIMESTAMP(6)' })
+    @UpdateDateColumn({
+        type: 'timestamp',
+        default: () => 'CURRENT_TIMESTAMP(6)',
+        onUpdate: 'CURRENT_TIMESTAMP(6)'
+    })
     updated_at: Date;
 }

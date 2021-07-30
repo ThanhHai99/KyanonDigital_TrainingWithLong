@@ -11,7 +11,7 @@ import {
     Unique
 } from 'typeorm';
 import { IsNotEmpty, Length } from 'class-validator';
-import { Price } from '../entities/price.entity';
+import { Price } from './prices.entity';
 import { Sale } from './sales.entity';
 import { User } from '../entities/users.entity';
 import { ItemOrder } from '../entities/item_order.entiy';
@@ -21,6 +21,7 @@ import { Warehouse } from '../entities/warehouses.entity';
 @Entity({ name: 'items' })
 export class Item extends BaseEntity {
     @Column()
+    @IsNotEmpty()
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -45,14 +46,17 @@ export class Item extends BaseEntity {
     @JoinColumn({ name: 'created_by' })
     user: User;
 
-    @Column()
-    @IsNotEmpty()
-    @CreateDateColumn({ type: 'timestamp' , default: () => 'CURRENT_TIMESTAMP(6)' })
+    @CreateDateColumn({
+        type: 'timestamp',
+        default: () => 'CURRENT_TIMESTAMP(6)'
+    })
     created_at: Date;
 
-    @Column()
-    @IsNotEmpty()
-    @UpdateDateColumn({ type: 'timestamp' , default: () => 'CURRENT_TIMESTAMP(6)', onUpdate: 'CURRENT_TIMESTAMP(6)' })
+    @UpdateDateColumn({
+        type: 'timestamp',
+        default: () => 'CURRENT_TIMESTAMP(6)',
+        onUpdate: 'CURRENT_TIMESTAMP(6)'
+    })
     updated_at: Date;
 
     @OneToMany((type) => Price, (price) => price.item)

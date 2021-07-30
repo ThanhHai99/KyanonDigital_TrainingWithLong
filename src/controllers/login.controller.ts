@@ -1,10 +1,12 @@
 import { Controller, Post, Body, Response } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import * as jwt from 'jsonwebtoken';
 import { CreateUserDto } from '../dto/create_user.dto';
 import { User } from '../entities/users.entity';
 import { LogInService } from '../services/login.service';
 require('dotenv').config();
 
+@ApiTags('roles')
 @Controller('login')
 export class LogInController {
     constructor(private logInService: LogInService) {}
