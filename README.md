@@ -69,12 +69,6 @@ $ npm start
 $ npm run db:sync
 ```
 
--   **Bước 7**: Khởi chạy ứng dụng
-
-```console
-$ npm start
-```
-
 ## Thực thi với docker
 
 -   **Bước 0**: Cài đặt docker <https://www.docker.com/products/docker-desktop>
@@ -92,7 +86,7 @@ $ npm install
 
 -   **Bước 4**: Thiết lập biến môi trường tại file `./.env`
 
--   **Bước 5**: Khởi chạy dự án
+-   **Bước 5**: Deploy ứng dụng với docker
 
 ```console
 $ docker-compose up

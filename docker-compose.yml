@@ -3,6 +3,7 @@ version: '3.5'
 services:
     kyanon:
         build: ./
+        container_name: shopping_online
         image: node:12
         links:
             - mysql
@@ -22,7 +23,7 @@ services:
         mem_limit: 536870912
 
     mysql:
-        container_name: mysql
+        container_name: db_local
         image: mysql
         ports:
             - '${DB_PORT}:${DB_PORT}'
@@ -33,7 +34,7 @@ services:
         environment:
             - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
             - MYSQL_DATABASE=${DB_DATABASE}
-        hostname: ${DB_HOST}
+        hostname: mysql
         cpu_shares: 512
         mem_limit: 536870912
 
