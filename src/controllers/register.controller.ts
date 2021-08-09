@@ -3,9 +3,7 @@ import { CreateUserDto } from '../dto/create_user.dto';
 import { User } from '../entities/users.entity';
 import { RegisterService } from '../services/register.service';
 import { validate } from 'class-validator';
-import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('roles')
 @Controller('register')
 export class RegisterController {
     constructor(private registerService: RegisterService) {}
