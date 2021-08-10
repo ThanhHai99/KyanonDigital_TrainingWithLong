@@ -5,9 +5,9 @@ import {
     Get,
     Patch,
     Post,
-    Param,
     Response,
-    Query
+    Query,
+    Param
 } from '@nestjs/common';
 import { CreateUserDto } from '../dto/create_user.dto';
 import { User } from '../entities/users.entity';
@@ -29,22 +29,34 @@ import { UpdateUserDto } from 'src/dto/update_user.dto';
 export class UsersController {
     constructor(private usersService: UsersService) {}
 
-    @ApiOkResponse({ description: 'Get all users' })
+    @ApiOkResponse({ description: 'Get user(s)' })
     @Get()
-    async readAll(@Response() res) {
+    async read(@Response() res, @Query() query) {
         try {
-            let users: User[] = await this.usersService.getAll();
+            const { name, phone } = query;
+            let user: any;
 
-            if (!users) {
+            if (!!phone && !!name) {
+                user = await this.usersService.getByNameAndPhone(name, phone);
+            } else if (!!phone) {
+                user = await this.usersService.getByPhone(phone);
+            } else if (!!name) {
+                user = await this.usersService.getByName(name);
+            } else {
+                user = await this.usersService.getAll();
+            }
+
+            if (!user || user.length === 0) {
                 return res.status(200).json({
                     error: 0,
                     data: 0
                 });
+            } else {
+                return res.status(200).json({
+                    errors: 0,
+                    data: user
+                });
             }
-            return res.status(200).json({
-                errors: 0,
-                data: users
-            });
         } catch (error) {
             return res.status(500).json({
                 error: 1,
@@ -53,69 +65,23 @@ export class UsersController {
         }
     }
 
-    @ApiOkResponse({ description: "Get a user by user's id" })
-    @Get('/id/:id')
+    @ApiOkResponse({ description: "Get user by user's id" })
+    @Get(':id')
     async readById(@Response() res, @Param('id') id: number) {
         try {
             let user: User = await this.usersService.getById(id);
-            if (!user) {
-                return res.status(200).json({
-                    error: 0,
-                    data: 0
-                });
-            }
-            return res.status(200).json({
-                errors: 0,
-                data: user
-            });
-        } catch (error) {
-            return res.status(500).json({
-                error: 1,
-                message: 'Server occurred an error'
-            });
-        }
-    }
-
-    @ApiOkResponse({ description: "Get a user by user's name" })
-    @Get('/name/:name')
-    async readByName(@Response() res, @Param('name') name: string) {
-        try {
-            let user: User = await this.usersService.getByName(name);
 
             if (!user) {
                 return res.status(200).json({
                     error: 0,
                     data: 0
                 });
-            }
-            return res.status(200).json({
-                errors: 0,
-                data: user
-            });
-        } catch (error) {
-            return res.status(500).json({
-                error: 1,
-                message: 'Server occurred an error'
-            });
-        }
-    }
-
-    @ApiOkResponse({ description: "Get a user by user's phone" })
-    @Get('/phone/:phone')
-    async readByPhone(@Response() res, @Param('phone') phone: string) {
-        try {
-            let user: User = await this.usersService.getByPhone(phone);
-
-            if (!user) {
+            } else {
                 return res.status(200).json({
-                    error: 0,
-                    data: 0
+                    errors: 0,
+                    data: user
                 });
             }
-            return res.status(200).json({
-                errors: 0,
-                data: user
-            });
         } catch (error) {
             return res.status(500).json({
                 error: 1,
@@ -143,7 +109,7 @@ export class UsersController {
         newUser.phone = createUserDto.phone;
         newUser.address = createUserDto.address;
         newUser.role = <any>createUserDto.role;
-        newUser.is_locked = false;
+        // newUser.is_locked = false;
 
         if (newUser.role === undefined) {
             return res.status(400).json({
@@ -167,6 +133,16 @@ export class UsersController {
             });
         }
 
+        const isUsernameExisting =
+            await this.usersService.isUsernameAlreadyInUse(newUser.username);
+
+        if (isUsernameExisting) {
+            return res.status(409).json({
+                error: 1,
+                data: 'Username already exists'
+            });
+        }
+
         try {
             const user = await this.usersService.create(newUser);
             return res.status(201).json({
@@ -186,10 +162,15 @@ export class UsersController {
         @Body() updateUserDto: UpdateUserDto,
         @Response() res
     ): Promise<any> {
-        let _user: User = await this.usersService.getById(updateUserDto.id);
-        _user.name = updateUserDto.name || _user.name;
-        _user.phone = updateUserDto.phone || _user.phone;
-        _user.address = updateUserDto.address || _user.address;
+        let _user: User = await this.usersService._findOne(updateUserDto.id);
+        _user.name = !!updateUserDto.name ? updateUserDto.name : _user.name;
+        _user.phone = !!updateUserDto.phone ? updateUserDto.phone : _user.phone;
+        _user.address = !!updateUserDto.address
+            ? updateUserDto.address
+            : _user.address;
+        _user.password = !!updateUserDto.password
+            ? updateUserDto.password
+            : _user.password;
 
         const errors = await validate(_user);
         if (errors.length > 0) {

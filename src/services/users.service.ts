@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import { User } from '../entities/users.entity';
 
 @Injectable()
@@ -59,8 +59,8 @@ export class UsersService {
         });
     }
 
-    async getByName(name: string): Promise<User> {
-        return this.userRepository.findOne({
+    async getByName(name: string): Promise<User[]> {
+        return this.userRepository.find({
             select: [
                 'id',
                 'username',
@@ -72,7 +72,7 @@ export class UsersService {
                 'updated_at'
             ],
             where: {
-                name: name
+                name: Like('%' + name + '%')
             },
             join: {
                 alias: 'users',
@@ -83,8 +83,8 @@ export class UsersService {
         });
     }
 
-    async getByPhone(phone: string): Promise<User> {
-        return this.userRepository.findOne({
+    async getByPhone(phone: string): Promise<User[]> {
+        return this.userRepository.find({
             select: [
                 'id',
                 'username',
@@ -96,7 +96,32 @@ export class UsersService {
                 'updated_at'
             ],
             where: {
-                phone: phone
+                phone: Like('%' + phone + '%')
+            },
+            join: {
+                alias: 'users',
+                leftJoinAndSelect: {
+                    role: 'users.role'
+                }
+            }
+        });
+    }
+
+    async getByNameAndPhone(name: string, phone: string): Promise<User[]> {
+        return this.userRepository.find({
+            select: [
+                'id',
+                'username',
+                'name',
+                'phone',
+                'address',
+                'is_locked',
+                'created_at',
+                'updated_at'
+            ],
+            where: {
+                name: Like('%' + name + '%'),
+                phone: Like('%' + phone + '%')
             },
             join: {
                 alias: 'users',
@@ -129,6 +154,20 @@ export class UsersService {
             }
         });
         return user.role;
+    }
+
+    async isUsernameAlreadyInUse(username: string): Promise<boolean> {
+        try {
+            const user = await this.userRepository.findOneOrFail({
+                where: {
+                    username: username
+                }
+            });
+            if (user) return true;
+            return false;
+        } catch (error) {
+            return false;
+        }
     }
 
     async lock(id: number): Promise<any> {
