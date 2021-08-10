@@ -10,20 +10,19 @@ import {
     UpdateDateColumn,
     ManyToOne
 } from 'typeorm';
-import { IsNotEmpty, Length } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 import { Item } from './items.entity';
 import { User } from './users.entity';
 
 @Entity({ name: 'categories' })
 export class Category extends BaseEntity {
     @Column()
-    @IsNotEmpty()
     @PrimaryGeneratedColumn()
     id: number;
 
     @Unique(['name'])
     @Column()
-    @Length(256)
+    @IsNotEmpty()
     name: string;
 
     @ManyToOne((type) => User, (user) => user.categories)
