@@ -5,7 +5,7 @@ import {
     ApiSecurity,
     ApiTags
 } from '@nestjs/swagger';
-import { Role } from '../entities/roles.entity';
+import { Role } from 'src/entities/roles.entity';
 import { RolesService } from '../services/roles.service';
 
 @ApiTags('roles')
@@ -15,21 +15,23 @@ import { RolesService } from '../services/roles.service';
 export class RolesController {
     constructor(private rolesService: RolesService) {}
 
-    @ApiOkResponse({ description: 'Get all item in warehouses' })
+    @ApiOkResponse({ description: 'Get role(s)' })
     @Get()
-    async readAll(@Response() res) {
+    async read(@Response() res) {
         try {
             const roles: Role[] = await this.rolesService.getAll();
-            if (!roles) {
+
+            if (!roles || roles.length === 0) {
                 return res.status(200).json({
                     error: 0,
                     data: 0
                 });
+            } else {
+                return res.status(200).json({
+                    errors: 0,
+                    data: roles
+                });
             }
-            return res.status(200).json({
-                errors: 0,
-                data: roles
-            });
         } catch (error) {
             return res.status(500).json({
                 error: 1,
@@ -38,21 +40,23 @@ export class RolesController {
         }
     }
 
-    @ApiOkResponse({ description: "Get a role by role's id" })
+    @ApiOkResponse({ description: "Get role by role's id" })
     @Get(':id')
-    async readOne(@Response() res, @Param('id') id: number) {
+    async readById(@Response() res, @Param('id') id: number) {
         try {
             const role: Role = await this.rolesService.getById(id);
+
             if (!role) {
                 return res.status(200).json({
                     error: 0,
                     data: 0
                 });
+            } else {
+                return res.status(200).json({
+                    errors: 0,
+                    data: role
+                });
             }
-            return res.status(200).json({
-                errors: 0,
-                data: role
-            });
         } catch (error) {
             return res.status(500).json({
                 error: 1,

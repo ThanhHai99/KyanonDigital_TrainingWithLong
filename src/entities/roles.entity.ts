@@ -14,7 +14,6 @@ import { User } from 'src/entities/users.entity';
 @Entity({ name: 'roles' })
 export class Role extends BaseEntity {
     @Column()
-    @IsNotEmpty()
     @PrimaryColumn()
     id: number;
 
