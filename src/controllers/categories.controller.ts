@@ -1,4 +1,12 @@
-import { Controller, Get, Response, Param, Post, Body, Patch } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Response,
+    Param,
+    Post,
+    Body,
+    Patch
+} from '@nestjs/common';
 import {
     ApiBasicAuth,
     ApiBody,
@@ -13,13 +21,18 @@ import { Category } from 'src/entities/categories.entity';
 import { CategoryService } from '../services/categories.service';
 import { validate } from 'class-validator';
 import { UpdateCategoryDto } from 'src/dto/update_category.dto';
+import { CategoryLogService } from 'src/services/category_logs.service';
+import { Category_Log } from 'src/entities/category_logs.entity';
 
 @ApiTags('categories')
 @ApiBasicAuth()
 @ApiSecurity('basic')
 @Controller('categories')
 export class CategoryController {
-    constructor(private categoryService: CategoryService) {}
+    constructor(
+        private readonly categoryService: CategoryService,
+        private readonly categoryLogService: CategoryLogService
+    ) {}
 
     @ApiOkResponse({ description: 'Get all categories' })
     @Get()
@@ -82,7 +95,7 @@ export class CategoryController {
     ): Promise<any> {
         let newCategory: Category = new Category();
         newCategory.name = createCategoryDto.name;
-        newCategory.user = <any> res.locals.jwtPayload.userId; // Get from token
+        newCategory.user = <any>res.locals.jwtPayload.userId; // Get from token
 
         const errors = await validate(newCategory);
         if (errors.length > 0) {
@@ -92,8 +105,9 @@ export class CategoryController {
             });
         }
 
-        const isNameExisting =
-            await this.categoryService.isNameAlreadyInUse(newCategory.name);
+        const isNameExisting = await this.categoryService.isNameAlreadyInUse(
+            newCategory.name
+        );
 
         if (isNameExisting) {
             return res.status(409).json({
@@ -104,6 +118,14 @@ export class CategoryController {
 
         try {
             const category = await this.categoryService.create(newCategory);
+            // Create category log
+            let newCategoryLog: Category_Log = new Category_Log();
+            newCategoryLog.category_id = category.id;
+            newCategoryLog.name = category.name;
+            newCategoryLog.status = 'created';
+            newCategoryLog.created_by = <any>res.locals.jwtPayload.userId; // Get from token
+            await this.categoryLogService.create(newCategoryLog);
+
             return res.status(201).json({
                 error: 0,
                 data: category
@@ -121,8 +143,12 @@ export class CategoryController {
         @Body() updateCategoryDto: UpdateCategoryDto,
         @Response() res
     ): Promise<any> {
-        let _category: Category = await this.categoryService._findOne(updateCategoryDto.id);
-        _category.name = !!updateCategoryDto.name ? updateCategoryDto.name : _category.name;
+        let _category: Category = await this.categoryService._findOne(
+            updateCategoryDto.id
+        );
+        _category.name = !!updateCategoryDto.name
+            ? updateCategoryDto.name
+            : _category.name;
 
         const errors = await validate(_category);
         if (errors.length > 0) {
@@ -133,7 +159,16 @@ export class CategoryController {
         }
 
         try {
-            const category: Category = await this.categoryService.update(_category);
+            const category: Category = await this.categoryService.update(
+                _category
+            );
+            // Create category log
+            let newCategoryLog: Category_Log = new Category_Log();
+            newCategoryLog.category_id = category.id;
+            newCategoryLog.name = category.name;
+            newCategoryLog.status = 'updated';
+            newCategoryLog.created_by = <any>res.locals.jwtPayload.userId; // Get from token
+            await this.categoryLogService.create(newCategoryLog);
             return res.status(200).json({
                 error: 0,
                 data: category
