@@ -3,31 +3,25 @@ import {
     BaseEntity,
     Column,
     Entity,
-    PrimaryGeneratedColumn,
     CreateDateColumn,
     UpdateDateColumn
 } from 'typeorm';
-import { IsNotEmpty, Length } from 'class-validator';
 import { Invoice } from './invoices.entity';
 import { PAY } from 'src/helpers/paymentMethod';
 import { ItemOrder } from './item_order.entiy';
 
 @Entity({ name: 'orders' })
 export class Order extends BaseEntity {
-    @Column()
-    @IsNotEmpty()
-    @PrimaryGeneratedColumn()
+    @Column({ primary: true, generated: true })
     id: number;
 
     @Column()
-    @Length(256)
     delivery_address: string;
 
     @Column({ type: 'enum', enum: PAY, default: 'COD' })
     payment_method: string;
 
     @Column()
-    @IsNotEmpty()
     created_by: number;
 
     @CreateDateColumn({

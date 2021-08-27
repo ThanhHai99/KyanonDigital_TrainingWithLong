@@ -1,41 +1,47 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Role } from 'src/entities/roles.entity';
+import { IsInt, IsNotEmpty, IsPhoneNumber, Min, MinLength } from 'class-validator';
 
-export class CreateUserDto {
-    id: number;
-    
+export class UserDto {
     @ApiProperty({
         description: 'Account using the application',
         type: String
     })
+    @IsNotEmpty()
     username: string;
 
     @ApiProperty({
         description: 'Password used to login the application',
         type: String
     })
+    @MinLength(8)
     password: string;
 
     @ApiProperty({
         description: 'Your fullname',
         type: String
     })
+    @IsNotEmpty()
     name: string;
 
     @ApiProperty({
         description: 'Your phone',
         type: String
     })
+    @IsPhoneNumber('VN')
     phone: string;
 
     @ApiProperty({
         description: 'Your address',
         type: String
     })
+    @IsNotEmpty()
     address: string;
 
     @ApiProperty({
-        type: () => Role
+        description: "Role' account",
+        type: Number
     })
-    role: Role;
+    @IsInt()
+    @Min(0)
+    role: number;
 }

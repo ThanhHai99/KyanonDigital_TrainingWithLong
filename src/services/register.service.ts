@@ -15,8 +15,8 @@ export class RegisterService {
         return this.userRepository.find();
     }
 
-    async isNotExisting(user: User): Promise<any> {
-        const _user = await User.find({ where: { username: user.username } });
+    async isNotExisting(username: string): Promise<any> {
+        const _user = await this.userRepository.find({ where: { username: username } });
         return _user.length === 0;
     }
 }

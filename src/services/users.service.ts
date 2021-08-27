@@ -132,13 +132,14 @@ export class UsersService {
         });
     }
 
-    async create(user: User): Promise<User> {
-        return await this.userRepository.save(user);
+    async create(user: User): Promise<any> {
+        const rs = await this.userRepository.save(user);
+        return this.getById(rs.id);
     }
 
     async update(user: User): Promise<User> {
         await this.userRepository.save(user);
-        return await this._findOne(user.id);
+        return await this.getById(user.id);
     }
 
     async isSuperAdmin(id: number): Promise<any> {
@@ -153,6 +154,7 @@ export class UsersService {
                 }
             }
         });
+        if (!user) return false;
         return user.role;
     }
 

@@ -1,33 +1,26 @@
 import { Controller, Post, Body, Response } from '@nestjs/common';
-import { CreateUserDto } from '../dto/create_user.dto';
-import { User } from '../entities/users.entity';
 import { RegisterService } from '../services/register.service';
-import { validate } from 'class-validator';
+import { BodyRegister, ResponseRegister } from 'src/dto/auth.dto';
+import { User } from 'src/entities/users.entity';
 
 @Controller('register')
 export class RegisterController {
     constructor(private registerService: RegisterService) {}
 
     @Post()
-    async index(@Body() createUserDto: CreateUserDto, @Response() res) {
+    async index(@Body() body: BodyRegister, @Response() res): Promise<ResponseRegister> {
         let newUser = new User();
-        newUser.username = createUserDto.username;
-        newUser.password = createUserDto.password;
-        newUser.name = createUserDto.name;
-        newUser.phone = createUserDto.phone;
-        newUser.address = createUserDto.address;
+        newUser.username = body.username;
+        newUser.password = body.password;
+        newUser.name = body.name;
+        newUser.phone = body.phone;
+        newUser.address = body.address;
         newUser.role = null;
 
-        const errors = await validate(newUser);
-        if (errors.length > 0) {
-            return res.status(400).json({
-                error: 1,
-                data: errors
-            });
-        }
-
         try {
-            const user = await this.registerService.isNotExisting(newUser);
+            const user = await this.registerService.isNotExisting(
+                body.username
+            );
             if (!user) {
                 return res.status(409).json({
                     error: 1,

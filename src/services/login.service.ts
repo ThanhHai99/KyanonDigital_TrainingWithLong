@@ -10,14 +10,9 @@ export class LogInService {
         private userRepository: Repository<User>
     ) {}
 
-    isExisting(user: User): Promise<any> {
-        return this.userRepository.findOneOrFail({
-            select: [
-                'id',
-                'username',
-                'password'
-            ],
-            where: { username: user.username },
+    async isExisting(username: string): Promise<User> {
+        return await this.userRepository.findOneOrFail({
+            where: { username: username },
             join: {
                 alias: 'users',
                 leftJoinAndSelect: {
@@ -27,7 +22,7 @@ export class LogInService {
         });
     }
 
-    checkPassword(user: User): Promise<any> {
-        return user.checkIfUnencryptedPasswordIsValid(user.password);
+    checkPassword(user: User, password: string): Boolean {
+        return user.checkIfUnencryptedPasswordIsValid(password);
     }
 }

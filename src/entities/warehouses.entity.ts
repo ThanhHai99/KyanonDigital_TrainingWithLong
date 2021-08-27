@@ -4,10 +4,8 @@ import {
     ManyToOne,
     BaseEntity,
     Column,
-    Entity,
-    PrimaryGeneratedColumn
+    Entity
 } from 'typeorm';
-import { IsNotEmpty } from 'class-validator';
 import { Item } from 'src/entities/items.entity';
 import { Exporting } from 'src/entities/exportings.entity';
 import { Importing } from 'src/entities/importings.entity';
@@ -15,9 +13,7 @@ import { UpdateDateColumn, CreateDateColumn } from 'typeorm';
 
 @Entity({ name: 'warehouses' })
 export class Warehouse extends BaseEntity {
-    @Column()
-    @IsNotEmpty()
-    @PrimaryGeneratedColumn()
+    @Column({ primary: true, generated: true })
     id: number;
 
     @ManyToOne((type) => Item, (item) => item.warehouses)
@@ -25,11 +21,9 @@ export class Warehouse extends BaseEntity {
     item: Item;
 
     @Column({ type: 'timestamp' })
-    @IsNotEmpty()
     expiration_date: Date;
 
     @Column()
-    @IsNotEmpty()
     amount: number;
 
     @CreateDateColumn({

@@ -5,25 +5,19 @@ import {
     UpdateDateColumn,
     BaseEntity,
     Column,
-    Entity,
-    PrimaryGeneratedColumn
+    Entity
 } from 'typeorm';
-import { IsNotEmpty } from 'class-validator';
 import { Warehouse } from './warehouses.entity';
 
 @Entity({ name: 'importings' })
 export class Importing extends BaseEntity {
-    @Column()
-    @IsNotEmpty()
-    @PrimaryGeneratedColumn()
+    @Column({ primary: true, generated: true })
     id: number;
 
     @Column()
-    @IsNotEmpty()
     amount: number;
 
     @Column()
-    @IsNotEmpty()
     created_by: number;
 
     @CreateDateColumn({

@@ -5,16 +5,16 @@ import {
     CreateDateColumn
 } from 'typeorm';
 
-@Entity({ name: 'category_logs' })
-export class CategoryLog extends BaseEntity {
+@Entity({ name: 'price_logs' })
+export class PriceLog extends BaseEntity {
     @Column({ primary: true, generated: true })
     id: number;
 
     @Column()
-    category_id: number;
+    item_id: number;
 
     @Column()
-    name: string;
+    price: number;
 
     @Column()
     created_by: number;

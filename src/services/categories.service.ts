@@ -10,10 +10,6 @@ export class CategoryService {
         private categoryRepository: Repository<Category>,
     ) {};
 
-    async _findOne(id: number): Promise<Category> {
-        return await this.categoryRepository.findOne(id);
-    }
-
     async getAll(): Promise<Category[]> {
         return await this.categoryRepository.find();
     };
@@ -24,12 +20,12 @@ export class CategoryService {
 
     async isNameAlreadyInUse(name: string): Promise<boolean> {
         try {
-            const user = await this.categoryRepository.findOneOrFail({
+            const category = await this.categoryRepository.findOneOrFail({
                 where: {
                     name: name
                 }
             });
-            if (user) return true;
+            if (category) return true;
             return false;
         } catch (error) {
             return false;
@@ -42,6 +38,6 @@ export class CategoryService {
 
     async update(category: Category): Promise<Category> {
         await this.categoryRepository.save(category);
-        return await this._findOne(category.id);
+        return await this.getById(category.id);
     }
 };

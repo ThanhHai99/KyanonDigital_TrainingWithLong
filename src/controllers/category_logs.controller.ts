@@ -1,12 +1,12 @@
-import { Controller, Get, Response, Param } from '@nestjs/common';
+import { Controller, Get, Response, Query, Param } from '@nestjs/common';
 import {
     ApiBasicAuth,
     ApiOkResponse,
     ApiSecurity,
     ApiTags
 } from '@nestjs/swagger';
+import { CategoryLog } from 'src/entities/category_logs.entity';
 import { CategoryLogService } from 'src/services/category_logs.service';
-import { Category_Log } from 'src/entities/category_logs.entity';
 
 @ApiTags('category_logs')
 @ApiBasicAuth()
@@ -17,20 +17,28 @@ export class CategoryLogController {
 
     @ApiOkResponse({ description: 'Get all categories log' })
     @Get()
-    async readAll(@Response() res) {
+    async readAll(@Response() res, @Query() query) {
         try {
-            let categoryLog: Category_Log[] =
-                await this.categoryLogService.getAll();
-            if (!categoryLog) {
+            const { name } = query;
+            let category: any;
+
+            if (!!name) {
+                category = await this.categoryLogService.getByName(name);
+            } else {
+                category = await this.categoryLogService.getAll();
+            }
+
+            if (!category || category.length === 0) {
                 return res.status(200).json({
                     error: 0,
                     data: 0
                 });
+            } else {
+                return res.status(200).json({
+                    errors: 0,
+                    data: category
+                });
             }
-            return res.status(200).json({
-                errors: 0,
-                data: categoryLog
-            });
         } catch (error) {
             return res.status(500).json({
                 error: 1,
@@ -43,7 +51,7 @@ export class CategoryLogController {
     @Get(':id')
     async readById(@Response() res, @Param('id') id: number) {
         try {
-            let categoryLog: Category_Log =
+            let categoryLog: CategoryLog =
                 await this.categoryLogService.getById(id);
 
             if (!categoryLog) {

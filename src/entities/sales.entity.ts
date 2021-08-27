@@ -6,22 +6,18 @@ import {
     BaseEntity,
     Column,
     Entity,
-    PrimaryGeneratedColumn
+    OneToMany
 } from 'typeorm';
-import { IsNotEmpty } from 'class-validator';
 import { User } from './users.entity';
-import { Item } from './items.entity';
+import { SaleItem } from './sale_items.entity';
 
 @Entity({ name: 'sales' })
 export class Sale extends BaseEntity {
-    @Column()
-    @IsNotEmpty()
-    @PrimaryGeneratedColumn()
+    @Column({ primary: true, generated: true })
     id: number;
 
     @Column()
-    @IsNotEmpty()
-    item_id: number;
+    name: string;
 
     @CreateDateColumn({
         type: 'timestamp',
@@ -30,16 +26,16 @@ export class Sale extends BaseEntity {
     start_date: Date;
 
     @Column({ type: 'timestamp' })
-    @IsNotEmpty()
     end_date: Date;
 
     @Column()
-    @IsNotEmpty()
     amount: number;
 
     @Column()
-    @IsNotEmpty()
-    price: number;
+    sale: number;
+
+    @Column({ default: false })
+    applied: boolean;
 
     @ManyToOne((type) => User, (user) => user.sales)
     @JoinColumn({ name: 'created_by' })
@@ -58,7 +54,10 @@ export class Sale extends BaseEntity {
     })
     updated_at: Date;
 
-    @ManyToOne((type) => Item, (item) => item.sales)
-    @JoinColumn({ name: 'item_id' })
-    item: Item;
+    // @ManyToOne((type) => SaleItem, (si) => si.sales)
+    // @JoinColumn({ name: 'sale_item_id' })
+    // sale_item: SaleItem;
+
+    @OneToMany((type) => SaleItem, (si) => si.sale)
+    sale_item: Sale[];
 }

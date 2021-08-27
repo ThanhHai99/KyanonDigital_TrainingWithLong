@@ -1,24 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Category_Log } from 'src/entities/category_logs.entity';
-import { Repository } from 'typeorm';
+import { CategoryLog } from 'src/entities/category_logs.entity';
+import { Like, Repository } from 'typeorm';
 
 @Injectable()
 export class CategoryLogService {
     constructor(
-        @InjectRepository(Category_Log)
-        private categoryLogRepository: Repository<Category_Log>
+        @InjectRepository(CategoryLog)
+        private categoryLogRepository: Repository<CategoryLog>
     ) {}
 
-    async getAll(): Promise<Category_Log[]> {
+    async getAll(): Promise<CategoryLog[]> {
         return await this.categoryLogRepository.find();
     }
 
-    async getById(id: number): Promise<Category_Log> {
+    async getById(id: number): Promise<CategoryLog> {
         return await this.categoryLogRepository.findOne(id);
     }
 
-    async create(categoryLog: Category_Log): Promise<Category_Log> {
+    async getByName(name: string): Promise<CategoryLog[]> {
+        // return await this.categoryLogRepository.findOne({ name: name });
+        return await this.categoryLogRepository.find({
+            where: {
+                name: Like('%' + name + '%')
+            }
+        });
+    }
+
+    async create(categoryLog: CategoryLog): Promise<CategoryLog> {
         return await this.categoryLogRepository.save(categoryLog);
     }
 }

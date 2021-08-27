@@ -5,17 +5,13 @@ import {
     ManyToOne,
     BaseEntity,
     Column,
-    Entity,
-    PrimaryGeneratedColumn
+    Entity
 } from 'typeorm';
-import { IsNotEmpty } from 'class-validator';
 import { Warehouse } from './warehouses.entity';
 
 @Entity({ name: 'exportings' })
 export class Exporting extends BaseEntity {
-    @Column()
-    @IsNotEmpty()
-    @PrimaryGeneratedColumn()
+    @Column({ primary: true, generated: true })
     id: number;
 
     @ManyToOne((type) => Warehouse, (warehouse) => warehouse.exportings)
@@ -23,11 +19,9 @@ export class Exporting extends BaseEntity {
     warehouse: Warehouse;
 
     @Column()
-    @IsNotEmpty()
     amount: number;
 
     @Column()
-    @IsNotEmpty()
     created_by: number;
 
     @CreateDateColumn({

@@ -1,31 +1,26 @@
 import {
-    ManyToOne,
-    JoinColumn,
+    CreateDateColumn,
+    UpdateDateColumn,
     BaseEntity,
     Column,
     Entity,
-    CreateDateColumn,
-    UpdateDateColumn
+    OneToMany,
+    ManyToOne,
+    JoinColumn
 } from 'typeorm';
-import { Order } from './orders.entity';
+import { Sale } from './sales.entity';
 
-@Entity({ name: 'invoices' })
-export class Invoice extends BaseEntity {
+@Entity({ name: 'sale_items' })
+export class SaleItem extends BaseEntity {
     @Column({ primary: true, generated: true })
     id: number;
 
-    @ManyToOne((type) => Order, (order) => order.invoices)
-    @JoinColumn({ name: 'order_id' })
-    order: Order;
-
     @Column()
-    name: string;
+    item_id: number;    
 
-    @Column({ length: 20 })
-    phone: string;
-
-    @Column()
-    created_by: number;
+    @ManyToOne((type) => Sale, (si) => si.sale_item)
+    @JoinColumn({ name: 'sale_id' })
+    sale: Sale;
 
     @CreateDateColumn({
         type: 'timestamp',

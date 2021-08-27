@@ -4,25 +4,19 @@ import {
     BaseEntity,
     Column,
     Entity,
-    PrimaryGeneratedColumn,
-    Unique,
     CreateDateColumn,
     UpdateDateColumn,
     ManyToOne
 } from 'typeorm';
-import { IsNotEmpty } from 'class-validator';
 import { Item } from './items.entity';
 import { User } from './users.entity';
 
 @Entity({ name: 'categories' })
 export class Category extends BaseEntity {
-    @Column()
-    @PrimaryGeneratedColumn()
+    @Column({ primary: true, generated: true })
     id: number;
 
-    @Unique(['name'])
-    @Column()
-    @IsNotEmpty()
+    @Column({ unique: true })
     name: string;
 
     @ManyToOne((type) => User, (user) => user.categories)

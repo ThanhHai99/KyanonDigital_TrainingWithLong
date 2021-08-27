@@ -3,18 +3,14 @@ import {
     JoinColumn,
     BaseEntity,
     Column,
-    Entity,
-    PrimaryGeneratedColumn
+    Entity
 } from 'typeorm';
-import { IsNotEmpty } from 'class-validator';
 import { Item } from '../entities/items.entity';
 import { Order } from './orders.entity';
 
 @Entity({ name: 'item_order' })
 export class ItemOrder extends BaseEntity {
-    @Column()
-    @IsNotEmpty()
-    @PrimaryGeneratedColumn()
+    @Column({ primary: true, generated: true })
     id: number;
 
     @ManyToOne((type) => Item, (item) => item.itemorders)
@@ -26,10 +22,8 @@ export class ItemOrder extends BaseEntity {
     order: Order;
 
     @Column()
-    @IsNotEmpty()
     price: number;
 
     @Column()
-    @IsNotEmpty()
     amount: number;
 }

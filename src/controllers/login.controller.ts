@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Response } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
-import { CreateUserDto } from '../dto/create_user.dto';
+import { BodyLogin, ResponseLogin } from 'src/dto/auth.dto';
 import { User } from '../entities/users.entity';
 import { LogInService } from '../services/login.service';
 require('dotenv').config();
@@ -10,39 +10,29 @@ export class LogInController {
     constructor(private logInService: LogInService) {}
 
     @Post()
-    async index(@Body() createUserDto: CreateUserDto, @Response() res) {
-        let _user = new User();
-        _user.username = createUserDto.username;
-        _user.password = createUserDto.password;
-
-        // Check if username and password are not set
-        if (!(_user.username && _user.password)) {
-            return res.status(400).json({
-                error: 1,
-                message: 'Username and password are not set'
-            });
-        }
+    async index(
+        @Body() body: BodyLogin,
+        @Response() res
+    ): Promise<ResponseLogin> {
+        const { username, password } = body;
 
         let user: User;
-        try {
-            // Get user from logIn service
-            user = await this.logInService.isExisting(_user);
-        } catch (error) {
+        user = await this.logInService.isExisting(username);
+        if (!user) {
             return res.status(401).json({
                 error: 1,
-                message: 'Server occur an error'
+                message: 'Username or password are invalid'
             });
         }
 
-        // Check if encrypted password match
-        if (!user.checkIfUnencryptedPasswordIsValid(_user.password)) {
+        const isValidPassword = this.logInService.checkPassword(user, password);
+        if (!isValidPassword) {
             return res.status(401).json({
                 error: 1,
                 message: 'Password is invalid'
             });
         }
 
-        // Check if user is locked
         if (user.is_locked) {
             return res.status(401).json({
                 error: 1,

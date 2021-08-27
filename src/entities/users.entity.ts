@@ -2,8 +2,6 @@ import {
     BaseEntity,
     Column,
     Entity,
-    PrimaryGeneratedColumn,
-    Unique,
     CreateDateColumn,
     UpdateDateColumn,
     ManyToOne,
@@ -13,7 +11,6 @@ import {
     BeforeUpdate
 } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
-import { IsNotEmpty, MinLength, IsPhoneNumber } from 'class-validator';
 import { Role } from 'src/entities/roles.entity';
 import { Category } from './categories.entity';
 import { Sale } from './sales.entity';
@@ -21,30 +18,22 @@ import { Item } from './items.entity';
 
 @Entity({ name: 'users' })
 export class User extends BaseEntity {
-    @Column()
-    @PrimaryGeneratedColumn()
+    @Column({ primary: true, generated: true })
     id: number;
 
-    @Unique(['username'])
-    @Column()
-    @IsNotEmpty()
+    @Column({ unique: true })
     username: string;
 
     @Column()
-    @MinLength(8)
     password: string;
 
     @Column()
-    @IsNotEmpty()
     name: string;
 
     @Column()
-    @IsNotEmpty()
-    @IsPhoneNumber('VN')
     phone: string;
 
     @Column()
-    @IsNotEmpty()
     address: string;
 
     @ManyToOne((type) => Role, (role) => role.users)

@@ -16,13 +16,11 @@ import {
     ApiSecurity,
     ApiTags
 } from '@nestjs/swagger';
-import { CreateCategoryDto } from 'src/dto/create_category.dto';
 import { Category } from 'src/entities/categories.entity';
 import { CategoryService } from '../services/categories.service';
-import { validate } from 'class-validator';
-import { UpdateCategoryDto } from 'src/dto/update_category.dto';
 import { CategoryLogService } from 'src/services/category_logs.service';
-import { Category_Log } from 'src/entities/category_logs.entity';
+import { CategoryLog } from 'src/entities/category_logs.entity';
+import { BodyCreateCategory, BodyUpdateCategory, ResponseCreateCategory, ResponseUpdateCategory } from 'src/dto/category.dto';
 
 @ApiTags('categories')
 @ApiBasicAuth()
@@ -39,7 +37,7 @@ export class CategoryController {
     async readAll(@Response() res) {
         try {
             let categories: Category[] = await this.categoryService.getAll();
-            if (!categories) {
+            if (!categories || categories.length === 0) {
                 return res.status(200).json({
                     error: 0,
                     data: 0
@@ -81,29 +79,19 @@ export class CategoryController {
         }
     }
 
-    @ApiBody({ type: CreateCategoryDto })
+    @ApiOkResponse({ description: 'Create a category' })
+    @ApiBody({ type: BodyCreateCategory })
     @Post()
     @ApiResponse({ status: 400, description: 'Not allowed to create' })
     @ApiResponse({ status: 500, description: 'Server occurred an error' })
     @ApiCreatedResponse({
-        description: '0',
+        description: '',
         type: Category
     })
-    async create(
-        @Body() createCategoryDto: CreateCategoryDto,
-        @Response() res
-    ): Promise<any> {
-        let newCategory: Category = new Category();
-        newCategory.name = createCategoryDto.name;
-        newCategory.user = <any>res.locals.jwtPayload.userId; // Get from token
-
-        const errors = await validate(newCategory);
-        if (errors.length > 0) {
-            return res.status(400).json({
-                error: 1,
-                data: errors
-            });
-        }
+    async create(@Body() body: BodyCreateCategory, @Response() res): Promise<ResponseCreateCategory> {
+        let newCategory = new Category();
+        newCategory.name = body.name;
+        newCategory.user = res.locals.jwtPayload.userId; // Get from token
 
         const isNameExisting = await this.categoryService.isNameAlreadyInUse(
             newCategory.name
@@ -112,18 +100,17 @@ export class CategoryController {
         if (isNameExisting) {
             return res.status(409).json({
                 error: 1,
-                data: 'Name already exists'
+                data: 'Category already exists'
             });
         }
 
         try {
             const category = await this.categoryService.create(newCategory);
             // Create category log
-            let newCategoryLog: Category_Log = new Category_Log();
+            let newCategoryLog: CategoryLog = new CategoryLog();
             newCategoryLog.category_id = category.id;
             newCategoryLog.name = category.name;
-            newCategoryLog.status = 'created';
-            newCategoryLog.created_by = <any>res.locals.jwtPayload.userId; // Get from token
+            newCategoryLog.created_by = res.locals.jwtPayload.userId; // Get from token
             await this.categoryLogService.create(newCategoryLog);
 
             return res.status(201).json({
@@ -138,23 +125,34 @@ export class CategoryController {
         }
     }
 
-    @Patch()
+    @ApiOkResponse({ description: 'Update a category' })
+    @ApiBody({ type: BodyUpdateCategory })
+    @Patch(':id')
     async update(
-        @Body() updateCategoryDto: UpdateCategoryDto,
-        @Response() res
-    ): Promise<any> {
-        let _category: Category = await this.categoryService._findOne(
-            updateCategoryDto.id
-        );
-        _category.name = !!updateCategoryDto.name
-            ? updateCategoryDto.name
-            : _category.name;
+        @Body() body: BodyUpdateCategory,
+        @Response() res,
+        @Param('id') id: number
+    ): Promise<ResponseUpdateCategory> {
+        let _category: Category = await this.categoryService.getById(id);
 
-        const errors = await validate(_category);
-        if (errors.length > 0) {
-            return res.status(400).json({
+        if (!_category) {
+            return res.status(404).json({
                 error: 1,
-                data: errors
+                message: 'Category is not found'
+            });
+        }
+
+        _category.name = !!body.name ? body.name : _category.name;
+        _category.user = res.locals.jwtPayload.userId; // Get from token
+
+        const isNameExisting = await this.categoryService.isNameAlreadyInUse(
+            body.name
+        );
+
+        if (isNameExisting) {
+            return res.status(409).json({
+                error: 1,
+                message: 'Name already exists'
             });
         }
 
@@ -163,11 +161,10 @@ export class CategoryController {
                 _category
             );
             // Create category log
-            let newCategoryLog: Category_Log = new Category_Log();
+            let newCategoryLog: CategoryLog = new CategoryLog();
             newCategoryLog.category_id = category.id;
             newCategoryLog.name = category.name;
-            newCategoryLog.status = 'updated';
-            newCategoryLog.created_by = <any>res.locals.jwtPayload.userId; // Get from token
+            newCategoryLog.created_by = res.locals.jwtPayload.userId; // Get from token
             await this.categoryLogService.create(newCategoryLog);
             return res.status(200).json({
                 error: 0,

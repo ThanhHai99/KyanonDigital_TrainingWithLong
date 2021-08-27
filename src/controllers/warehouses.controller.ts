@@ -21,7 +21,7 @@ export class WarehouseController {
         try {
             let warehouses: Warehouse[] = await this.warehouseService.getAll();
 
-            if (!warehouses) {
+            if (!warehouses || warehouses.length === 0) {
                 return res.status(200).json({
                     error: 0,
                     data: 0

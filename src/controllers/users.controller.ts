@@ -9,10 +9,9 @@ import {
     Query,
     Param
 } from '@nestjs/common';
-import { CreateUserDto } from '../dto/create_user.dto';
+import { UserDto } from '../dto/user.dto';
 import { User } from '../entities/users.entity';
 import { UsersService } from '../services/users.service';
-import { validate } from 'class-validator';
 import {
     ApiBasicAuth,
     ApiBody,
@@ -21,7 +20,6 @@ import {
     ApiResponse,
     ApiTags
 } from '@nestjs/swagger';
-import { UpdateUserDto } from 'src/dto/update_user.dto';
 
 @ApiTags('users')
 @ApiBasicAuth()
@@ -90,7 +88,7 @@ export class UsersController {
         }
     }
 
-    @ApiBody({ type: CreateUserDto })
+    @ApiBody({ type: UserDto })
     @Post()
     @ApiResponse({ status: 400, description: 'Not allowed to create' })
     @ApiResponse({ status: 500, description: 'Server occurred an error' })
@@ -98,18 +96,14 @@ export class UsersController {
         description: '0',
         type: User
     })
-    async create(
-        @Body() createUserDto: CreateUserDto,
-        @Response() res
-    ): Promise<any> {
+    async create(@Body() userDto: UserDto, @Response() res): Promise<any> {
         let newUser: User = new User();
-        newUser.username = createUserDto.username;
-        newUser.password = createUserDto.password;
-        newUser.name = createUserDto.name;
-        newUser.phone = createUserDto.phone;
-        newUser.address = createUserDto.address;
-        newUser.role = <any>createUserDto.role;
-        // newUser.is_locked = false;
+        newUser.username = userDto.username;
+        newUser.password = userDto.password;
+        newUser.name = userDto.name;
+        newUser.phone = userDto.phone;
+        newUser.address = userDto.address;
+        newUser.role = <any>userDto.role;
 
         if (newUser.role === undefined) {
             return res.status(400).json({
@@ -122,14 +116,6 @@ export class UsersController {
             return res.status(400).json({
                 error: 1,
                 message: 'Not allowed to create another super admin'
-            });
-        }
-
-        const errors = await validate(newUser);
-        if (errors.length > 0) {
-            return res.status(400).json({
-                error: 1,
-                data: errors
             });
         }
 
@@ -157,28 +143,23 @@ export class UsersController {
         }
     }
 
-    @Patch()
+    @Patch(':id')
     async update(
-        @Body() updateUserDto: UpdateUserDto,
-        @Response() res
+        @Body() userDto: UserDto,
+        @Response() res,
+        @Param('id') id: number
     ): Promise<any> {
-        let _user: User = await this.usersService._findOne(updateUserDto.id);
-        _user.name = !!updateUserDto.name ? updateUserDto.name : _user.name;
-        _user.phone = !!updateUserDto.phone ? updateUserDto.phone : _user.phone;
-        _user.address = !!updateUserDto.address
-            ? updateUserDto.address
-            : _user.address;
-        _user.password = !!updateUserDto.password
-            ? updateUserDto.password
-            : _user.password;
-
-        const errors = await validate(_user);
-        if (errors.length > 0) {
-            return res.status(400).json({
+        let _user: User = await this.usersService._findOne(id);
+        if (!_user) {
+            return res.status(404).json({
                 error: 1,
-                data: errors
+                message: 'User is not found'
             });
         }
+        _user.password = !!userDto.password ? userDto.password : _user.password;
+        _user.name = !!userDto.name ? userDto.name : _user.name;
+        _user.phone = !!userDto.phone ? userDto.phone : _user.phone;
+        _user.address = !!userDto.address ? userDto.address : _user.address;
 
         try {
             const user: User = await this.usersService.update(_user);
@@ -199,6 +180,13 @@ export class UsersController {
         try {
             const { id } = query;
             const isSuperAdmin: any = await this.usersService.isSuperAdmin(id);
+
+            if (isSuperAdmin === false)
+                return res.status(404).json({
+                    error: 1,
+                    message: 'Account is not found'
+                });
+
             if (isSuperAdmin === null || isSuperAdmin.id !== 0) {
                 await this.usersService.lock(id);
                 return res.status(200).json({

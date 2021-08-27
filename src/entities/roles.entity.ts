@@ -2,24 +2,18 @@ import {
     BaseEntity,
     Column,
     Entity,
-    PrimaryColumn,
-    Unique,
     CreateDateColumn,
     UpdateDateColumn,
     OneToMany
 } from 'typeorm';
-import { IsNotEmpty } from 'class-validator';
 import { User } from 'src/entities/users.entity';
 
 @Entity({ name: 'roles' })
 export class Role extends BaseEntity {
-    @Column()
-    @PrimaryColumn()
+    @Column({ primary: true, generated: true })
     id: number;
 
-    @Unique(['name'])
-    @Column()
-    @IsNotEmpty()
+    @Column({ unique: true })
     name: string;
 
     @CreateDateColumn({

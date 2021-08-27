@@ -6,13 +6,8 @@ import {
     UpdateDateColumn,
     BaseEntity,
     Column,
-    Entity,
-    PrimaryGeneratedColumn,
-    Unique
+    Entity
 } from 'typeorm';
-import { IsNotEmpty, Length } from 'class-validator';
-import { Price } from './prices.entity';
-import { Sale } from './sales.entity';
 import { User } from '../entities/users.entity';
 import { ItemOrder } from '../entities/item_order.entiy';
 import { Category } from './categories.entity';
@@ -20,14 +15,10 @@ import { Warehouse } from '../entities/warehouses.entity';
 
 @Entity({ name: 'items' })
 export class Item extends BaseEntity {
-    @Column()
-    @IsNotEmpty()
-    @PrimaryGeneratedColumn()
+    @Column({ primary: true, generated: true })
     id: number;
 
-    @Unique(['name'])
-    @Column()
-    @Length(256)
+    @Column({ unique: true })
     name: string;
 
     @ManyToOne((type) => Category, (category) => category.items)
@@ -35,12 +26,13 @@ export class Item extends BaseEntity {
     category: Category;
 
     @Column()
-    @Length(256)
-    details: string;
+    detail: string;
 
     @Column()
-    @Length(256)
     user_manual: string;
+
+    @Column()
+    price: number;
 
     @ManyToOne((type) => User, (user) => user.items)
     @JoinColumn({ name: 'created_by' })
@@ -58,12 +50,6 @@ export class Item extends BaseEntity {
         onUpdate: 'CURRENT_TIMESTAMP(6)'
     })
     updated_at: Date;
-
-    @OneToMany((type) => Price, (price) => price.item)
-    prices: Price[];
-
-    @OneToMany((type) => Sale, (sale) => sale.item)
-    sales: Sale[];
 
     @OneToMany((type) => ItemOrder, (itemorder) => itemorder.item)
     itemorders: ItemOrder[];
