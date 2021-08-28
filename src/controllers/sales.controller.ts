@@ -20,6 +20,7 @@ import {
     BodyCreateSale,
     BodyUpdateSale,
     ResponseCreateSale,
+    ResponseGetSale,
     ResponseUpdateSale
 } from 'src/dto/sale.dto';
 import { Sale } from 'src/entities/sales.entity';
@@ -42,9 +43,9 @@ export class SaleController {
 
     @ApiOkResponse({ description: 'Get all sales' })
     @Get()
-    async readAll(@Response() res) {
+    async readAll(@Response() res): Promise<ResponseGetSale> {
         try {
-            let sales: Sale[] = await this.saleService.getAll();
+            const sales: Sale[] = await this.saleService.getAll();
             if (!sales || sales.length === 0) {
                 return res.status(200).json({
                     error: 0,
@@ -65,9 +66,9 @@ export class SaleController {
 
     @ApiOkResponse({ description: "Get a sale by sale's id" })
     @Get(':id')
-    async readById(@Response() res, @Param('id') id: number) {
+    async readById(@Response() res, @Param('id') id: number): Promise<ResponseGetSale> {
         try {
-            let sale: Sale = await this.saleService.getById(id);
+            const sale: Sale = await this.saleService.getById(id);
             if (!sale) {
                 return res.status(200).json({
                     error: 0,
@@ -104,11 +105,11 @@ export class SaleController {
         newSale.start_date = body.start_date;
         newSale.end_date = body.end_date;
         newSale.amount = body.amount;
-        newSale.sale = body.sale;
+        newSale.discount = body.discount;
         newSale.applied = !!body.applied ? body.applied : false;
         newSale.user = res.locals.jwtPayload.userId; // Get from token
 
-        const isNameExisting = await this.saleService.isNameAlreadyInUse(
+        const isNameExisting: boolean = await this.saleService.isNameAlreadyInUse(
             newSale.name
         );
 
@@ -120,12 +121,12 @@ export class SaleController {
         }
 
         try {
-            const sale = await this.saleService.create(newSale);
+            const sale: Sale = await this.saleService.create(newSale);
             // Create sale item
-            const itemArray = body.item_id;
+            const itemArray: Array<number> = body.item_id;
             for (const i in itemArray) {
                 if (Object.prototype.hasOwnProperty.call(itemArray, i)) {
-                    const e = itemArray[i];
+                    const e: number = itemArray[i];
                     let newSaleItem = new SaleItem();
                     newSaleItem.item_id = e;
                     newSaleItem.sale = <any>sale.id;
@@ -136,12 +137,12 @@ export class SaleController {
             // Create sale log
             let newSaleLog = new SaleLog();
             newSaleLog.name = sale.name;
-            newSaleLog.sale_id = sale.id;
+            newSaleLog.sale = <any>sale.id;
             newSaleLog.sale_item = body.item_id.toString();
             newSaleLog.start_date = sale.start_date;
             newSaleLog.end_date = sale.end_date;
             newSaleLog.amount = sale.amount;
-            newSaleLog.sale = sale.sale;
+            newSaleLog.discount = sale.discount;
             newSaleLog.applied = sale.applied;
             newSaleLog.created_by = res.locals.jwtPayload.userId; // Get from token
             await this.saleLogService.create(newSaleLog);
@@ -166,7 +167,7 @@ export class SaleController {
         @Response() res,
         @Param('id') id: number
     ): Promise<ResponseUpdateSale> {
-        let _sale: Sale = await this.saleService._findOne(id);
+        const _sale: Sale = await this.saleService._findOne(id);
         if (!_sale) {
             return res.status(404).json({
                 error: 1,
@@ -181,7 +182,7 @@ export class SaleController {
             });
         }
 
-        const isNameExisting = await this.saleService.isNameAlreadyInUse(
+        const isNameExisting: boolean = await this.saleService.isNameAlreadyInUse(
             body.name
         );
 
@@ -198,24 +199,24 @@ export class SaleController {
             : _sale.start_date;
         _sale.end_date = !!body.end_date ? body.end_date : _sale.end_date;
         _sale.amount = !!body.amount ? body.amount : _sale.amount;
-        _sale.sale = !!body.sale ? body.sale : _sale.sale;
+        _sale.discount = !!body.discount ? body.discount : _sale.discount;
         _sale.applied = !!body.applied ? body.applied : _sale.applied;
         _sale.user = res.locals.jwtPayload.userId; // Get from token
 
         try {
             const sale: Sale = await this.saleService.update(_sale);
-            const t = await this.saleItemService.getBySaleId(_sale.id);
-            const sale_item = t.map((e) => e.item_id).toString();
+            const t: SaleItem[] = await this.saleItemService.getBySaleId(_sale.id);
+            const sale_item: string = t.map((e) => e.item_id).toString();
 
             // Create sale log
             let newSaleLog: SaleLog = new SaleLog();
             newSaleLog.name = sale.name;
-            newSaleLog.sale_id = sale.id;
+            newSaleLog.sale = <any>sale.id;
             newSaleLog.sale_item = sale_item;
             newSaleLog.start_date = sale.start_date;
             newSaleLog.end_date = sale.end_date;
             newSaleLog.amount = sale.amount;
-            newSaleLog.sale = sale.sale;
+            newSaleLog.discount = sale.discount;
             newSaleLog.applied = sale.applied;
             newSaleLog.created_by = res.locals.jwtPayload.userId; // Get from token
             await this.saleLogService.create(newSaleLog);

@@ -8,8 +8,9 @@ import {
     Entity,
     OneToMany
 } from 'typeorm';
-import { User } from './users.entity';
 import { SaleItem } from './sale_items.entity';
+import { SaleLog } from './sale_logs.entity';
+import { User } from './users.entity';
 
 @Entity({ name: 'sales' })
 export class Sale extends BaseEntity {
@@ -32,7 +33,7 @@ export class Sale extends BaseEntity {
     amount: number;
 
     @Column()
-    sale: number;
+    discount: number;
 
     @Column({ default: false })
     applied: boolean;
@@ -54,10 +55,9 @@ export class Sale extends BaseEntity {
     })
     updated_at: Date;
 
-    // @ManyToOne((type) => SaleItem, (si) => si.sales)
-    // @JoinColumn({ name: 'sale_item_id' })
-    // sale_item: SaleItem;
-
     @OneToMany((type) => SaleItem, (si) => si.sale)
     sale_item: Sale[];
+
+    @OneToMany((type) => SaleLog, (log) => log.sale)
+    sale_logs: SaleLog[];
 }

@@ -2,8 +2,11 @@ import {
     BaseEntity,
     Column,
     Entity,
-    CreateDateColumn
+    CreateDateColumn,
+    ManyToOne,
+    JoinColumn
 } from 'typeorm';
+import { Sale } from './sales.entity';
 
 @Entity({ name: 'sale_logs' })
 export class SaleLog extends BaseEntity {
@@ -12,9 +15,6 @@ export class SaleLog extends BaseEntity {
 
     @Column()
     name: string;
-
-    @Column()
-    sale_id: number;
 
     @Column()
     sale_item: string;
@@ -32,7 +32,7 @@ export class SaleLog extends BaseEntity {
     amount: number;
 
     @Column()
-    sale: number;
+    discount: number;
 
     @Column()
     applied: boolean;
@@ -45,4 +45,8 @@ export class SaleLog extends BaseEntity {
         default: () => 'CURRENT_TIMESTAMP(6)'
     })
     created_at: Date;
+
+    @ManyToOne((type) => Sale, (sale) => sale.sale_logs)
+    @JoinColumn({ name: 'sale_id' })
+    sale: Sale;
 }

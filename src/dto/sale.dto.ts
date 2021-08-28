@@ -41,7 +41,7 @@ export class BodyCreateSale {
     @IsInt()
     @Min(0)
     @Max(100)
-    sale: number;
+    discount: number;
 
     @ApiProperty({
         description: '',
@@ -96,7 +96,7 @@ export class BodyUpdateSale {
     @IsInt()
     @Min(0)
     @Max(100)
-    sale: number;
+    discount: number;
 
     @ApiProperty({
         description: '',
@@ -118,6 +118,20 @@ export class BodyUpdateSale {
     @IsOptional()
     @IsBoolean()
     applied: boolean;
+}
+
+export class ResponseGetSale {
+    @ApiProperty({ description: '', type: Number })
+    @IsIn([0, 1])
+    error: number;
+    
+    @ApiProperty({ description: '', type: String })
+    @IsOptional()
+    message: string;
+
+    @ApiProperty({ description: '' })
+    @IsOptional()
+    data: any;
 }
 
 export class ResponseCreateSale {
