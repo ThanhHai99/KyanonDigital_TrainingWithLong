@@ -19,6 +19,20 @@ export class BodyUpdateCategory {
     name: string;
 }
 
+export class ResponseGetCategory {
+    @ApiProperty({ description: '', type: Number })
+    @IsIn([0, 1])
+    error: number;
+    
+    @ApiProperty({ description: '', type: String })
+    @IsOptional()
+    message: string;
+
+    @ApiProperty({ description: '' })
+    @IsOptional()
+    data: any;
+}
+
 export class ResponseCreateCategory {
     @ApiProperty({ description: '', type: Number })
     @IsIn([0, 1])

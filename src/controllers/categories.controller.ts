@@ -20,7 +20,13 @@ import { Category } from 'src/entities/categories.entity';
 import { CategoryService } from '../services/categories.service';
 import { CategoryLogService } from 'src/services/category_logs.service';
 import { CategoryLog } from 'src/entities/category_logs.entity';
-import { BodyCreateCategory, BodyUpdateCategory, ResponseCreateCategory, ResponseUpdateCategory } from 'src/dto/category.dto';
+import {
+    BodyCreateCategory,
+    BodyUpdateCategory,
+    ResponseCreateCategory,
+    ResponseGetCategory,
+    ResponseUpdateCategory
+} from 'src/dto/category.dto';
 
 @ApiTags('categories')
 @ApiBasicAuth()
@@ -34,7 +40,7 @@ export class CategoryController {
 
     @ApiOkResponse({ description: 'Get all categories' })
     @Get()
-    async readAll(@Response() res) {
+    async readAll(@Response() res): Promise<ResponseGetCategory> {
         try {
             let categories: Category[] = await this.categoryService.getAll();
             if (!categories || categories.length === 0) {
@@ -57,7 +63,10 @@ export class CategoryController {
 
     @ApiOkResponse({ description: "Get a category by category's id" })
     @Get(':id')
-    async readById(@Response() res, @Param('id') id: number) {
+    async readById(
+        @Response() res,
+        @Param('id') id: number
+    ): Promise<ResponseGetCategory> {
         try {
             let category: Category = await this.categoryService.getById(id);
 
@@ -88,12 +97,15 @@ export class CategoryController {
         description: '',
         type: Category
     })
-    async create(@Body() body: BodyCreateCategory, @Response() res): Promise<ResponseCreateCategory> {
+    async create(
+        @Body() body: BodyCreateCategory,
+        @Response() res
+    ): Promise<ResponseCreateCategory> {
         let newCategory = new Category();
         newCategory.name = body.name;
         newCategory.user = res.locals.jwtPayload.userId; // Get from token
 
-        const isNameExisting = await this.categoryService.isNameAlreadyInUse(
+        const isNameExisting: boolean = await this.categoryService.isNameAlreadyInUse(
             newCategory.name
         );
 
@@ -107,7 +119,7 @@ export class CategoryController {
         try {
             const category = await this.categoryService.create(newCategory);
             // Create category log
-            let newCategoryLog: CategoryLog = new CategoryLog();
+            let newCategoryLog = new CategoryLog();
             newCategoryLog.category_id = category.id;
             newCategoryLog.name = category.name;
             newCategoryLog.created_by = res.locals.jwtPayload.userId; // Get from token
@@ -145,7 +157,7 @@ export class CategoryController {
         _category.name = !!body.name ? body.name : _category.name;
         _category.user = res.locals.jwtPayload.userId; // Get from token
 
-        const isNameExisting = await this.categoryService.isNameAlreadyInUse(
+        const isNameExisting: boolean = await this.categoryService.isNameAlreadyInUse(
             body.name
         );
 
@@ -161,7 +173,7 @@ export class CategoryController {
                 _category
             );
             // Create category log
-            let newCategoryLog: CategoryLog = new CategoryLog();
+            let newCategoryLog = new CategoryLog();
             newCategoryLog.category_id = category.id;
             newCategoryLog.name = category.name;
             newCategoryLog.created_by = res.locals.jwtPayload.userId; // Get from token

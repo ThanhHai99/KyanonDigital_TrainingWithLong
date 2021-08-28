@@ -2,8 +2,11 @@ import {
     BaseEntity,
     Column,
     Entity,
-    CreateDateColumn
+    CreateDateColumn,
+    ManyToOne,
+    JoinColumn
 } from 'typeorm';
+import { Category } from './categories.entity';
 
 @Entity({ name: 'category_logs' })
 export class CategoryLog extends BaseEntity {
@@ -24,4 +27,8 @@ export class CategoryLog extends BaseEntity {
         default: () => 'CURRENT_TIMESTAMP(6)'
     })
     created_at: Date;
+
+    @ManyToOne((type) => Category, (category) => category.category_logs)
+    @JoinColumn({ name: 'category_id' })
+    category: Category;
 }

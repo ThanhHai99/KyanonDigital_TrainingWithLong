@@ -8,6 +8,7 @@ import {
     UpdateDateColumn,
     ManyToOne
 } from 'typeorm';
+import { CategoryLog } from './category_logs.entity';
 import { Item } from './items.entity';
 import { User } from './users.entity';
 
@@ -38,4 +39,7 @@ export class Category extends BaseEntity {
 
     @OneToMany((type) => Item, (item) => item.category)
     items: Item[];
+
+    @OneToMany((type) => CategoryLog, (log) => log.category)
+    category_logs: CategoryLog[];
 }
