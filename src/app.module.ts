@@ -3,33 +3,32 @@ import { Connection } from 'typeorm';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './modules/users.module';
-import { User } from './entities/users.entity';
-import { RegisterModule } from './modules/register.module';
-import { LoginModule } from './modules/login.module';
-import { LogoutModule } from './modules/logout.module';
-import { RolesModule } from './modules/roles.module';
-import { Role } from './entities/roles.entity';
-import { Item } from './entities/items.entity';
-import { Sale } from './entities/sales.entity';
-import { Order } from './entities/orders.entity';
-import { ItemOrder } from './entities/item_order.entiy';
-import { Invoice } from './entities/invoices.entity';
-import { Importing } from './entities/importings.entity';
-import { Exporting } from './entities/exportings.entity';
-import { Category } from './entities/categories.entity';
-import { Warehouse } from './entities/warehouses.entity';
-import { WarehouseModule } from './modules/warehouses.module';
-import { SaleModule } from './modules/sales.module';
-import { PriceLog } from './entities/price_logs.entity';
-import { CategoriesModule } from './modules/categories.module';
+import { UsersModule } from './modules/user/users.module';
+import { User } from './modules/user/entity/users.entity';
+import { RolesModule } from './modules/role/roles.module';
+import { Role } from './modules/role/entity/roles.entity';
+import { Item } from './modules/item/entity/items.entity';
+import { Sale } from './modules/sale/entity/sales.entity';
+import { ItemOrder } from './modules/item_order/entity/item_order.entiy';
+import { Invoice } from './modules/invoice/entity/invoices.entity';
+import { Category } from './modules/category/entity/categories.entity';
+import { Warehouse } from './modules/warehouse/entity/warehouses.entity';
+import { WarehouseModule } from './modules/warehouse/warehouses.module';
+import { SaleModule } from './modules/sale/sales.module';
 import { checkJwt } from './middlewares/checkJwt';
 import { checkRole } from './middlewares/checkRole';
-import { CategoryLog } from './entities/category_logs.entity';
-import { ItemsModule } from './modules/items.module';
-import { ItemLog } from './entities/item_logs.entity';
-import { SaleLog } from './entities/sale_logs.entity';
-import { SaleItem } from './entities/sale_items.entity';
+import { CategoryLog } from './modules/category_log/entity/category_logs.entity';
+import { ItemLog } from './modules/item_log/entity/item_logs.entity';
+import { SaleItem } from './modules/sale_item/entity/sale_items.entity';
+import { Order } from './modules/order/entity/orders.entity';
+import { PriceLog } from './modules/price_log/entity/price_logs.entity';
+import { SaleLog } from './modules/sale_log/entity/sale_logs.entity';
+import { CategoriesModule } from './modules/category/categories.module';
+import { ItemsModule } from './modules/item/items.module';
+import { WarehouseLog } from './modules/warehouse_log/entity/warehouse_logs.entity';
+import { OrdersModule } from './modules/order/orders.module';
+import { InvoiceModule } from './modules/invoice/invoices.module';
+import { AuthModule } from './modules/auth/auth.module';
 require('dotenv').config();
 
 @Module({
@@ -44,32 +43,31 @@ require('dotenv').config();
             entities: [
                 Role,
                 User,
+                CategoryLog,
                 Category,
+                ItemLog,
                 Item,
+                SaleLog,
                 Sale,
                 SaleItem,
                 Order,
                 ItemOrder,
                 Invoice,
+                WarehouseLog,
                 Warehouse,
-                Importing,
-                Exporting,
                 PriceLog,
-                CategoryLog,
-                ItemLog,
-                SaleLog
             ],
             synchronize: true
         }),
-        LoginModule,
-        LogoutModule,
+        AuthModule,
         RolesModule,
         UsersModule,
         WarehouseModule,
         SaleModule,
+        OrdersModule,
         CategoriesModule,
         ItemsModule,
-        RegisterModule,
+        InvoiceModule,
     ],
     controllers: [AppController],
     providers: [AppService]
@@ -84,6 +82,8 @@ export class AppModule implements NestModule {
         consumer.apply(checkJwt, checkRole([1])).forRoutes('category_logs');
         consumer.apply(checkJwt, checkRole([1, 2])).forRoutes('warehouses');
         consumer.apply(checkJwt, checkRole([1, 3])).forRoutes('sales');
+        consumer.apply(checkJwt, checkRole([1, 2])).forRoutes('orders');
+        // consumer.apply(checkJwt, checkRole([4])).forRoutes('orders/');
         consumer.apply(checkJwt, checkRole([1])).forRoutes('items');
         consumer.apply(checkJwt, checkRole([1])).forRoutes('item_logs');
         consumer.apply(checkJwt, checkRole([1, 3])).forRoutes('price_logs');

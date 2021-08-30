@@ -19,8 +19,6 @@ module.exports = {
         'src/entities/item_order.entity',
         'src/entities/invoices.entity',
         'src/entities/warehouses.entity',
-        'src/entities/importings.entity',
-        'src/entities/exportings.entity',
         'src/entities/category_logs.entity',
     ],
     migrations: [
@@ -33,9 +31,7 @@ module.exports = {
         'src/migration/1627548103208-Orders.ts',
         'src/migration/1627548113959-ItemOrder.ts',
         'src/migration/1627548123574-Invoices.ts',
-        'src/migration/1627548130703-Warehouses.ts',
-        'src/migration/1627548139302-Importings.ts',
-        'src/migration/1627548148266-Exportings.ts'
+        'src/migration/1627548130703-Warehouses.ts'
     ],
     cli: {
         entitiesDir: 'src/entities',
