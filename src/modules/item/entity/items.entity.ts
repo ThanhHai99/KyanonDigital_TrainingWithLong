@@ -9,7 +9,7 @@ import {
     Entity
 } from 'typeorm';
 import { User } from '../../user/entity/users.entity';
-import { ItemOrder } from '../../item_order/entity/item_order.entiy';
+import { ItemOrder } from '../../item_order/entity/item_order.entity';
 import { Category } from '../../category/entity/categories.entity';
 import { Warehouse } from '../../warehouse/entity/warehouses.entity';
 import { ItemLog } from '../../item_log/entity/item_logs.entity';
