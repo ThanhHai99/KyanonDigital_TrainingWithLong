@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Raw, Repository } from 'typeorm';
 import { Sale } from '../entity/sales.entity';
 
 @Injectable()
@@ -27,6 +27,21 @@ export class SaleService {
             return false;
         }
     }
+
+    async getSaleStillApply(sale_code: string): Promise<Sale> {
+        const _sale = await this.saleRepository.findOne({
+            where: {
+                end_date: Raw(
+                    (alias) => `${alias} IS NULL OR ${alias} > NOW()`
+                ),
+                code: sale_code
+            }
+        });
+        if (!_sale) return null;
+        return _sale;
+    }
+
+    
 
     async getAll(): Promise<Sale[]> {
         return this.saleRepository.find({

@@ -36,6 +36,9 @@ export class SaleLog extends BaseEntity {
 
     @Column()
     applied: boolean;
+    
+    @Column()
+    code: string;
 
     @Column()
     created_by: number;

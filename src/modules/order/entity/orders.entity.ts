@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { Invoice } from '../../invoice/entity/invoices.entity';
 import { PAY } from 'src/helpers/paymentMethod';
-import { ItemOrder } from '../../item_order/entity/item_order.entiy';
+import { ItemOrder } from '../../item_order/entity/item_order.entity';
 import { User } from '../../user/entity/users.entity';
 
 @Entity({ name: 'orders' })
@@ -26,6 +26,9 @@ export class Order extends BaseEntity {
 
     @Column({ default: false })
     paid: boolean;
+
+    @Column({ default: false })
+    exported: boolean;
 
     @Column()
     created_by: number;

@@ -9,7 +9,7 @@ import { RolesModule } from './modules/role/roles.module';
 import { Role } from './modules/role/entity/roles.entity';
 import { Item } from './modules/item/entity/items.entity';
 import { Sale } from './modules/sale/entity/sales.entity';
-import { ItemOrder } from './modules/item_order/entity/item_order.entiy';
+import { ItemOrder } from './modules/item_order/entity/item_order.entity';
 import { Invoice } from './modules/invoice/entity/invoices.entity';
 import { Category } from './modules/category/entity/categories.entity';
 import { Warehouse } from './modules/warehouse/entity/warehouses.entity';

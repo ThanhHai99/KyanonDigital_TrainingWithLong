@@ -23,6 +23,17 @@ export class SaleItemService {
         });
     }
 
+    async findItemBySaleId(saleId: number, itemId: number): Promise<boolean> {
+        const _saleItem = await this.saleItemRepository.findOne({
+            where: {
+                sale: saleId,
+                item_id: itemId
+            }
+        });
+        if (!_saleItem) return false;
+        return true;
+    }
+
     async create(sale_item: SaleItem): Promise<SaleItem> {
         return await this.saleItemRepository.save(sale_item);
     }

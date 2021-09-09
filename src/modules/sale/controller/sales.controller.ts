@@ -107,6 +107,7 @@ export class SaleController {
         newSale.amount = body.amount;
         newSale.discount = body.discount;
         newSale.applied = !!body.applied ? body.applied : false;
+        newSale.code = body.code;
         newSale.user = res.locals.jwtPayload.userId; // Get from token
 
         const isNameExisting: boolean = await this.saleService.isNameAlreadyInUse(
@@ -144,6 +145,7 @@ export class SaleController {
             newSaleLog.amount = sale.amount;
             newSaleLog.discount = sale.discount;
             newSaleLog.applied = sale.applied;
+            newSaleLog.code = sale.code;
             newSaleLog.created_by = res.locals.jwtPayload.userId; // Get from token
             await this.saleLogService.create(newSaleLog);
 

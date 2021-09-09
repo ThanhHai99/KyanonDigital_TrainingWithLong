@@ -22,8 +22,5 @@ export class ItemOrder extends BaseEntity {
     order: Order;
 
     @Column()
-    price: number;
-
-    @Column()
     amount: number;
 }

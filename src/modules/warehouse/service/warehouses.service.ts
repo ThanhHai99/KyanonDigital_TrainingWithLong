@@ -45,21 +45,21 @@ export class WarehouseService {
 
     async isEnoughItemToExport(
         condition: Date,
-        item: Array<number>,
-        amount: Array<number>
+        item: number,
+        amount: number
     ): Promise<boolean> {
-        for (const i in item) {
-            if (Object.prototype.hasOwnProperty.call(item, i)) {
-                const e = item[i];
+        // for (const i in item) {
+            // if (Object.prototype.hasOwnProperty.call(item, i)) {
+                // const e = item[i];
                 const { sumAmount } = await this.warehouseRepository
                     .createQueryBuilder('warehouses')
                     .select('SUM(amount)', 'sumAmount')
-                    .where('item_id = :e', { e })
+                    .where('item_id = :item', { item })
                     .andWhere('expiration_date > :condition', { condition })
                     .getRawOne();
-                if (sumAmount < amount[i]) return false;
-            }
-        }
+                if (sumAmount < amount) return false;
+            // }
+        // }
         return true;
     }
 

@@ -25,6 +25,9 @@ export class Invoice extends BaseEntity {
     phone: string;
 
     @Column()
+    amount: number;
+
+    @Column()
     created_by: number;
 
     @CreateDateColumn({

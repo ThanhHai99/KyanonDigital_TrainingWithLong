@@ -26,10 +26,10 @@ export class Sale extends BaseEntity {
     })
     start_date: Date;
 
-    @Column({ type: 'timestamp' })
+    @Column({ type: 'timestamp', nullable: true, default: null })
     end_date: Date;
 
-    @Column()
+    @Column({ nullable: true, default: null })
     amount: number;
 
     @Column()
@@ -37,6 +37,9 @@ export class Sale extends BaseEntity {
 
     @Column({ default: false })
     applied: boolean;
+
+    @Column()
+    code: string;
 
     @ManyToOne((type) => User, (user) => user.sales)
     @JoinColumn({ name: 'created_by' })

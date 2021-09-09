@@ -28,8 +28,10 @@ export class BodyCreateSale {
 
     @ApiProperty({
         description: '',
-        type: Number
+        type: Number,
+        default: null
     })
+    @IsOptional()
     @IsInt()
     @Min(0)
     amount: number;
@@ -52,8 +54,10 @@ export class BodyCreateSale {
 
     @ApiProperty({
         description: '',
-        type: Date
+        type: Date,
+        default: null
     })
+    @IsOptional()
     @IsDateString()
     end_date: Date;
 
@@ -61,6 +65,13 @@ export class BodyCreateSale {
     @IsOptional()
     @IsBoolean()
     applied: boolean;
+
+    @ApiProperty({
+        description: '',
+        type: String
+    })
+    @IsNotEmpty()
+    code: string;
 }
 
 export class BodyUpdateSale {
@@ -81,7 +92,8 @@ export class BodyUpdateSale {
 
     @ApiProperty({
         description: '',
-        type: Number
+        type: Number,
+        default: null
     })
     @IsOptional()
     @IsInt()
@@ -118,13 +130,20 @@ export class BodyUpdateSale {
     @IsOptional()
     @IsBoolean()
     applied: boolean;
+
+    @ApiProperty({
+        description: '',
+        type: String
+    })
+    @IsOptional()
+    code: string;
 }
 
 export class ResponseGetSale {
     @ApiProperty({ description: '', type: Number })
     @IsIn([0, 1])
     error: number;
-    
+
     @ApiProperty({ description: '', type: String })
     @IsOptional()
     message: string;

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from 'src/modules/order/entity/orders.entity';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 
 @Injectable()
 export class OrderService {
@@ -19,7 +19,23 @@ export class OrderService {
     }
 
     async isPaid(id: number): Promise<boolean> {
-        const order = await this.orderRepository.findOneOrFail(id);
+        const order = await this.orderRepository.findOne({
+            where: {
+                id: id,
+                paid: true
+            }
+        });
+        if (order) return true;
+        return false;
+    }
+
+    async isExported(id: number): Promise<boolean> {
+        const order = await this.orderRepository.findOne({
+            where: {
+                id: id,
+                exported: true
+            }
+        });
         if (order) return true;
         return false;
     }
@@ -31,5 +47,15 @@ export class OrderService {
     async update(order: Order): Promise<Order> {
         await this.orderRepository.save(order);
         return await this.getById(order.id);
+    }
+
+    async payOrder(id: number): Promise<Order> {
+        await this.orderRepository.update(id, { paid: true });
+        return this.getById(id);
+    }
+
+    async exportOrder(id: number): Promise<Order> {
+        await this.orderRepository.update(id, { exported: true });
+        return this.getById(id);
     }
 }
