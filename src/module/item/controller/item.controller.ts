@@ -18,10 +18,10 @@ import {
     ApiTags
 } from '@nestjs/swagger';
 import {
-    CreateItemDto,
+    BodyCreateItem,
     ResponseGetItem,
     ResponseUpdateItem,
-    UpdateItemDto
+    BodyUpdateItem
 } from '../dto/item.dto';
 import { Item } from '../entity/item.entity';
 import { ItemLog } from '../../item_log/entity/item_log.entity';
@@ -99,7 +99,7 @@ export class ItemController {
         }
     }
 
-    @ApiBody({ type: CreateItemDto })
+    @ApiBody({ type: BodyCreateItem })
     @Post()
     @ApiResponse({ status: 400, description: 'Not allowed to create' })
     @ApiResponse({ status: 500, description: 'Server occurred an error' })
@@ -107,7 +107,7 @@ export class ItemController {
         description: '0',
         type: Item
     })
-    async create(@Body() body: CreateItemDto, @Response() res): Promise<any> {
+    async create(@Body() body: BodyCreateItem, @Response() res): Promise<any> {
         let newItem = new Item();
         newItem.name = body.name;
         newItem.category = <any>body.category_id;
@@ -122,7 +122,7 @@ export class ItemController {
         if (isNameExisting) {
             return res.status(409).json({
                 error: 1,
-                data: 'Name already exists'
+                message: 'Name already exists'
             });
         }
 
@@ -159,7 +159,7 @@ export class ItemController {
 
     @Patch(':id')
     async update(
-        @Body() body: UpdateItemDto,
+        @Body() body: BodyUpdateItem,
         @Response() res,
         @Param('id') id: number
     ): Promise<ResponseUpdateItem> {

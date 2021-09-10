@@ -12,22 +12,16 @@ import {
 } from 'class-validator';
 
 export class BodyCreateSale {
-    @ApiProperty({
-        description: '',
-        type: String
-    })
+    @ApiProperty({ description: 'Sale name', type: String })
     @IsNotEmpty()
     name: string;
 
-    @ApiProperty({
-        description: '',
-        type: Array
-    })
+    @ApiProperty({ description: 'Item list sale', type: Array })
     @IsArray()
     item_id: Array<number>;
 
     @ApiProperty({
-        description: '',
+        description: 'Amount of item is reduced',
         type: Number,
         default: null
     })
@@ -36,24 +30,18 @@ export class BodyCreateSale {
     @Min(0)
     amount: number;
 
-    @ApiProperty({
-        description: '',
-        type: Number
-    })
+    @ApiProperty({ description: 'Percent is reduced', type: Number })
     @IsInt()
     @Min(0)
     @Max(100)
     discount: number;
 
-    @ApiProperty({
-        description: '',
-        type: Date
-    })
+    @ApiProperty({ description: 'Sale start date', type: Date })
     @IsDateString()
     start_date: Date;
 
     @ApiProperty({
-        description: '',
+        description: 'End start date',
         type: Date,
         default: null
     })
@@ -61,37 +49,28 @@ export class BodyCreateSale {
     @IsDateString()
     end_date: Date;
 
-    @ApiProperty({ description: '', type: Boolean, default: false })
+    @ApiProperty({ description: 'Sale status', type: Boolean, default: false })
     @IsOptional()
     @IsBoolean()
     applied: boolean;
 
-    @ApiProperty({
-        description: '',
-        type: String
-    })
+    @ApiProperty({ description: 'Sale code', type: String })
     @IsNotEmpty()
     code: string;
 }
 
 export class BodyUpdateSale {
-    @ApiProperty({
-        description: '',
-        type: String
-    })
+    @ApiProperty({ description: 'Sale name', type: String })
     @IsOptional()
     name: string;
 
-    @ApiProperty({
-        description: '',
-        type: Array
-    })
+    @ApiProperty({ description: 'Item list sale', type: Array })
     @IsOptional()
     @IsArray()
     item_id: Array<number>;
 
     @ApiProperty({
-        description: '',
+        description: 'Amount of item is reduced',
         type: Number,
         default: null
     })
@@ -101,7 +80,7 @@ export class BodyUpdateSale {
     amount: number;
 
     @ApiProperty({
-        description: '',
+        description: 'Percent is reduced',
         type: Number
     })
     @IsOptional()
@@ -111,7 +90,7 @@ export class BodyUpdateSale {
     discount: number;
 
     @ApiProperty({
-        description: '',
+        description: 'Sale start date',
         type: Date
     })
     @IsOptional()
@@ -119,48 +98,36 @@ export class BodyUpdateSale {
     start_date: Date;
 
     @ApiProperty({
-        description: '',
-        type: Date
+        description: 'Sale end date',
+        type: Date,
+        default: null
     })
     @IsOptional()
     @IsDateString()
     end_date: Date;
 
-    @ApiProperty({ description: '', type: Boolean, default: false })
+    @ApiProperty({ description: 'Sale status', type: Boolean, default: false })
     @IsOptional()
     @IsBoolean()
     applied: boolean;
 
-    @ApiProperty({
-        description: '',
-        type: String
-    })
+    @ApiProperty({ description: 'Sale code', type: String })
     @IsOptional()
     code: string;
 }
 
-export class ResponseGetSale {
-    @ApiProperty({ description: '', type: Number })
+export class ResponseCreateSale {
+    @ApiProperty({ description: 'Error status', type: Number })
     @IsIn([0, 1])
     error: number;
 
-    @ApiProperty({ description: '', type: String })
-    @IsOptional()
+    @ApiProperty({ description: 'Message is returned', type: String })
     message: string;
 
-    @ApiProperty({ description: '' })
-    @IsOptional()
+    @ApiProperty({ description: 'Data is returned' })
     data: any;
 }
 
-export class ResponseCreateSale {
-    @ApiProperty({ description: '', type: Number })
-    @IsIn([0, 1])
-    error: number;
-
-    @ApiProperty({ description: '', type: String })
-    @IsNotEmpty()
-    message: string;
-}
+export class ResponseGetSale extends ResponseCreateSale {}
 
 export class ResponseUpdateSale extends ResponseCreateSale {}

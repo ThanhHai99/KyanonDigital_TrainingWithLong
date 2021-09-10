@@ -3,28 +3,28 @@ import { IsArray, IsIn, IsInt, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class BodyCreateOrder {
     @ApiProperty({
-        description: 'Order',
+        description: 'Item list',
         type: Array
     })
     @IsArray()
     item: Array<number>;
 
     @ApiProperty({
-        description: 'Order',
+        description: 'Amount list of each product',
         type: Array
     })
     @IsArray()
     amount: Array<number>;
 
     @ApiProperty({
-        description: 'Order',
+        description: 'The delivery address',
         type: String
     })
     @IsNotEmpty()
     delivery_address: string;
 
     @ApiProperty({
-        description: 'Order',
+        description: 'The payment method',
         type: String
     })
     @IsOptional()
@@ -34,7 +34,7 @@ export class BodyCreateOrder {
 
 export class BodyPayment {
     @ApiProperty({
-        description: '',
+        description: 'The sale code',
         type: String
     })
     @IsOptional()
@@ -42,28 +42,20 @@ export class BodyPayment {
 }
 
 export class ResponseGetOrder {
-    @ApiProperty({ description: '', type: Number })
+    @ApiProperty({ description: 'Error status', type: Number })
     @IsIn([0, 1])
     error: number;
 
-    @ApiProperty({ description: '', type: String })
+    @ApiProperty({ description: 'Message is returned', type: String })
     @IsOptional()
     message: string;
 
-    @ApiProperty({ description: '' })
+    @ApiProperty({ description: 'Data is returned' })
     @IsOptional()
     data: any;
 }
 
-export class ResponseCreateOrder {
-    @ApiProperty({ description: '', type: Number })
-    @IsIn([0, 1])
-    error: number;
-
-    @ApiProperty({ description: '', type: String })
-    @IsNotEmpty()
-    message: string;
-}
+export class ResponseCreateOrder extends ResponseGetOrder {}
 
 export class ResponseExport extends ResponseCreateOrder {}
 

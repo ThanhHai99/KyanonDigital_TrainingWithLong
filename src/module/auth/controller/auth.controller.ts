@@ -19,7 +19,7 @@ export class AuthController {
     ) {}
 
     @Post('login')
-    async Login(
+    async login(
         @Body() body: BodyLogin,
         @Response() res
     ): Promise<ResponseLogin> {
@@ -85,7 +85,7 @@ export class AuthController {
     }
 
     @Get('logout')
-    async index(@Response() res) {
+    async logout(@Response() res) {
         res.setHeader('auth', '');
         return res.status(200).json({
             error: 0,

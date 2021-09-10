@@ -20,7 +20,7 @@ import {
     ApiTags
 } from '@nestjs/swagger';
 import {
-    CreateUserDto,
+    BodyCreateUser,
     ResponseCreateUser,
     ResponseGetUser,
     ResponseLockUser,
@@ -98,7 +98,7 @@ export class UserController {
         }
     }
 
-    @ApiBody({ type: CreateUserDto })
+    @ApiBody({ type: BodyCreateUser })
     @Post()
     @ApiResponse({ status: 400, description: 'Not allowed to create' })
     @ApiResponse({ status: 500, description: 'Server occurred an error' })
@@ -107,7 +107,7 @@ export class UserController {
         type: User
     })
     async create(
-        @Body() body: CreateUserDto,
+        @Body() body: BodyCreateUser,
         @Response() res
     ): Promise<ResponseCreateUser> {
         let newUser = new User();

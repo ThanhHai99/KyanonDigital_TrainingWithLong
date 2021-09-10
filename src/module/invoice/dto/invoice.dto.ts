@@ -1,35 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsIn, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsIn } from 'class-validator';
 
-export class BodyCreateInvoice {
-    @ApiProperty({
-        description: 'Invoice name',
-        type: String
-    })
-    @IsNotEmpty()
-    name: string;
-}
-
-export class ResponseGetInvoice {
-    @ApiProperty({ description: '', type: Number })
+export class ResponseCreateInvoice {
+    @ApiProperty({ description: 'Error status', type: Number })
     @IsIn([0, 1])
     error: number;
 
-    @ApiProperty({ description: '', type: String })
-    @IsOptional()
+    @ApiProperty({ description: 'Message is returned', type: String })
     message: string;
 
-    @ApiProperty({ description: '' })
-    @IsOptional()
+    @ApiProperty({ description: 'Data is returned' })
     data: any;
 }
 
-export class ResponseCreateInvoice {
-    @ApiProperty({ description: '', type: Number })
-    @IsIn([0, 1])
-    error: number;
-
-    @ApiProperty({ description: '', type: String })
-    @IsNotEmpty()
-    message: string;
-}
+export class ResponseGetInvoice extends ResponseCreateInvoice {}

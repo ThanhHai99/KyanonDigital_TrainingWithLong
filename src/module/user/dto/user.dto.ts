@@ -9,7 +9,7 @@ import {
     MinLength
 } from 'class-validator';
 
-export class CreateUserDto {
+export class BodyCreateUser {
     @ApiProperty({
         description: 'Account using the application',
         type: String
@@ -25,7 +25,7 @@ export class CreateUserDto {
     password: string;
 
     @ApiProperty({
-        description: 'Your fullname',
+        description: 'Your name',
         type: String
     })
     @IsNotEmpty()
@@ -46,7 +46,7 @@ export class CreateUserDto {
     address: string;
 
     @ApiProperty({
-        description: "Role' account",
+        description: 'Role of account',
         type: Number
     })
     @IsInt()
@@ -56,7 +56,7 @@ export class CreateUserDto {
 
 export class UpdateUserDto {
     @ApiProperty({
-        description: 'Your fullname',
+        description: 'Your name',
         type: String
     })
     @IsOptional()
@@ -79,29 +79,19 @@ export class UpdateUserDto {
     address: string;
 }
 
-export class ResponseGetUser {
-    @ApiProperty({ description: '', type: Number })
+export class ResponseCreateUser {
+    @ApiProperty({ description: 'Error status', type: Number })
     @IsIn([0, 1])
     error: number;
 
-    @ApiProperty({ description: '', type: String })
-    @IsOptional()
+    @ApiProperty({ description: 'Message is returned', type: String })
     message: string;
 
-    @ApiProperty({ description: '' })
-    @IsOptional()
+    @ApiProperty({ description: 'Data is returned' })
     data: any;
 }
 
-export class ResponseCreateUser {
-    @ApiProperty({ description: '', type: Number })
-    @IsIn([0, 1])
-    error: number;
-
-    @ApiProperty({ description: '', type: String })
-    @IsNotEmpty()
-    message: string;
-}
+export class ResponseGetUser extends ResponseCreateUser {}
 
 export class ResponseUpdateUser extends ResponseCreateUser {}
 

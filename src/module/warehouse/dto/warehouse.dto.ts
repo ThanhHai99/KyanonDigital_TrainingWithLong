@@ -1,67 +1,49 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-    IsArray,
-    IsDateString,
-    IsIn,
-    IsInt,
-    IsNotEmpty,
-    IsOptional,
-    Min
-} from 'class-validator';
+import { IsArray, IsDateString, IsIn, IsInt, Min } from 'class-validator';
 
 export class BodyImporting {
-    @ApiProperty({ description: '', type: Date })
+    @ApiProperty({ description: 'Expiration date of item', type: Date })
     @IsDateString()
     expiration_date: Date;
-    
-    @ApiProperty({ description: '', type: Number })
+
+    @ApiProperty({ description: 'Amount of item', type: Number })
     @IsInt()
     @Min(0)
     amount: number;
 
-    @ApiProperty({ description: '', type: Number })
+    @ApiProperty({ description: 'Price of item', type: Number })
     @IsInt()
     @Min(0)
     price: number;
-    
-    @ApiProperty({ description: '', type: Number })
+
+    @ApiProperty({ description: 'Item id', type: Number })
     @IsInt()
     @Min(1)
     item_id: number;
 }
 
 export class BodyExporting {
-    @ApiProperty({ description: '', type: Array })
+    @ApiProperty({ description: 'Item id', type: Array })
     @IsArray()
     item_id: Array<number>;
 
-    @ApiProperty({ description: '', type: Array })
+    @ApiProperty({ description: 'Amount of item', type: Array })
     @IsArray()
     amount: Array<number>;
 }
 
 export class ResponseGetWarehouse {
-    @ApiProperty({ description: '', type: Number })
+    @ApiProperty({ description: 'Error status', type: Number })
     @IsIn([0, 1])
     error: number;
-    
-    @ApiProperty({ description: '', type: String })
-    @IsOptional()
+
+    @ApiProperty({ description: 'Message is returned', type: String })
     message: string;
 
-    @ApiProperty({ description: '' })
-    @IsOptional()
+    @ApiProperty({ description: 'Data is returned' })
     data: any;
 }
 
-export class ResponseImporting {
-    @ApiProperty({ description: '', type: Number })
-    @IsIn([0, 1])
-    error: number;
-
-    @ApiProperty({ description: '', type: String })
-    @IsNotEmpty()
-    message: string;
-}
+export class ResponseImporting extends ResponseGetWarehouse {}
 
 export class ResponseExporting extends ResponseImporting {}
