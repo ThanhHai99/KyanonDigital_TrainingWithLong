@@ -5,8 +5,8 @@ import {
     Column,
     Entity
 } from 'typeorm';
-import { Item } from '../../item/entity/items.entity';
-import { Order } from '../../order/entity/orders.entity';
+import { Item } from '../../item/entity/item.entity';
+import { Order } from '../../order/entity/order.entity';
 
 @Entity({ name: 'item_order' })
 export class ItemOrder extends BaseEntity {

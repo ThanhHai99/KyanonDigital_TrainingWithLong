@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { getRepository } from 'typeorm';
-import { User } from '../modules/user/entity/users.entity';
+import { User } from '../modules/user/entity/user.entity';
 
 export const checkRole = (roles: Array<number>) => {
     return async (req: Request, res: Response, next: NextFunction) => {

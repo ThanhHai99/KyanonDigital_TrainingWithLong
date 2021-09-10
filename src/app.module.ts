@@ -3,32 +3,38 @@ import { Connection } from 'typeorm';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './modules/user/users.module';
-import { User } from './modules/user/entity/users.entity';
-import { RolesModule } from './modules/role/roles.module';
-import { Role } from './modules/role/entity/roles.entity';
-import { Item } from './modules/item/entity/items.entity';
-import { Sale } from './modules/sale/entity/sales.entity';
+import { UsersModule } from './modules/user/user.module';
+import { User } from './modules/user/entity/user.entity';
+import { RolesModule } from './modules/role/role.module';
+import { Role } from './modules/role/entity/role.entity';
+import { Item } from './modules/item/entity/item.entity';
+import { Sale } from './modules/sale/entity/sale.entity';
 import { ItemOrder } from './modules/item_order/entity/item_order.entity';
-import { Invoice } from './modules/invoice/entity/invoices.entity';
-import { Category } from './modules/category/entity/categories.entity';
-import { Warehouse } from './modules/warehouse/entity/warehouses.entity';
-import { WarehouseModule } from './modules/warehouse/warehouses.module';
-import { SaleModule } from './modules/sale/sales.module';
+import { Invoice } from './modules/invoice/entity/invoice.entity';
+import { Category } from './modules/category/entity/category.entity';
+import { Warehouse } from './modules/warehouse/entity/warehouse.entity';
+import { WarehouseModule } from './modules/warehouse/warehouse.module';
+import { SaleModule } from './modules/sale/sale.module';
 import { checkJwt } from './middlewares/checkJwt';
 import { checkRole } from './middlewares/checkRole';
-import { CategoryLog } from './modules/category_log/entity/category_logs.entity';
-import { ItemLog } from './modules/item_log/entity/item_logs.entity';
+import { CategoryLog } from './modules/category_log/entity/category_log.entity';
+import { ItemLog } from './modules/item_log/entity/item_log.entity';
 import { SaleItem } from './modules/sale_item/entity/sale_items.entity';
-import { Order } from './modules/order/entity/orders.entity';
-import { PriceLog } from './modules/price_log/entity/price_logs.entity';
-import { SaleLog } from './modules/sale_log/entity/sale_logs.entity';
-import { CategoriesModule } from './modules/category/categories.module';
-import { ItemsModule } from './modules/item/items.module';
-import { WarehouseLog } from './modules/warehouse_log/entity/warehouse_logs.entity';
-import { OrdersModule } from './modules/order/orders.module';
-import { InvoiceModule } from './modules/invoice/invoices.module';
+import { Order } from './modules/order/entity/order.entity';
+import { PriceLog } from './modules/price_log/entity/price_log.entity';
+import { SaleLog } from './modules/sale_log/entity/sale_log.entity';
+import { CategoriesModule } from './modules/category/category.module';
+import { ItemsModule } from './modules/item/item.module';
+import { WarehouseLog } from './modules/warehouse_log/entity/warehouse_log.entity';
+import { OrdersModule } from './modules/order/order.module';
+import { InvoiceModule } from './modules/invoice/invoice.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { SaleLogModule } from './modules/sale_log/sale_log.module';
+import { SaleItemModule } from './modules/sale_item/sale_item.module';
+import { WarehouseLogModule } from './modules/warehouse_log/warehouse_log.module';
+import { CategoryLogModule } from './modules/category_log/category_log.module';
+import { ItemLogModule } from './modules/item_log/item_log.module';
+import { ItemOrderModule } from './modules/item_order/item_order.module';
 require('dotenv').config();
 
 @Module({
@@ -55,7 +61,7 @@ require('dotenv').config();
                 Invoice,
                 WarehouseLog,
                 Warehouse,
-                PriceLog,
+                PriceLog
             ],
             synchronize: true
         }),
@@ -68,6 +74,12 @@ require('dotenv').config();
         CategoriesModule,
         ItemsModule,
         InvoiceModule,
+        SaleLogModule,
+        SaleItemModule,
+        WarehouseLogModule,
+        CategoryLogModule,
+        ItemLogModule,
+        ItemOrderModule
     ],
     controllers: [AppController],
     providers: [AppService]

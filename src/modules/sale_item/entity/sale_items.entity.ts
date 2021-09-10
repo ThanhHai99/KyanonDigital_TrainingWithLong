@@ -8,15 +8,15 @@ import {
     ManyToOne,
     JoinColumn
 } from 'typeorm';
-import { Sale } from '../../sale/entity/sales.entity';
+import { Sale } from '../../sale/entity/sale.entity';
 
-@Entity({ name: 'sale_items' })
+@Entity({ name: 'sale_item' })
 export class SaleItem extends BaseEntity {
     @Column({ primary: true, generated: true })
     id: number;
 
     @Column()
-    item_id: number;    
+    item_id: number;
 
     @ManyToOne((type) => Sale, (si) => si.sale_item)
     @JoinColumn({ name: 'sale_id' })

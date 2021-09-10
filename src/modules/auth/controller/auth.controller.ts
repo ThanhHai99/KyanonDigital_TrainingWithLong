@@ -5,17 +5,17 @@ import {
     BodyRegister,
     ResponseLogin,
     ResponseRegister
-} from 'src/modules/auth/dto/auth.dto';
-import { AuthService } from 'src/modules/auth/service/auth.service';
-import { UsersService } from 'src/modules/user/service/users.service';
-import { User } from '../../user/entity/users.entity';
+} from '../dto/auth.dto';
+import { AuthService } from '../service/auth.service';
+import { UserService } from '../../user/service/user.service';
+import { User } from '../../user/entity/user.entity';
 require('dotenv').config();
 
 @Controller('auth')
 export class AuthController {
     constructor(
         private authService: AuthService,
-        private usersService: UsersService
+        private userService: UserService
     ) {}
 
     @Post('login')
@@ -25,7 +25,7 @@ export class AuthController {
     ): Promise<ResponseLogin> {
         const { username, password } = body;
 
-        let user: User = await this.usersService.isExisting(username);
+        let user: User = await this.userService.isExisting(username);
         if (!user) {
             return res.status(401).json({
                 error: 1,
@@ -107,9 +107,7 @@ export class AuthController {
         newUser.role = <any>4;
 
         try {
-            const user = await this.authService.isNotExisting(
-                body.username
-            );
+            const user = await this.authService.isNotExisting(body.username);
             if (!user) {
                 return res.status(409).json({
                     error: 1,
