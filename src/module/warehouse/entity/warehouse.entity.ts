@@ -1,4 +1,4 @@
-import { Item } from 'src/modules/item/entity/item.entity';
+import { Item } from 'src/module/item/entity/item.entity';
 import {
     JoinColumn,
     ManyToOne,

@@ -9,7 +9,7 @@ import {
     JoinColumn
 } from 'typeorm';
 import { Invoice } from '../../invoice/entity/invoice.entity';
-import { PAY } from 'src/helpers/paymentMethod';
+import { PAY } from '../../../helpers/paymentMethod';
 import { ItemOrder } from '../../item_order/entity/item_order.entity';
 import { User } from '../../user/entity/user.entity';
 

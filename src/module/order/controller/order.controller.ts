@@ -18,11 +18,11 @@ import {
     ApiSecurity,
     ApiTags
 } from '@nestjs/swagger';
-import { Invoice } from 'src/modules/invoice/entity/invoice.entity';
-import { InvoiceService } from 'src/modules/invoice/service/invoice.service';
-import { ItemService } from 'src/modules/item/service/item.service';
-import { ItemOrder } from 'src/modules/item_order/entity/item_order.entity';
-import { ItemOrderService } from 'src/modules/item_order/service/item_order.service';
+import { Invoice } from 'src/module/invoice/entity/invoice.entity';
+import { InvoiceService } from 'src/module/invoice/service/invoice.service';
+import { ItemService } from 'src/module/item/service/item.service';
+import { ItemOrder } from 'src/module/item_order/entity/item_order.entity';
+import { ItemOrderService } from 'src/module/item_order/service/item_order.service';
 import {
     BodyPayment,
     ResponseCreateOrder,
