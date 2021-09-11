@@ -29,7 +29,7 @@ export class SaleLog extends BaseEntity {
     end_date: Date;
 
     @Column()
-    amount: number;
+    amount: string;
 
     @Column()
     discount: number;

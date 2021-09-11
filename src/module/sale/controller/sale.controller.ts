@@ -26,7 +26,6 @@ import {
     ResponseUpdateSale
 } from '../dto/sale.dto';
 import { Sale } from '../entity/sale.entity';
-
 import { SaleService } from '../service/sale.service';
 
 @ApiTags('sale')
@@ -94,10 +93,6 @@ export class SaleController {
     })
     @ApiBody({ type: BodyCreateSale })
     @Post()
-    @ApiCreatedResponse({
-        description: '0',
-        type: Sale
-    })
     async create(
         @Body() body: BodyCreateSale,
         @Response() res
@@ -106,7 +101,6 @@ export class SaleController {
         newSale.name = body.name;
         newSale.start_date = body.start_date;
         newSale.end_date = body.end_date;
-        newSale.amount = body.amount;
         newSale.discount = body.discount;
         newSale.applied = !!body.applied ? body.applied : false;
         newSale.code = body.code;
@@ -126,12 +120,14 @@ export class SaleController {
             const sale: Sale = await this.saleService.create(newSale);
             // Create sale item
             const itemArray: Array<number> = body.item_id;
+            const amountArray: Array<number> = body.amount;
+
             for (const i in itemArray) {
                 if (Object.prototype.hasOwnProperty.call(itemArray, i)) {
-                    const e: number = itemArray[i];
                     let newSaleItem = new SaleItem();
-                    newSaleItem.item_id = e;
+                    newSaleItem.item_id = itemArray[i];
                     newSaleItem.sale = <any>sale.id;
+                    newSaleItem.amount = amountArray[i];
                     await this.saleItemService.create(newSaleItem);
                 }
             }
@@ -143,7 +139,7 @@ export class SaleController {
             newSaleLog.sale_item = body.item_id.toString();
             newSaleLog.start_date = sale.start_date;
             newSaleLog.end_date = sale.end_date;
-            newSaleLog.amount = sale.amount;
+            newSaleLog.amount = body.amount.toString();
             newSaleLog.discount = sale.discount;
             newSaleLog.applied = sale.applied;
             newSaleLog.code = sale.code;
@@ -203,7 +199,7 @@ export class SaleController {
             ? body.start_date
             : _sale.start_date;
         _sale.end_date = !!body.end_date ? body.end_date : _sale.end_date;
-        _sale.amount = !!body.amount ? body.amount : _sale.amount;
+        // _sale.amount = !!body.amount ? body.amount : _sale.amount;
         _sale.discount = !!body.discount ? body.discount : _sale.discount;
         _sale.applied = !!body.applied ? body.applied : _sale.applied;
         _sale.user = res.locals.jwtPayload.userId; // Get from token
@@ -222,7 +218,7 @@ export class SaleController {
             newSaleLog.sale_item = sale_item;
             newSaleLog.start_date = sale.start_date;
             newSaleLog.end_date = sale.end_date;
-            newSaleLog.amount = sale.amount;
+            // newSaleLog.amount = sale.amount;
             newSaleLog.discount = sale.discount;
             newSaleLog.applied = sale.applied;
             newSaleLog.created_by = res.locals.jwtPayload.userId; // Get from token

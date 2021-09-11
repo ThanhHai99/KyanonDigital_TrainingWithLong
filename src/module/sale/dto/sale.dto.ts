@@ -20,15 +20,9 @@ export class BodyCreateSale {
     @IsArray()
     item_id: Array<number>;
 
-    @ApiProperty({
-        description: 'Amount of item is reduced',
-        type: Number,
-        default: null
-    })
-    @IsOptional()
-    @IsInt()
-    @Min(0)
-    amount: number;
+    @ApiProperty({ description: 'Amount of item is reduced', type: Array })
+    @IsArray()
+    amount: Array<number>;
 
     @ApiProperty({ description: 'Percent is reduced', type: Number })
     @IsInt()

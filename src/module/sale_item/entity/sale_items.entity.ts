@@ -4,7 +4,6 @@ import {
     BaseEntity,
     Column,
     Entity,
-    OneToMany,
     ManyToOne,
     JoinColumn
 } from 'typeorm';
@@ -21,6 +20,9 @@ export class SaleItem extends BaseEntity {
     @ManyToOne((type) => Sale, (si) => si.sale_item)
     @JoinColumn({ name: 'sale_id' })
     sale: Sale;
+
+    @Column({ nullable: true, default: null })
+    amount: number;
 
     @CreateDateColumn({
         type: 'timestamp',

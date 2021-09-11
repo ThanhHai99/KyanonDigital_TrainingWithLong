@@ -29,9 +29,6 @@ export class Sale extends BaseEntity {
     @Column({ type: 'timestamp', nullable: true, default: null })
     end_date: Date;
 
-    @Column({ nullable: true, default: null })
-    amount: number;
-
     @Column()
     discount: number;
 
