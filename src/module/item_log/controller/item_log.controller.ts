@@ -1,17 +1,11 @@
 import { Controller, Get, Response, Param } from '@nestjs/common';
-import {
-    ApiBasicAuth,
-    ApiOkResponse,
-    ApiSecurity,
-    ApiTags
-} from '@nestjs/swagger';
+import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { ResponseGetLog } from 'src/dto/log.dto';
 import { ItemLog } from '../entity/item_log.entity';
 import { ItemLogService } from '../service/item_log.service';
 
 @ApiTags('item_log')
-@ApiBasicAuth()
-@ApiSecurity('basic')
+@ApiSecurity('JwtAuthGuard')
 @Controller('item_log')
 export class ItemLogController {
     constructor(private itemLogService: ItemLogService) {}

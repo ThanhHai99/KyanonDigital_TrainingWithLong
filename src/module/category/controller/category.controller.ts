@@ -8,11 +8,9 @@ import {
     Patch
 } from '@nestjs/common';
 import {
-    ApiBasicAuth,
     ApiBody,
     ApiCreatedResponse,
     ApiOkResponse,
-    ApiResponse,
     ApiSecurity,
     ApiTags
 } from '@nestjs/swagger';
@@ -29,8 +27,7 @@ import {
 } from '../dto/category.dto';
 
 @ApiTags('category')
-@ApiBasicAuth()
-@ApiSecurity('basic')
+@ApiSecurity('JwtAuthGuard')
 @Controller('category')
 export class CategoryController {
     constructor(
@@ -88,15 +85,12 @@ export class CategoryController {
         }
     }
 
-    @ApiOkResponse({ description: 'Create a category' })
+    @ApiCreatedResponse({
+        type: BodyCreateCategory,
+        description: 'The record has been successfully created.'
+    })
     @ApiBody({ type: BodyCreateCategory })
     @Post()
-    @ApiResponse({ status: 400, description: 'Not allowed to create' })
-    @ApiResponse({ status: 500, description: 'Server occurred an error' })
-    @ApiCreatedResponse({
-        description: '',
-        type: Category
-    })
     async create(
         @Body() body: BodyCreateCategory,
         @Response() res
@@ -136,6 +130,10 @@ export class CategoryController {
         }
     }
 
+    @ApiCreatedResponse({
+        type: BodyUpdateCategory,
+        description: 'The record has been successfully updated.'
+    })
     @ApiOkResponse({ description: 'Update a category' })
     @ApiBody({ type: BodyUpdateCategory })
     @Patch(':id')

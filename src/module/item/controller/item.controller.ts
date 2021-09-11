@@ -9,11 +9,9 @@ import {
     Query
 } from '@nestjs/common';
 import {
-    ApiBasicAuth,
     ApiBody,
     ApiCreatedResponse,
     ApiOkResponse,
-    ApiResponse,
     ApiSecurity,
     ApiTags
 } from '@nestjs/swagger';
@@ -31,8 +29,7 @@ import { ItemLogService } from '../../item_log/service/item_log.service';
 import { PriceLogService } from '../../price_log/service/price_log.service';
 
 @ApiTags('item')
-@ApiBasicAuth()
-@ApiSecurity('basic')
+@ApiSecurity('JwtAuthGuard')
 @Controller('item')
 export class ItemController {
     constructor(
@@ -99,10 +96,12 @@ export class ItemController {
         }
     }
 
+    @ApiCreatedResponse({
+        type: BodyCreateItem,
+        description: 'The record has been successfully created.'
+    })
     @ApiBody({ type: BodyCreateItem })
     @Post()
-    @ApiResponse({ status: 400, description: 'Not allowed to create' })
-    @ApiResponse({ status: 500, description: 'Server occurred an error' })
     @ApiCreatedResponse({
         description: '0',
         type: Item
@@ -157,6 +156,11 @@ export class ItemController {
         }
     }
 
+    @ApiCreatedResponse({
+        type: BodyUpdateItem,
+        description: 'The record has been successfully updated.'
+    })
+    @ApiBody({ type: BodyUpdateItem })
     @Patch(':id')
     async update(
         @Body() body: BodyUpdateItem,

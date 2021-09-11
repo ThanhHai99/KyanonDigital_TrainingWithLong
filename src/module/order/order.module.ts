@@ -4,11 +4,11 @@ import { OrderController } from './controller/order.controller';
 import { Order } from './entity/order.entity';
 import { OrderService } from './service/order.service';
 import { InvoiceModule } from '../invoice/invoice.module';
-import { ItemsModule } from '../item/item.module';
+import { ItemModule } from '../item/item.module';
 import { ItemOrderModule } from '../item_order/item_order.module';
 import { SaleModule } from '../sale/sale.module';
 import { SaleItemModule } from '../sale_item/sale_item.module';
-import { UsersModule } from '../user/user.module';
+import { UserModule } from '../user/user.module';
 import { WarehouseModule } from '../warehouse/warehouse.module';
 import { WarehouseLogModule } from '../warehouse_log/warehouse_log.module';
 
@@ -19,12 +19,12 @@ import { WarehouseLogModule } from '../warehouse_log/warehouse_log.module';
         WarehouseModule,
         WarehouseLogModule,
         InvoiceModule,
-        UsersModule,
-        ItemsModule,
+        UserModule,
+        ItemModule,
         SaleModule,
         SaleItemModule
     ],
     controllers: [OrderController],
     providers: [OrderService]
 })
-export class OrdersModule {}
+export class OrderModule {}

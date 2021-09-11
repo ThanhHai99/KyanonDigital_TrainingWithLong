@@ -1,6 +1,5 @@
 import { Controller, Get, Response, Param } from '@nestjs/common';
 import {
-    ApiBasicAuth,
     ApiOkResponse,
     ApiSecurity,
     ApiTags
@@ -9,8 +8,7 @@ import { PriceLog } from '../entity/price_log.entity';
 import { PriceLogService } from '../service/price_log.service';
 
 @ApiTags('price_log')
-@ApiBasicAuth()
-@ApiSecurity('basic')
+@ApiSecurity('JwtAuthGuard')
 @Controller('price_log')
 export class PriceLogController {
     constructor(private priceLogService: PriceLogService) {}

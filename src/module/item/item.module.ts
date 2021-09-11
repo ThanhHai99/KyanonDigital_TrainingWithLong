@@ -12,4 +12,4 @@ import { Item } from './entity/item.entity';
     providers: [ItemService],
     exports: [TypeOrmModule.forFeature([Item]), ItemService]
 })
-export class ItemsModule {}
+export class ItemModule {}

@@ -6,17 +6,20 @@ require('dotenv').config();
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
-    app.useGlobalPipes(new ValidationPipe())
+    app.useGlobalPipes(new ValidationPipe());
     const config = new DocumentBuilder()
         .setTitle('Shopping Online')
         .setDescription('The API Description')
         .setVersion('1.0.0')
         .addTag('v1.0.0')
-        .addBasicAuth()
-        .addSecurity('basic', {
-            type: 'http',
-            scheme: 'basic'
-        })
+        .addApiKey(
+            {
+                type: 'apiKey',
+                name: 'auth',
+                in: 'header'
+            },
+            'JwtAuthGuard'
+        )
         .build();
 
     const document = SwaggerModule.createDocument(app, config);

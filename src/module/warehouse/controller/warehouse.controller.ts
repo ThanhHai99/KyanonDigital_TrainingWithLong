@@ -1,6 +1,8 @@
-import { Body, Controller, Get, Param, Post, Response } from '@nestjs/common';
+import { Body, Controller, Get, Post, Response } from '@nestjs/common';
 import {
     ApiBasicAuth,
+    ApiBody,
+    ApiCreatedResponse,
     ApiOkResponse,
     ApiSecurity,
     ApiTags
@@ -78,7 +80,11 @@ export class WarehouseController {
     //     }
     // }
 
-    @ApiOkResponse({ description: '' })
+    @ApiCreatedResponse({
+        type: BodyImporting,
+        description: 'The record has been successfully created.'
+    })
+    @ApiBody({ type: BodyImporting })
     @Post('importing')
     async importing(
         @Body() body: BodyImporting,
@@ -117,67 +123,7 @@ export class WarehouseController {
         }
     }
 
-    // @ApiOkResponse({ description: '' })
-    // @Post('exporting')
-    // async exporting(
-    //     @Body() body: BodyExporting,
-    //     @Response() res
-    // ): Promise<ResponseExporting> {
-    //     try {
-    //         const subtractOneMonth = moment()
-    //             .subtract(1, 'months')
-    //             .format('YYYY-MM-DD');
-    //         const enoughToExport =
-    //             await this.warehouseService.isEnoughItemToExport(
-    //                 subtractOneMonth,
-    //                 body.item_id,
-    //                 body.amount
-    //             );
-
-    //         if (!enoughToExport) {
-    //             return res.status(400).json({
-    //                 error: 0,
-    //                 message: 'Item quantity is not enough'
-    //             });
-    //         }
-
-    //         // Exporting
-    //         let responseExport = await this.warehouseService.exportItemByAmount(
-    //             subtractOneMonth,
-    //             body.item_id,
-    //             body.amount
-    //         );
-
-    //         // Create warehouse log
-    //         for (let index = 0; index < responseExport.length; index++) {
-    //             let responseExport_i = responseExport[index]
-    //                 .toString()
-    //                 .split(';');
-    //             let newWarehouseLog = new WarehouseLog();
-    //             newWarehouseLog.status = '-';
-    //             newWarehouseLog.warehouse = <any>responseExport_i[0];
-    //             newWarehouseLog.item_id = <any>responseExport_i[1];
-    //             newWarehouseLog.amount = <any>responseExport_i[2];
-    //             newWarehouseLog.expiration_date = <any>responseExport_i[3];
-    //             newWarehouseLog.created_by = res.locals.jwtPayload.userId; // Get from token
-
-    //             await this.warehouseLogService.create(newWarehouseLog);
-    //         }
-
-    //         return res.status(201).json({
-    //             error: 0,
-    //             message: 'exporting successfully'
-    //         });
-    //     } catch (error) {
-    //         console.log(error);
-    //         return res.status(500).json({
-    //             error: 1,
-    //             message: 'Server occurred an error'
-    //         });
-    //     }
-    // }
-
-    @ApiOkResponse({ description: '' })
+    @ApiOkResponse({ description: 'Get all item inventory' })
     @Get('inventory')
     async inventory(@Response() res): Promise<ResponseGetWarehouse> {
         try {

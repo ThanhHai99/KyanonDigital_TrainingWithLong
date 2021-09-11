@@ -6,15 +6,12 @@ import {
     Post,
     Body,
     Patch,
-    Query,
     Delete
 } from '@nestjs/common';
 import {
-    ApiBasicAuth,
     ApiBody,
     ApiCreatedResponse,
     ApiOkResponse,
-    ApiResponse,
     ApiSecurity,
     ApiTags
 } from '@nestjs/swagger';
@@ -42,8 +39,7 @@ import { WarehouseLogService } from '../../warehouse_log/service/warehouse_log.s
 const moment = require('moment');
 
 @ApiTags('order')
-@ApiBasicAuth()
-@ApiSecurity('basic')
+@ApiSecurity('JwtAuthGuard')
 @Controller('order')
 export class OrderController {
     constructor(
@@ -108,11 +104,12 @@ export class OrderController {
         }
     }
 
-    @ApiOkResponse({ description: 'Create a order' })
+    @ApiCreatedResponse({
+        type: BodyCreateOrder,
+        description: 'The record has been successfully created.'
+    })
     @ApiBody({ type: BodyCreateOrder })
     @Post()
-    @ApiResponse({ status: 400, description: 'Not allowed to create' })
-    @ApiResponse({ status: 500, description: 'Server occurred an error' })
     @ApiCreatedResponse({
         description: '',
         type: Order
@@ -152,7 +149,10 @@ export class OrderController {
         }
     }
 
-    @ApiOkResponse({ description: 'Exporting a order' })
+    @ApiCreatedResponse({
+        type: BodyPayment,
+        description: 'The record has been successfully updated.'
+    })
     @ApiBody({ type: BodyPayment })
     @Patch(':id')
     async update(

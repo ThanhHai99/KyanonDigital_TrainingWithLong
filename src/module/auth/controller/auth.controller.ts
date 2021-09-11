@@ -9,8 +9,18 @@ import {
 import { AuthService } from '../service/auth.service';
 import { UserService } from '../../user/service/user.service';
 import { User } from '../../user/entity/user.entity';
+import {
+    ApiBody,
+    ApiCreatedResponse,
+    ApiOkResponse,
+    ApiParam,
+    ApiSecurity,
+    ApiTags,
+    ApiUnauthorizedResponse
+} from '@nestjs/swagger';
 require('dotenv').config();
 
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
     constructor(
@@ -18,6 +28,9 @@ export class AuthController {
         private userService: UserService
     ) {}
 
+    @ApiOkResponse({ description: 'Login is successful!' })
+    @ApiUnauthorizedResponse({ description: 'Incorrect email or password!' })
+    @ApiSecurity('auth')
     @Post('login')
     async login(
         @Body() body: BodyLogin,
@@ -84,6 +97,7 @@ export class AuthController {
         });
     }
 
+    @ApiOkResponse({ description: 'Logout is successful!' })
     @Get('logout')
     async logout(@Response() res) {
         res.setHeader('auth', '');
@@ -93,6 +107,13 @@ export class AuthController {
         });
     }
 
+    @ApiCreatedResponse({
+        type: ResponseRegister,
+        description: 'The record has been successfully created.'
+    })
+    @ApiBody({
+        type: BodyRegister
+    })
     @Post('register')
     async register(
         @Body() body: BodyRegister,

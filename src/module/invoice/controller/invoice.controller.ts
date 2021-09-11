@@ -1,17 +1,11 @@
 import { Controller, Get, Response, Param } from '@nestjs/common';
-import {
-    ApiBasicAuth,
-    ApiOkResponse,
-    ApiSecurity,
-    ApiTags
-} from '@nestjs/swagger';
+import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { ResponseGetInvoice } from '../dto/invoice.dto';
 import { Invoice } from '../entity/invoice.entity';
 import { InvoiceService } from '../service/invoice.service';
 
 @ApiTags('invoice')
-@ApiBasicAuth()
-@ApiSecurity('basic')
+@ApiSecurity('JwtAuthGuard')
 @Controller('invoice')
 export class InvoiceController {
     constructor(private readonly invoiceService: InvoiceService) {}

@@ -8,11 +8,9 @@ import {
     Patch
 } from '@nestjs/common';
 import {
-    ApiBasicAuth,
     ApiBody,
     ApiCreatedResponse,
     ApiOkResponse,
-    ApiResponse,
     ApiSecurity,
     ApiTags
 } from '@nestjs/swagger';
@@ -32,8 +30,7 @@ import { Sale } from '../entity/sale.entity';
 import { SaleService } from '../service/sale.service';
 
 @ApiTags('sale')
-@ApiBasicAuth()
-@ApiSecurity('basic')
+@ApiSecurity('JwtAuthGuard')
 @Controller('sale')
 export class SaleController {
     constructor(
@@ -67,7 +64,10 @@ export class SaleController {
 
     @ApiOkResponse({ description: "Get a sale by sale's id" })
     @Get(':id')
-    async readById(@Response() res, @Param('id') id: number): Promise<ResponseGetSale> {
+    async readById(
+        @Response() res,
+        @Param('id') id: number
+    ): Promise<ResponseGetSale> {
         try {
             const sale: Sale = await this.saleService.getById(id);
             if (!sale) {
@@ -88,11 +88,12 @@ export class SaleController {
         }
     }
 
-    @ApiOkResponse({ description: 'Create a sale' })
+    @ApiCreatedResponse({
+        type: BodyCreateSale,
+        description: 'The record has been successfully created.'
+    })
     @ApiBody({ type: BodyCreateSale })
     @Post()
-    @ApiResponse({ status: 400, description: 'Not allowed to create' })
-    @ApiResponse({ status: 500, description: 'Server occurred an error' })
     @ApiCreatedResponse({
         description: '0',
         type: Sale
@@ -111,9 +112,8 @@ export class SaleController {
         newSale.code = body.code;
         newSale.user = res.locals.jwtPayload.userId; // Get from token
 
-        const isNameExisting: boolean = await this.saleService.isNameAlreadyInUse(
-            newSale.name
-        );
+        const isNameExisting: boolean =
+            await this.saleService.isNameAlreadyInUse(newSale.name);
 
         if (isNameExisting) {
             return res.status(409).json({
@@ -162,7 +162,10 @@ export class SaleController {
         }
     }
 
-    @ApiOkResponse({ description: 'Update a sale' })
+    @ApiCreatedResponse({
+        type: BodyUpdateSale,
+        description: 'The record has been successfully updated.'
+    })
     @ApiBody({ type: BodyUpdateSale })
     @Patch(':id')
     async update(
@@ -185,9 +188,8 @@ export class SaleController {
             });
         }
 
-        const isNameExisting: boolean = await this.saleService.isNameAlreadyInUse(
-            body.name
-        );
+        const isNameExisting: boolean =
+            await this.saleService.isNameAlreadyInUse(body.name);
 
         if (isNameExisting) {
             return res.status(409).json({
@@ -208,7 +210,9 @@ export class SaleController {
 
         try {
             const sale: Sale = await this.saleService.update(_sale);
-            const t: SaleItem[] = await this.saleItemService.getBySaleId(_sale.id);
+            const t: SaleItem[] = await this.saleItemService.getBySaleId(
+                _sale.id
+            );
             const sale_item: string = t.map((e) => e.item_id).toString();
 
             // Create sale log

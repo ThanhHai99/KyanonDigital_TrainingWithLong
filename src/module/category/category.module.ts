@@ -10,4 +10,4 @@ import { CategoryLogModule } from '../category_log/category_log.module';
     controllers: [CategoryController],
     providers: [CategoryService]
 })
-export class CategoriesModule {}
+export class CategoryModule {}

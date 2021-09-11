@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ApiParam } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../user/entity/user.entity';
@@ -10,6 +11,7 @@ export class AuthService {
         private userRepository: Repository<User>
     ) {}
 
+    @ApiParam({ name: 'user', type: User })
     async create(user: User): Promise<any> {
         await this.userRepository.save(user);
         return this.userRepository.find();

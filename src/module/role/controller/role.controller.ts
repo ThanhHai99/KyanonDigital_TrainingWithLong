@@ -1,16 +1,10 @@
 import { Controller, Get, Param, Response } from '@nestjs/common';
-import {
-    ApiBasicAuth,
-    ApiOkResponse,
-    ApiSecurity,
-    ApiTags
-} from '@nestjs/swagger';
+import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Role } from '../entity/role.entity';
 import { RoleService } from '../service/role.service';
 
 @ApiTags('role')
-@ApiBasicAuth()
-@ApiSecurity('basic')
+@ApiSecurity('JwtAuthGuard')
 @Controller('role')
 export class RoleController {
     constructor(private roleService: RoleService) {}

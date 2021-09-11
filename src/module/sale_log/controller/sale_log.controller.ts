@@ -1,16 +1,10 @@
 import { Controller, Get, Response, Param } from '@nestjs/common';
-import {
-    ApiBasicAuth,
-    ApiOkResponse,
-    ApiSecurity,
-    ApiTags
-} from '@nestjs/swagger';
+import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { SaleLog } from '../entity/sale_log.entity';
 import { SaleLogService } from '../service/sale_log.service';
 
 @ApiTags('sale_log')
-@ApiBasicAuth()
-@ApiSecurity('basic')
+@ApiSecurity('JwtAuthGuard')
 @Controller('sale_log')
 export class SaleLogController {
     constructor(private saleLogService: SaleLogService) {}
@@ -19,8 +13,7 @@ export class SaleLogController {
     @Get()
     async readAll(@Response() res) {
         try {
-            let saleLog: SaleLog[] =
-                await this.saleLogService.getAll();
+            let saleLog: SaleLog[] = await this.saleLogService.getAll();
             if (!saleLog || saleLog.length === 0) {
                 return res.status(200).json({
                     error: 0,
@@ -43,8 +36,7 @@ export class SaleLogController {
     @Get(':id')
     async readById(@Response() res, @Param('id') id: number) {
         try {
-            let saleLog: SaleLog =
-                await this.saleLogService.getById(id);
+            let saleLog: SaleLog = await this.saleLogService.getById(id);
 
             if (!saleLog) {
                 return res.status(200).json({

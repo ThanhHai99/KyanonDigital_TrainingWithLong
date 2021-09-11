@@ -12,11 +12,10 @@ import {
 import { User } from '../entity/user.entity';
 import { UserService } from '../service/user.service';
 import {
-    ApiBasicAuth,
     ApiBody,
     ApiCreatedResponse,
     ApiOkResponse,
-    ApiResponse,
+    ApiSecurity,
     ApiTags
 } from '@nestjs/swagger';
 import {
@@ -29,7 +28,7 @@ import {
 } from '../dto/user.dto';
 
 @ApiTags('user')
-@ApiBasicAuth()
+@ApiSecurity('JwtAuthGuard')
 @Controller('user')
 export class UserController {
     constructor(private userService: UserService) {}
@@ -98,10 +97,12 @@ export class UserController {
         }
     }
 
+    @ApiCreatedResponse({
+        type: BodyCreateUser,
+        description: 'The record has been successfully created.'
+    })
     @ApiBody({ type: BodyCreateUser })
     @Post()
-    @ApiResponse({ status: 400, description: 'Not allowed to create' })
-    @ApiResponse({ status: 500, description: 'Server occurred an error' })
     @ApiCreatedResponse({
         description: '0',
         type: User
@@ -156,6 +157,11 @@ export class UserController {
         }
     }
 
+    @ApiCreatedResponse({
+        type: UpdateUserDto,
+        description: 'The record has been successfully updated.'
+    })
+    @ApiBody({ type: UpdateUserDto })
     @Patch(':id')
     async update(
         @Body() body: UpdateUserDto,
@@ -187,6 +193,7 @@ export class UserController {
         }
     }
 
+    @ApiOkResponse({ description: 'The account is locked.' })
     @Delete()
     async lock(@Query() query, @Response() res): Promise<ResponseLockUser> {
         try {
