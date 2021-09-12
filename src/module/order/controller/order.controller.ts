@@ -249,7 +249,7 @@ export class OrderController {
             }
 
             // Sum total order amount
-            let sumAmount = 0;
+            let sumAmount = 30000;
             for (let i in _itemData) {
                 if (Object.prototype.hasOwnProperty.call(_itemData, i)) {
                     let _item = await this.itemService.getById(_itemData[i]);
@@ -297,7 +297,8 @@ export class OrderController {
             let newInvoice = new Invoice();
             newInvoice.name = _user.name;
             newInvoice.phone = _user.phone;
-            newInvoice.amount = sumAmount;
+            newInvoice.amount = sumAmount <= 0 ? 0 : sumAmount;
+            newInvoice.shipping = 30000;
             newInvoice.created_by = res.locals.jwtPayload.userId;
             newInvoice.order = <any>_order.id;
             await this.invoiceService.create(newInvoice);

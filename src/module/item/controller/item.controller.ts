@@ -35,7 +35,7 @@ export class ItemController {
     constructor(
         private readonly itemService: ItemService,
         private readonly itemLogService: ItemLogService,
-        private readonly priceLogService: PriceLogService,
+        private readonly priceLogService: PriceLogService
     ) {}
 
     @ApiOkResponse({ description: 'Get all items' })
