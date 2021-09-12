@@ -1,6 +1,6 @@
 import { Controller, Get, Response, Param } from '@nestjs/common';
 import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { ResponseGetLog } from 'src/dto/log.dto';
+import { ResponseGetItemLog } from '../dto/item_log.dto';
 import { ItemLog } from '../entity/item_log.entity';
 import { ItemLogService } from '../service/item_log.service';
 
@@ -12,7 +12,7 @@ export class ItemLogController {
 
     @ApiOkResponse({ description: 'Get all items log' })
     @Get()
-    async readAll(@Response() res): Promise<ResponseGetLog> {
+    async readAll(@Response() res): Promise<ResponseGetItemLog> {
         try {
             let itemLog: ItemLog[] = await this.itemLogService.getAll();
             if (!itemLog || itemLog.length === 0) {
@@ -38,7 +38,7 @@ export class ItemLogController {
     async readById(
         @Response() res,
         @Param('id') id: number
-    ): Promise<ResponseGetLog> {
+    ): Promise<ResponseGetItemLog> {
         try {
             let itemLog: ItemLog = await this.itemLogService.getById(id);
 

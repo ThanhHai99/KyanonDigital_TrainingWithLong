@@ -7,8 +7,8 @@ import {
     ApiSecurity,
     ApiTags
 } from '@nestjs/swagger';
-import { WarehouseLog } from 'src/module/warehouse_log/entity/warehouse_log.entity';
-import { WarehouseLogService } from 'src/module/warehouse_log/service/warehouse_log.service';
+import { WarehouseLog } from '../../warehouse_log/entity/warehouse_log.entity';
+import { WarehouseLogService } from '../../warehouse_log/service/warehouse_log.service';
 import { getManager } from 'typeorm';
 import {
     BodyImporting,

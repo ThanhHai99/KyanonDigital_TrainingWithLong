@@ -15,7 +15,7 @@ import { Category } from '../../category/entity/category.entity';
 import { Sale } from '../../sale/entity/sale.entity';
 import { Item } from '../../item/entity/item.entity';
 import { Order } from '../../order/entity/order.entity';
-import { Role } from 'src/module/role/entity/role.entity';
+import { Role } from '../../role/entity/role.entity';
 
 @Entity({ name: 'user' })
 export class User extends BaseEntity {
