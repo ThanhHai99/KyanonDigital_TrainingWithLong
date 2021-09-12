@@ -27,6 +27,7 @@ import { PriceLog } from '../../price_log/entity/price_log.entity';
 import { ItemService } from '../service/item.service';
 import { ItemLogService } from '../../item_log/service/item_log.service';
 import { PriceLogService } from '../../price_log/service/price_log.service';
+import { getManager } from 'typeorm';
 
 @ApiTags('item')
 @ApiSecurity('JwtAuthGuard')
@@ -107,25 +108,28 @@ export class ItemController {
         type: Item
     })
     async create(@Body() body: BodyCreateItem, @Response() res): Promise<any> {
-        let newItem = new Item();
-        newItem.name = body.name;
-        newItem.category = <any>body.category_id;
-        newItem.detail = body.detail;
-        newItem.user_manual = body.user_manual;
-        newItem.price = body.price;
-        newItem.user = res.locals.jwtPayload.userId; // Get from token
-
-        const isNameExisting: boolean =
-            await this.itemService.isNameAlreadyInUse(newItem.name);
-
-        if (isNameExisting) {
-            return res.status(409).json({
-                error: 1,
-                message: 'Name already exists'
-            });
-        }
-
+        const itemManager = getManager();
+        // Start transaction
+        await itemManager.queryRunner.startTransaction();
         try {
+            let newItem = new Item();
+            newItem.name = body.name;
+            newItem.category = <any>body.category_id;
+            newItem.detail = body.detail;
+            newItem.user_manual = body.user_manual;
+            newItem.price = body.price;
+            newItem.user = res.locals.jwtPayload.userId; // Get from token
+
+            const isNameExisting: boolean =
+                await this.itemService.isNameAlreadyInUse(newItem.name);
+
+            if (isNameExisting) {
+                return res.status(409).json({
+                    error: 1,
+                    message: 'Name already exists'
+                });
+            }
+
             const item = await this.itemService.create(newItem);
             // Create item log
             let newItemLog = new ItemLog();
@@ -143,16 +147,21 @@ export class ItemController {
             newPriceLog.price = newItem.price;
             newPriceLog.created_by = res.locals.jwtPayload.userId; // Get from token
             await this.priceLogService.create(newPriceLog);
-
+            
+            // commit transaction
+            await itemManager.queryRunner.commitTransaction();
             return res.status(201).json({
                 error: 0,
                 data: item
             });
         } catch (error) {
+            await itemManager.queryRunner.rollbackTransaction();
             return res.status(500).json({
                 error: 1,
                 message: 'Server occurred an error'
             });
+        } finally {
+            await itemManager.queryRunner.release();
         }
     }
 

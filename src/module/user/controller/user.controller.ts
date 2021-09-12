@@ -26,6 +26,7 @@ import {
     ResponseUpdateUser,
     UpdateUserDto
 } from '../dto/user.dto';
+import { getManager } from 'typeorm';
 
 @ApiTags('user')
 @ApiSecurity('JwtAuthGuard')
@@ -35,7 +36,7 @@ export class UserController {
 
     @ApiOkResponse({ description: 'Get user(s)' })
     @Get()
-    async read(@Response() res, @Query() query): Promise<ResponseGetUser> {
+    async getAll(@Response() res, @Query() query): Promise<ResponseGetUser> {
         try {
             let user: any = await this.userService.getAll(query);
 
@@ -60,7 +61,7 @@ export class UserController {
 
     @ApiOkResponse({ description: "Get user by user's id" })
     @Get(':id')
-    async readById(
+    async getById(
         @Response() res,
         @Param('id') id: number
     ): Promise<ResponseGetUser> {
@@ -100,56 +101,65 @@ export class UserController {
         @Body() body: BodyCreateUser,
         @Response() res
     ): Promise<ResponseCreateUser> {
-        let newUser = new User();
-        newUser.username = body.username;
-        newUser.password = body.password;
-        newUser.name = body.name;
-        newUser.phone = body.phone;
-        newUser.address = body.address;
-        newUser.role = <any>body.role;
-
-        if (body.role === null) {
-            return res.status(400).json({
-                error: 1,
-                message: 'Not allowed to create customers'
-            });
-        }
-
-        if (body.role < 3) {
-            return res.status(400).json({
-                error: 1,
-                message: 'Role is invalid.'
-            });
-        }
-
-        if (newUser.role == <any>1) {
-            return res.status(400).json({
-                error: 1,
-                message: 'Not allowed to create another super admin'
-            });
-        }
-
-        const isUsernameExisting =
-            await this.userService.isUsernameAlreadyInUse(newUser.username);
-
-        if (isUsernameExisting) {
-            return res.status(409).json({
-                error: 1,
-                data: 'Username already exists'
-            });
-        }
-
+        const userManager = getManager();
+        // Start transaction
+        await userManager.queryRunner.startTransaction();
         try {
+            let newUser = new User();
+            newUser.username = body.username;
+            newUser.password = body.password;
+            newUser.name = body.name;
+            newUser.phone = body.phone;
+            newUser.address = body.address;
+            newUser.role = <any>body.role;
+
+            if (body.role === null) {
+                return res.status(400).json({
+                    error: 1,
+                    message: 'Not allowed to create customers'
+                });
+            }
+
+            if (body.role < 3) {
+                return res.status(400).json({
+                    error: 1,
+                    message: 'Role is invalid.'
+                });
+            }
+
+            if (newUser.role == <any>1) {
+                return res.status(400).json({
+                    error: 1,
+                    message: 'Not allowed to create another super admin'
+                });
+            }
+
+            const isUsernameExisting =
+                await this.userService.isUsernameAlreadyInUse(newUser.username);
+
+            if (isUsernameExisting) {
+                return res.status(409).json({
+                    error: 1,
+                    data: 'Username already exists'
+                });
+            }
+
             const user = await this.userService.create(newUser);
+            
+            // commit transaction
+            await userManager.queryRunner.commitTransaction();
             return res.status(201).json({
                 error: 0,
                 data: user
             });
         } catch (error) {
+            await userManager.queryRunner.rollbackTransaction();
             return res.status(500).json({
                 error: 1,
                 message: 'Server occurred an error'
             });
+        } finally {
+            await userManager.queryRunner.release();
         }
     }
 

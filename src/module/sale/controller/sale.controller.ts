@@ -14,6 +14,7 @@ import {
     ApiSecurity,
     ApiTags
 } from '@nestjs/swagger';
+import { getManager } from 'typeorm';
 import { SaleItem } from '../../sale_item/entity/sale_items.entity';
 import { SaleItemService } from '../../sale_item/service/sale_item.service';
 import { SaleLog } from '../../sale_log/entity/sale_log.entity';
@@ -97,26 +98,30 @@ export class SaleController {
         @Body() body: BodyCreateSale,
         @Response() res
     ): Promise<ResponseCreateSale> {
-        let newSale = new Sale();
-        newSale.name = body.name;
-        newSale.start_date = body.start_date;
-        newSale.end_date = body.end_date;
-        newSale.discount = body.discount;
-        newSale.applied = !!body.applied ? body.applied : false;
-        newSale.code = body.code;
-        newSale.user = res.locals.jwtPayload.userId; // Get from token
-
-        const isNameExisting: boolean =
-            await this.saleService.isNameAlreadyInUse(newSale.name);
-
-        if (isNameExisting) {
-            return res.status(409).json({
-                error: 1,
-                data: 'Name already exists'
-            });
-        }
+        const saleManager = getManager();
+        // Start transaction
+        await saleManager.queryRunner.startTransaction();
 
         try {
+            let newSale = new Sale();
+            newSale.name = body.name;
+            newSale.start_date = body.start_date;
+            newSale.end_date = body.end_date;
+            newSale.discount = body.discount;
+            newSale.applied = !!body.applied ? body.applied : false;
+            newSale.code = body.code;
+            newSale.user = res.locals.jwtPayload.userId; // Get from token
+
+            const isNameExisting: boolean =
+                await this.saleService.isNameAlreadyInUse(newSale.name);
+
+            if (isNameExisting) {
+                return res.status(409).json({
+                    error: 1,
+                    data: 'Name already exists'
+                });
+            }
+
             const sale: Sale = await this.saleService.create(newSale);
             // Create sale item
             const itemArray: Array<number> = body.item_id;
@@ -146,15 +151,20 @@ export class SaleController {
             newSaleLog.created_by = res.locals.jwtPayload.userId; // Get from token
             await this.saleLogService.create(newSaleLog);
 
+            // commit transaction
+            await saleManager.queryRunner.commitTransaction();
             return res.status(201).json({
                 error: 0,
                 data: sale
             });
         } catch (error) {
+            await saleManager.queryRunner.rollbackTransaction();
             return res.status(500).json({
                 error: 1,
                 message: 'Server occurred an error'
             });
+        } finally {
+            await saleManager.queryRunner.release();
         }
     }
 
@@ -169,42 +179,44 @@ export class SaleController {
         @Response() res,
         @Param('id') id: number
     ): Promise<ResponseUpdateSale> {
-        const _sale: Sale = await this.saleService.getById(id);
-        if (!_sale) {
-            return res.status(404).json({
-                error: 1,
-                message: 'Sale is not found'
-            });
-        }
-
-        if (_sale.applied) {
-            return res.status(400).json({
-                error: 0,
-                message: 'This sale was applied'
-            });
-        }
-
-        const isNameExisting: boolean =
-            await this.saleService.isNameAlreadyInUse(body.name);
-
-        if (isNameExisting) {
-            return res.status(409).json({
-                error: 1,
-                message: 'Name already exists'
-            });
-        }
-
-        _sale.name = !!body.name ? body.name : _sale.name;
-        _sale.start_date = !!body.start_date
-            ? body.start_date
-            : _sale.start_date;
-        _sale.end_date = !!body.end_date ? body.end_date : _sale.end_date;
-        // _sale.amount = !!body.amount ? body.amount : _sale.amount;
-        _sale.discount = !!body.discount ? body.discount : _sale.discount;
-        _sale.applied = !!body.applied ? body.applied : _sale.applied;
-        _sale.user = res.locals.jwtPayload.userId; // Get from token
-
+        const saleManager = getManager();
+        // Start transaction
+        await saleManager.queryRunner.startTransaction();
         try {
+            const _sale: Sale = await this.saleService.getById(id);
+            if (!_sale) {
+                return res.status(404).json({
+                    error: 1,
+                    message: 'Sale is not found'
+                });
+            }
+
+            if (_sale.applied) {
+                return res.status(400).json({
+                    error: 0,
+                    message: 'This sale was applied'
+                });
+            }
+
+            const isNameExisting: boolean =
+                await this.saleService.isNameAlreadyInUse(body.name);
+
+            if (isNameExisting) {
+                return res.status(409).json({
+                    error: 1,
+                    message: 'Name already exists'
+                });
+            }
+
+            _sale.name = !!body.name ? body.name : _sale.name;
+            _sale.start_date = !!body.start_date
+                ? body.start_date
+                : _sale.start_date;
+            _sale.end_date = !!body.end_date ? body.end_date : _sale.end_date;
+            _sale.discount = !!body.discount ? body.discount : _sale.discount;
+            _sale.applied = !!body.applied ? body.applied : _sale.applied;
+            _sale.user = res.locals.jwtPayload.userId; // Get from token
+
             const sale: Sale = await this.saleService.update(_sale);
             const t: SaleItem[] = await this.saleItemService.getBySaleId(
                 _sale.id
@@ -224,15 +236,20 @@ export class SaleController {
             newSaleLog.created_by = res.locals.jwtPayload.userId; // Get from token
             await this.saleLogService.create(newSaleLog);
 
+            // commit transaction
+            await saleManager.queryRunner.commitTransaction();
             return res.status(200).json({
                 error: 0,
                 data: sale
             });
         } catch (error) {
+            await saleManager.queryRunner.rollbackTransaction();
             return res.status(500).json({
                 error: 1,
                 message: 'Server occurred an error'
             });
+        } finally {
+            await saleManager.queryRunner.release();
         }
     }
 }

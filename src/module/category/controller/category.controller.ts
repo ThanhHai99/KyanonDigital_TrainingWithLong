@@ -25,6 +25,7 @@ import {
     ResponseGetCategory,
     ResponseUpdateCategory
 } from '../dto/category.dto';
+import { getManager } from 'typeorm';
 
 @ApiTags('category')
 @ApiSecurity('JwtAuthGuard')
@@ -95,21 +96,24 @@ export class CategoryController {
         @Body() body: BodyCreateCategory,
         @Response() res
     ): Promise<ResponseCreateCategory> {
-        let newCategory = new Category();
-        newCategory.name = body.name;
-        newCategory.user = res.locals.jwtPayload.userId; // Get from token
-
-        const isNameExisting: boolean =
-            await this.categoryService.isNameAlreadyInUse(newCategory.name);
-
-        if (isNameExisting) {
-            return res.status(409).json({
-                error: 1,
-                data: 'Category already exists'
-            });
-        }
-
+        const categoryManager = getManager();
+        // Start transaction
+        await categoryManager.queryRunner.startTransaction();
         try {
+            let newCategory = new Category();
+            newCategory.name = body.name;
+            newCategory.user = res.locals.jwtPayload.userId; // Get from token
+
+            const isNameExisting: boolean =
+                await this.categoryService.isNameAlreadyInUse(newCategory.name);
+
+            if (isNameExisting) {
+                return res.status(409).json({
+                    error: 1,
+                    data: 'Category already exists'
+                });
+            }
+
             const category = await this.categoryService.create(newCategory);
             // Create category log
             let newCategoryLog = new CategoryLog();
@@ -117,16 +121,21 @@ export class CategoryController {
             newCategoryLog.name = category.name;
             newCategoryLog.created_by = res.locals.jwtPayload.userId; // Get from token
             await this.categoryLogService.create(newCategoryLog);
-
+            
+            // commit transaction
+            await categoryManager.queryRunner.commitTransaction();
             return res.status(201).json({
                 error: 0,
                 data: category
             });
         } catch (error) {
+            await categoryManager.queryRunner.rollbackTransaction();
             return res.status(500).json({
                 error: 1,
                 message: 'Server occurred an error'
             });
+        } finally {
+            await categoryManager.queryRunner.release();
         }
     }
 

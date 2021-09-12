@@ -9,6 +9,7 @@ import {
 } from '@nestjs/swagger';
 import { WarehouseLog } from 'src/module/warehouse_log/entity/warehouse_log.entity';
 import { WarehouseLogService } from 'src/module/warehouse_log/service/warehouse_log.service';
+import { getManager } from 'typeorm';
 import {
     BodyImporting,
     ResponseGetWarehouse,
@@ -90,12 +91,16 @@ export class WarehouseController {
         @Body() body: BodyImporting,
         @Response() res
     ): Promise<ResponseImporting> {
-        let newWarehouse = new Warehouse();
-        newWarehouse.item = <any>body.item_id;
-        newWarehouse.amount = body.amount;
-        newWarehouse.expiration_date = body.expiration_date;
+        const warehouseManager = getManager();
+        // Start transaction
+        await warehouseManager.queryRunner.startTransaction();
 
         try {
+            let newWarehouse = new Warehouse();
+            newWarehouse.item = <any>body.item_id;
+            newWarehouse.amount = body.amount;
+            newWarehouse.expiration_date = body.expiration_date;
+
             const warehouse: Warehouse = await this.warehouseService.create(
                 newWarehouse
             );
@@ -110,16 +115,20 @@ export class WarehouseController {
             newWarehouseLog.created_by = res.locals.jwtPayload.userId; // Get from token
             await this.warehouseLogService.create(newWarehouseLog);
 
+            // commit transaction
+            await warehouseManager.queryRunner.commitTransaction();
             return res.status(201).json({
                 error: 0,
                 data: warehouse
             });
         } catch (error) {
-            console.log(error);
+            await warehouseManager.queryRunner.rollbackTransaction();
             return res.status(500).json({
                 error: 1,
                 message: 'Server occurred an error'
             });
+        } finally {
+            await warehouseManager.queryRunner.release();
         }
     }
 

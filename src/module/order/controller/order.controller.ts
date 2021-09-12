@@ -121,8 +121,7 @@ export class OrderController {
     ): Promise<ResponseCreateOrder> {
         const orderManager = getManager();
         // Start transaction
-        // await orderManager.queryRunner.startTransaction();
-
+        await orderManager.queryRunner.startTransaction();
         try {
             let newOrder = new Order();
             newOrder.payment_method = body.payment_method;
@@ -142,20 +141,19 @@ export class OrderController {
                 }
             }
             // commit transaction
-            // await orderManager.queryRunner.commitTransaction();
+            await orderManager.queryRunner.commitTransaction();
             return res.status(201).json({
                 error: 0,
                 data: order
             });
         } catch (error) {
-            console.log(error);
             await orderManager.queryRunner.rollbackTransaction();
             return res.status(500).json({
                 error: 1,
                 message: 'Server occurred an error'
             });
         } finally {
-            // await orderManager.queryRunner.release();
+            await orderManager.queryRunner.release();
         }
     }
 
@@ -170,38 +168,41 @@ export class OrderController {
         @Response() res,
         @Param('id') id: number
     ): Promise<ResponseExport> {
-        const _order: Order = await this.orderService.getById(id);
-
-        if (!_order) {
-            return res.status(404).json({
-                error: 1,
-                message: 'Order is not found'
-            });
-        }
-
-        // Check order is exported
-        const isExported: boolean = await this.orderService.isExported(
-            _order.id
-        );
-
-        if (isExported) {
-            return res.status(409).json({
-                error: 1,
-                message: 'This order is exported'
-            });
-        }
-
-        // Check order is paid
-        const isPaid: boolean = await this.orderService.isPaid(_order.id);
-
-        if (isPaid) {
-            return res.status(409).json({
-                error: 1,
-                message: 'This order is paid'
-            });
-        }
-
+        const orderManager = getManager();
+        // Start transaction
+        await orderManager.queryRunner.startTransaction();
         try {
+            const _order: Order = await this.orderService.getById(id);
+
+            if (!_order) {
+                return res.status(404).json({
+                    error: 1,
+                    message: 'Order is not found'
+                });
+            }
+
+            // Check order is exported
+            const isExported: boolean = await this.orderService.isExported(
+                _order.id
+            );
+
+            if (isExported) {
+                return res.status(409).json({
+                    error: 1,
+                    message: 'This order is exported'
+                });
+            }
+
+            // Check order is paid
+            const isPaid: boolean = await this.orderService.isPaid(_order.id);
+
+            if (isPaid) {
+                return res.status(409).json({
+                    error: 1,
+                    message: 'This order is paid'
+                });
+            }
+
             // Check quantity to export
             const subtractOneMonth = moment()
                 .subtract(1, 'months')
@@ -322,15 +323,20 @@ export class OrderController {
             // Update exported into order
             await this.orderService.exportOrder(_order.id);
 
+            // commit transaction
+            await orderManager.queryRunner.commitTransaction();
             return res.status(200).json({
                 error: 0,
                 message: 'Exporting successful'
             });
         } catch (error) {
+            await orderManager.queryRunner.rollbackTransaction();
             return res.status(500).json({
                 error: 1,
                 message: 'Server occurred an error'
             });
+        } finally {
+            await orderManager.queryRunner.release();
         }
     }
 
