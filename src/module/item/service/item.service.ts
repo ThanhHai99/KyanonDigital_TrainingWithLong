@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Item } from '../entity/item.entity';
-import { Like, Repository } from 'typeorm';
+import { getManager, Repository } from 'typeorm';
 
 @Injectable()
 export class ItemService {
@@ -15,39 +15,41 @@ export class ItemService {
     }
 
     async getAll(): Promise<Item[]> {
-        return await this.itemRepository.find({
-            join: {
-                alias: 'item',
-                leftJoinAndSelect: {
-                    role: 'item.category'
-                }
-            }
-        });
+        const itemManager = getManager();
+        return await itemManager.query(`
+            SELECT item.*, warehouse.amount, category.name AS category_name
+            FROM item
+            LEFT JOIN warehouse
+            ON item.id = warehouse.item_id AND warehouse.amount >= 10
+            LEFT JOIN category
+            ON item.category_id = category.id
+        `);
     }
 
     async getByName(name: string): Promise<Item[]> {
-        return await this.itemRepository.find({
-            where: {
-                name: Like('%' + name + '%')
-            },
-            join: {
-                alias: 'item',
-                leftJoinAndSelect: {
-                    role: 'item.category'
-                }
-            }
-        });
+        const itemManager = getManager();
+        return await itemManager.query(`
+            SELECT item.*, warehouse.amount, category.name AS category_name
+            FROM item
+            LEFT JOIN warehouse
+            ON item.id = warehouse.item_id AND warehouse.amount >= 10
+            LEFT JOIN category
+            ON item.category_id = category.id
+            WHERE item.name LIKE '%${name}%'
+        `);
     }
 
     async getById(id: number): Promise<Item> {
-        return await this.itemRepository.findOne(id, {
-            join: {
-                alias: 'item',
-                leftJoinAndSelect: {
-                    role: 'item.category'
-                }
-            }
-        });
+        const itemManager = getManager();
+        return await itemManager.query(`
+            SELECT item.*, warehouse.amount, category.name AS category_name
+            FROM item
+            LEFT JOIN warehouse
+            ON item.id = warehouse.item_id AND warehouse.amount >= 10
+            LEFT JOIN category
+            ON item.category_id = category.id
+            WHERE item.id = ${id}
+        `);
     }
 
     async isNameAlreadyInUse(name: string): Promise<boolean> {
