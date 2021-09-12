@@ -11,9 +11,6 @@ export class Roles1627548002385 implements MigrationInterface {
         await queryRunner.query(
             `insert into role(id,name) values (3,'business_manager');`
         );
-        await queryRunner.query(
-            `insert into role(id,name) values (4,'customer');`
-        );
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {}

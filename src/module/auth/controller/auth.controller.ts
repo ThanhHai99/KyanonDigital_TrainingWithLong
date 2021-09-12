@@ -125,7 +125,7 @@ export class AuthController {
         newUser.name = body.name;
         newUser.phone = body.phone;
         newUser.address = body.address;
-        newUser.role = <any>4;
+        newUser.role = <any>null;
 
         try {
             const user = await this.authService.isNotExisting(body.username);

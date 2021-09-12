@@ -13,7 +13,7 @@ export class Users1627548027316 implements MigrationInterface {
             `insert into user(id,username,password,name,phone,address,is_locked,role_id) values (3,'thao',"${bcrypt.hashSync("Aa@123456", 8)}",'Tran Thi Thu Thao','0333771802','Tp.HCM',0,3);`
         );
         await queryRunner.query(
-            `insert into user(id,username,password,name,phone,address,is_locked,role_id) values (4,'sang',"${bcrypt.hashSync("Aa@123456", 8)}",'Nguyen Dinh Sang','0333771803','Tp.HCM',0,4);`
+            `insert into user(id,username,password,name,phone,address,is_locked) values (4,'sang',"${bcrypt.hashSync("Aa@123456", 8)}",'Nguyen Dinh Sang','0333771803','Tp.HCM',0);`
         );
     }
 

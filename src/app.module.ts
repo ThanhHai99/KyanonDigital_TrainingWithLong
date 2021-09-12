@@ -5,8 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-import { checkJwt } from './middlewares/checkJwt';
-import { checkRole } from './middlewares/checkRole';
+import { checkJwt } from './middleware/checkJwt';
+import { checkRole } from './middleware/checkRole';
 
 import { AuthModule } from './module/auth/auth.module';
 
@@ -104,12 +104,11 @@ export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
         consumer.apply(checkJwt, checkRole([1])).forRoutes('user');
         consumer.apply(checkJwt, checkRole([1])).forRoutes('role');
-        consumer.apply(checkJwt, checkRole([1])).forRoutes('categorie');
+        consumer.apply(checkJwt, checkRole([1])).forRoutes('category');
         consumer.apply(checkJwt, checkRole([1])).forRoutes('category_log');
         consumer.apply(checkJwt, checkRole([1, 2])).forRoutes('warehouse');
         consumer.apply(checkJwt, checkRole([1, 3])).forRoutes('sale');
-        consumer.apply(checkJwt, checkRole([1, 2])).forRoutes('order');
-        // consumer.apply(checkJwt, checkRole([4])).forRoutes('orders/');
+        consumer.apply(checkJwt).forRoutes('order');
         consumer.apply(checkJwt, checkRole([1])).forRoutes('item');
         consumer.apply(checkJwt, checkRole([1])).forRoutes('item_log');
         consumer.apply(checkJwt, checkRole([1, 3])).forRoutes('price_log');

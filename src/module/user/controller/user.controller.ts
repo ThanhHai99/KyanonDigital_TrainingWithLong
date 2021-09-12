@@ -119,10 +119,17 @@ export class UserController {
         newUser.address = body.address;
         newUser.role = <any>body.role;
 
-        if (body.role === 4) {
+        if (body.role === null) {
             return res.status(400).json({
                 error: 1,
                 message: 'Not allowed to create customers'
+            });
+        }
+
+        if (body.role < 3) {
+            return res.status(400).json({
+                error: 1,
+                message: 'Role is invalid.'
             });
         }
 
