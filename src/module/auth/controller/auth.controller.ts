@@ -13,7 +13,6 @@ import {
     ApiBody,
     ApiCreatedResponse,
     ApiOkResponse,
-    ApiParam,
     ApiSecurity,
     ApiTags,
     ApiUnauthorizedResponse

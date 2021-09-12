@@ -10,9 +10,9 @@ export class SaleService {
         private saleRepository: Repository<Sale>
     ) {}
 
-    async _findOne(id: number): Promise<Sale> {
-        return await this.saleRepository.findOne(id);
-    }
+    // async getById(id: number): Promise<Sale> {
+    //     return await this.saleRepository.findOne(id);
+    // }
 
     async isNameAlreadyInUse(name: string): Promise<boolean> {
         try {
@@ -40,8 +40,6 @@ export class SaleService {
         if (!_sale) return null;
         return _sale;
     }
-
-    
 
     async getAll(): Promise<Sale[]> {
         return this.saleRepository.find({
@@ -71,6 +69,6 @@ export class SaleService {
 
     async update(sale: Sale): Promise<Sale> {
         await this.saleRepository.save(sale);
-        return await this._findOne(sale.id);
+        return await this.getById(sale.id);
     }
 }

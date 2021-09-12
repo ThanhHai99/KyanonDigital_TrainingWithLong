@@ -10,7 +10,7 @@ export class SaleItemService {
         private saleItemRepository: Repository<SaleItem>
     ) {}
 
-    async _findOne(id: number): Promise<SaleItem> {
+    async getById(id: number): Promise<SaleItem> {
         return await this.saleItemRepository.findOne(id);
     }
 
@@ -40,6 +40,6 @@ export class SaleItemService {
 
     async update(sale_item: SaleItem): Promise<SaleItem> {
         await this.saleItemRepository.save(sale_item);
-        return await this._findOne(sale_item.id);
+        return await this.getById(sale_item.id);
     }
 }

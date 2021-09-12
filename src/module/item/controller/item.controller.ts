@@ -167,7 +167,7 @@ export class ItemController {
         @Response() res,
         @Param('id') id: number
     ): Promise<ResponseUpdateItem> {
-        let _item: Item = await this.itemService._findOne(id);
+        let _item: Item = await this.itemService.getById(id);
         _item.name = !!body.name ? body.name : _item.name;
         _item.detail = !!body.detail ? body.detail : _item.detail;
         _item.user_manual = !!body.user_manual

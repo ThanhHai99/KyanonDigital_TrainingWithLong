@@ -169,7 +169,7 @@ export class SaleController {
         @Response() res,
         @Param('id') id: number
     ): Promise<ResponseUpdateSale> {
-        const _sale: Sale = await this.saleService._findOne(id);
+        const _sale: Sale = await this.saleService.getById(id);
         if (!_sale) {
             return res.status(404).json({
                 error: 1,

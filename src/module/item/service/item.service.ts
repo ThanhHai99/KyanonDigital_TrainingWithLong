@@ -10,9 +10,9 @@ export class ItemService {
         private itemRepository: Repository<Item>
     ) {}
 
-    async _findOne(id: number): Promise<Item> {
-        return await this.itemRepository.findOne(id);
-    }
+    // async _findOne(id: number): Promise<Item> {
+    //     return await this.itemRepository.findOne(id);
+    // }
 
     async getAll(): Promise<Item[]> {
         const itemManager = getManager();

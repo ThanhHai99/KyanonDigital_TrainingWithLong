@@ -37,18 +37,7 @@ export class UserController {
     @Get()
     async read(@Response() res, @Query() query): Promise<ResponseGetUser> {
         try {
-            const { name, phone } = query;
-            let user: any;
-
-            if (!!phone && !!name) {
-                user = await this.userService.getByNameAndPhone(name, phone);
-            } else if (!!phone) {
-                user = await this.userService.getByPhone(phone);
-            } else if (!!name) {
-                user = await this.userService.getByName(name);
-            } else {
-                user = await this.userService.getAll();
-            }
+            let user: any = await this.userService.getAll(query);
 
             if (!user || user.length === 0) {
                 return res.status(200).json({
@@ -175,7 +164,7 @@ export class UserController {
         @Response() res,
         @Param('id') id: number
     ): Promise<ResponseUpdateUser> {
-        let _user: User = await this.userService._findOne(id);
+        let _user: User = await this.userService.getById(id);
         if (!_user) {
             return res.status(404).json({
                 error: 1,
