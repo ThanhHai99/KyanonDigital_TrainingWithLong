@@ -36,6 +36,7 @@ import { UserService } from '../../user/service/user.service';
 import { WarehouseService } from '../../warehouse/service/warehouse.service';
 import { WarehouseLog } from '../../warehouse_log/entity/warehouse_log.entity';
 import { WarehouseLogService } from '../../warehouse_log/service/warehouse_log.service';
+import { getManager } from 'typeorm';
 const moment = require('moment');
 
 @ApiTags('order')
@@ -118,11 +119,15 @@ export class OrderController {
         @Body() body: BodyCreateOrder,
         @Response() res
     ): Promise<ResponseCreateOrder> {
-        let newOrder = new Order();
-        newOrder.payment_method = body.payment_method;
-        newOrder.delivery_address = body.delivery_address;
-        newOrder.created_by = res.locals.jwtPayload.userId; // Get from token
+        const orderManager = getManager();
+        // Start transaction
+        // await orderManager.queryRunner.startTransaction();
+
         try {
+            let newOrder = new Order();
+            newOrder.payment_method = body.payment_method;
+            newOrder.delivery_address = body.delivery_address;
+            newOrder.created_by = res.locals.jwtPayload.userId; // Get from token
             const order = await this.orderService.create(newOrder);
 
             const _item = body.item;
@@ -136,16 +141,21 @@ export class OrderController {
                     await this.itemOrderService.create(newItemOrder);
                 }
             }
+            // commit transaction
+            // await orderManager.queryRunner.commitTransaction();
             return res.status(201).json({
                 error: 0,
                 data: order
             });
         } catch (error) {
             console.log(error);
+            await orderManager.queryRunner.rollbackTransaction();
             return res.status(500).json({
                 error: 1,
                 message: 'Server occurred an error'
             });
+        } finally {
+            // await orderManager.queryRunner.release();
         }
     }
 
@@ -267,12 +277,18 @@ export class OrderController {
                         if (
                             Object.prototype.hasOwnProperty.call(_itemData, i)
                         ) {
+                            // Check item exist in this sale
                             let _saleItem =
-                                await this.saleItemService.findItemBySaleId(
+                                await this.saleItemService.findItemAndAmountBySaleId(
                                     _sale.id,
-                                    _itemData[i]
+                                    _itemData[i],
+                                    _amountData[i]
                                 );
                             if (_saleItem) {
+                                await this.saleItemService.updateAmount(
+                                    _saleItem.id,
+                                    _amountData[i]
+                                );
                                 let _item = await this.itemService.getById(
                                     _itemData[i]
                                 );

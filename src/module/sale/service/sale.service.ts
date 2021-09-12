@@ -10,10 +10,6 @@ export class SaleService {
         private saleRepository: Repository<Sale>
     ) {}
 
-    // async getById(id: number): Promise<Sale> {
-    //     return await this.saleRepository.findOne(id);
-    // }
-
     async isNameAlreadyInUse(name: string): Promise<boolean> {
         try {
             const sale = await this.saleRepository.findOneOrFail({

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { MoreThanOrEqual, Raw, Repository } from 'typeorm';
 import { SaleItem } from '../entity/sale_items.entity';
 
 @Injectable()
@@ -23,15 +23,20 @@ export class SaleItemService {
         });
     }
 
-    async findItemBySaleId(saleId: number, itemId: number): Promise<boolean> {
+    async findItemAndAmountBySaleId(
+        saleId: number,
+        itemId: number,
+        amount: number
+    ): Promise<SaleItem> {
         const _saleItem = await this.saleItemRepository.findOne({
             where: {
                 sale: saleId,
-                item_id: itemId
+                item_id: itemId,
+                amount: MoreThanOrEqual(amount)
             }
         });
-        if (!_saleItem) return false;
-        return true;
+        if (!_saleItem) return null;
+        return _saleItem;
     }
 
     async create(sale_item: SaleItem): Promise<SaleItem> {
@@ -41,5 +46,11 @@ export class SaleItemService {
     async update(sale_item: SaleItem): Promise<SaleItem> {
         await this.saleItemRepository.save(sale_item);
         return await this.getById(sale_item.id);
+    }
+
+    async updateAmount(saleItemId: number, amount: number): Promise<any> {
+        const _saleItem = await this.saleItemRepository.findOne(saleItemId);
+        const tmp = _saleItem.amount - amount;
+        await this.saleItemRepository.update(saleItemId, { amount: tmp });
     }
 }
