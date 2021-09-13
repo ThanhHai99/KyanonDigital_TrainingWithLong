@@ -19,7 +19,7 @@ import {
 } from '@nestjs/swagger';
 require('dotenv').config();
 
-@ApiTags('Authentication')
+@ApiTags('authentication')
 @Controller('auth')
 export class AuthController {
     constructor(

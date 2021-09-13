@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, In } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from '../entity/user.entity';
 import * as bcrypt from 'bcryptjs';
 
@@ -45,6 +45,8 @@ export class UserService {
                         role_id: e[7]
                     };
                 });
+            console.log('lackingUsers');
+            console.log(lackingUsers);
             if (lackingUsers.length) {
                 await this.userRepository.insert(<any>lackingUsers);
             }

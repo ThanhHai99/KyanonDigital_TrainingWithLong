@@ -22,6 +22,7 @@ module.exports = {
         'src/module/category_log/entity/category_log.entity'
     ],
     migrations: [
+        'src/migration/1627548002385-Roles.ts',
         'src/migration/1627548027316-Users.ts',
         'src/migration/1627548037065-Categories.ts',
         'src/migration/1627548081008-Items.ts',
