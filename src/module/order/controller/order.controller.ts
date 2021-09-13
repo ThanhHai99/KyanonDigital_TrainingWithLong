@@ -36,7 +36,7 @@ import { UserService } from '../../user/service/user.service';
 import { WarehouseService } from '../../warehouse/service/warehouse.service';
 import { WarehouseLog } from '../../warehouse_log/entity/warehouse_log.entity';
 import { WarehouseLogService } from '../../warehouse_log/service/warehouse_log.service';
-import { getManager } from 'typeorm';
+import { getConnection } from 'typeorm';
 const moment = require('moment');
 
 @ApiTags('order')
@@ -119,9 +119,11 @@ export class OrderController {
         @Body() body: BodyCreateOrder,
         @Response() res
     ): Promise<ResponseCreateOrder> {
-        const orderManager = getManager();
+        const connection = getConnection();
+        const queryRunner = connection.createQueryRunner();
+        await queryRunner.connect();
         // Start transaction
-        await orderManager.queryRunner.startTransaction();
+        await queryRunner.startTransaction();
         try {
             let newOrder = new Order();
             newOrder.payment_method = body.payment_method;
@@ -141,19 +143,19 @@ export class OrderController {
                 }
             }
             // commit transaction
-            await orderManager.queryRunner.commitTransaction();
+            await queryRunner.commitTransaction();
             return res.status(201).json({
                 error: 0,
                 data: order
             });
         } catch (error) {
-            await orderManager.queryRunner.rollbackTransaction();
+            await queryRunner.rollbackTransaction();
             return res.status(500).json({
                 error: 1,
                 message: 'Server occurred an error'
             });
         } finally {
-            await orderManager.queryRunner.release();
+            await queryRunner.release();
         }
     }
 
@@ -168,9 +170,11 @@ export class OrderController {
         @Response() res,
         @Param('id') id: number
     ): Promise<ResponseExport> {
-        const orderManager = getManager();
+        const connection = getConnection();
+        const queryRunner = connection.createQueryRunner();
+        await queryRunner.connect();
         // Start transaction
-        await orderManager.queryRunner.startTransaction();
+        await queryRunner.startTransaction();
         try {
             const _order: Order = await this.orderService.getById(id);
 
@@ -324,19 +328,19 @@ export class OrderController {
             await this.orderService.exportOrder(_order.id);
 
             // commit transaction
-            await orderManager.queryRunner.commitTransaction();
+            await queryRunner.commitTransaction();
             return res.status(200).json({
                 error: 0,
                 message: 'Exporting successful'
             });
         } catch (error) {
-            await orderManager.queryRunner.rollbackTransaction();
+            await queryRunner.rollbackTransaction();
             return res.status(500).json({
                 error: 1,
                 message: 'Server occurred an error'
             });
         } finally {
-            await orderManager.queryRunner.release();
+            await queryRunner.release();
         }
     }
 

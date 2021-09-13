@@ -27,7 +27,7 @@ import { PriceLog } from '../../price_log/entity/price_log.entity';
 import { ItemService } from '../service/item.service';
 import { ItemLogService } from '../../item_log/service/item_log.service';
 import { PriceLogService } from '../../price_log/service/price_log.service';
-import { getManager } from 'typeorm';
+import { getConnection } from 'typeorm';
 
 @ApiTags('item')
 @ApiSecurity('JwtAuthGuard')
@@ -108,9 +108,11 @@ export class ItemController {
         type: Item
     })
     async create(@Body() body: BodyCreateItem, @Response() res): Promise<any> {
-        const itemManager = getManager();
+        const connection = getConnection();
+        const queryRunner = connection.createQueryRunner();
+        await queryRunner.connect();
         // Start transaction
-        await itemManager.queryRunner.startTransaction();
+        await queryRunner.startTransaction();
         try {
             let newItem = new Item();
             newItem.name = body.name;
@@ -147,21 +149,21 @@ export class ItemController {
             newPriceLog.price = newItem.price;
             newPriceLog.created_by = res.locals.jwtPayload.userId; // Get from token
             await this.priceLogService.create(newPriceLog);
-            
+
             // commit transaction
-            await itemManager.queryRunner.commitTransaction();
+            await queryRunner.commitTransaction();
             return res.status(201).json({
                 error: 0,
                 data: item
             });
         } catch (error) {
-            await itemManager.queryRunner.rollbackTransaction();
+            await queryRunner.rollbackTransaction();
             return res.status(500).json({
                 error: 1,
                 message: 'Server occurred an error'
             });
         } finally {
-            await itemManager.queryRunner.release();
+            await queryRunner.release();
         }
     }
 

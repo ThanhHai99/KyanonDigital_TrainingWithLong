@@ -14,7 +14,7 @@ import {
     ApiSecurity,
     ApiTags
 } from '@nestjs/swagger';
-import { getManager } from 'typeorm';
+import { getConnection } from 'typeorm';
 import { SaleItem } from '../../sale_item/entity/sale_items.entity';
 import { SaleItemService } from '../../sale_item/service/sale_item.service';
 import { SaleLog } from '../../sale_log/entity/sale_log.entity';
@@ -98,9 +98,11 @@ export class SaleController {
         @Body() body: BodyCreateSale,
         @Response() res
     ): Promise<ResponseCreateSale> {
-        const saleManager = getManager();
+        const connection = getConnection();
+        const queryRunner = connection.createQueryRunner();
+        await queryRunner.connect();
         // Start transaction
-        await saleManager.queryRunner.startTransaction();
+        await queryRunner.startTransaction();
 
         try {
             let newSale = new Sale();
@@ -152,19 +154,19 @@ export class SaleController {
             await this.saleLogService.create(newSaleLog);
 
             // commit transaction
-            await saleManager.queryRunner.commitTransaction();
+            await queryRunner.commitTransaction();
             return res.status(201).json({
                 error: 0,
                 data: sale
             });
         } catch (error) {
-            await saleManager.queryRunner.rollbackTransaction();
+            await queryRunner.rollbackTransaction();
             return res.status(500).json({
                 error: 1,
                 message: 'Server occurred an error'
             });
         } finally {
-            await saleManager.queryRunner.release();
+            await queryRunner.release();
         }
     }
 
@@ -179,9 +181,11 @@ export class SaleController {
         @Response() res,
         @Param('id') id: number
     ): Promise<ResponseUpdateSale> {
-        const saleManager = getManager();
+        const connection = getConnection();
+        const queryRunner = connection.createQueryRunner();
+        await queryRunner.connect();
         // Start transaction
-        await saleManager.queryRunner.startTransaction();
+        await queryRunner.startTransaction();
         try {
             const _sale: Sale = await this.saleService.getById(id);
             if (!_sale) {
@@ -237,19 +241,19 @@ export class SaleController {
             await this.saleLogService.create(newSaleLog);
 
             // commit transaction
-            await saleManager.queryRunner.commitTransaction();
+            await queryRunner.commitTransaction();
             return res.status(200).json({
                 error: 0,
                 data: sale
             });
         } catch (error) {
-            await saleManager.queryRunner.rollbackTransaction();
+            await queryRunner.rollbackTransaction();
             return res.status(500).json({
                 error: 1,
                 message: 'Server occurred an error'
             });
         } finally {
-            await saleManager.queryRunner.release();
+            await queryRunner.release();
         }
     }
 }

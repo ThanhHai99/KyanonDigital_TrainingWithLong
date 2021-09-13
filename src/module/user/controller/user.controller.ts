@@ -26,7 +26,7 @@ import {
     ResponseUpdateUser,
     UpdateUserDto
 } from '../dto/user.dto';
-import { getManager } from 'typeorm';
+import { getConnection } from 'typeorm';
 
 @ApiTags('user')
 @ApiSecurity('JwtAuthGuard')
@@ -101,9 +101,11 @@ export class UserController {
         @Body() body: BodyCreateUser,
         @Response() res
     ): Promise<ResponseCreateUser> {
-        const userManager = getManager();
+        const connection = getConnection();
+        const queryRunner = connection.createQueryRunner();
+        await queryRunner.connect();
         // Start transaction
-        await userManager.queryRunner.startTransaction();
+        await queryRunner.startTransaction();
         try {
             let newUser = new User();
             newUser.username = body.username;
@@ -145,21 +147,21 @@ export class UserController {
             }
 
             const user = await this.userService.create(newUser);
-            
+
             // commit transaction
-            await userManager.queryRunner.commitTransaction();
+            await queryRunner.commitTransaction();
             return res.status(201).json({
                 error: 0,
                 data: user
             });
         } catch (error) {
-            await userManager.queryRunner.rollbackTransaction();
+            await queryRunner.rollbackTransaction();
             return res.status(500).json({
                 error: 1,
                 message: 'Server occurred an error'
             });
         } finally {
-            await userManager.queryRunner.release();
+            await queryRunner.release();
         }
     }
 

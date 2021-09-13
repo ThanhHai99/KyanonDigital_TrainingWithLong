@@ -8,7 +8,7 @@ import {
 } from '@nestjs/swagger';
 import { WarehouseLog } from '../../warehouse_log/entity/warehouse_log.entity';
 import { WarehouseLogService } from '../../warehouse_log/service/warehouse_log.service';
-import { getManager } from 'typeorm';
+import { getConnection } from 'typeorm';
 import {
     BodyImporting,
     ResponseGetWarehouse,
@@ -89,9 +89,11 @@ export class WarehouseController {
         @Body() body: BodyImporting,
         @Response() res
     ): Promise<ResponseImporting> {
-        const warehouseManager = getManager();
+        const connection = getConnection();
+        const queryRunner = connection.createQueryRunner();
+        await queryRunner.connect();
         // Start transaction
-        await warehouseManager.queryRunner.startTransaction();
+        await queryRunner.startTransaction();
 
         try {
             let newWarehouse = new Warehouse();
@@ -114,19 +116,19 @@ export class WarehouseController {
             await this.warehouseLogService.create(newWarehouseLog);
 
             // commit transaction
-            await warehouseManager.queryRunner.commitTransaction();
+            await queryRunner.commitTransaction();
             return res.status(201).json({
                 error: 0,
                 data: warehouse
             });
         } catch (error) {
-            await warehouseManager.queryRunner.rollbackTransaction();
+            await queryRunner.rollbackTransaction();
             return res.status(500).json({
                 error: 1,
                 message: 'Server occurred an error'
             });
         } finally {
-            await warehouseManager.queryRunner.release();
+            await queryRunner.release();
         }
     }
 
