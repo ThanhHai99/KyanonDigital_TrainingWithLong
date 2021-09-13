@@ -35,10 +35,7 @@ export class RoleService {
                             name: e[0]
                         };
                     });
-                console.log('lackingRoles');
-                console.log(lackingRoles);
                 if (lackingRoles.length) {
-                    
                     await this.roleRepository.insert(<any>lackingRoles);
                 }
             }

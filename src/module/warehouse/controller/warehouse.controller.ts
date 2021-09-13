@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Post, Response } from '@nestjs/common';
 import {
-    ApiBasicAuth,
     ApiBody,
     ApiCreatedResponse,
     ApiOkResponse,
@@ -20,8 +19,7 @@ import { WarehouseService } from '../service/warehouse.service';
 const moment = require('moment');
 
 @ApiTags('warehouse')
-@ApiBasicAuth()
-@ApiSecurity('basic')
+@ApiSecurity('JwtAuthGuard')
 @Controller('warehouse')
 export class WarehouseController {
     constructor(

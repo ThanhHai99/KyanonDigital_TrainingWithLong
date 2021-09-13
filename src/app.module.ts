@@ -4,12 +4,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
+import { RoleModule } from './module/role/role.module';
+import { Role } from './module/role/entity/role.entity';
+
 // middleware
 import { checkJwt } from './middleware/checkJwt';
 import { checkRole } from './middleware/checkRole';
-
-import { RoleModule } from './module/role/role.module';
-import { Role } from './module/role/entity/role.entity';
 
 import { AuthModule } from './module/auth/auth.module';
 import { UserModule } from './module/user/user.module';
@@ -51,6 +51,7 @@ require('dotenv').config();
 
 @Module({
     imports: [
+        TypeOrmModule.forFeature([Role, User]),
         TypeOrmModule.forRoot({
             type: 'mysql',
             host: process.env.DB_HOST,
@@ -77,9 +78,9 @@ require('dotenv').config();
             ],
             synchronize: true
         }),
-        AuthModule,
         RoleModule,
         UserModule,
+        AuthModule,
         WarehouseModule,
         SaleModule,
         OrderModule,
@@ -101,8 +102,8 @@ export class AppModule implements NestModule {
     constructor(private connection: Connection) {}
 
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(checkJwt, checkRole([1])).forRoutes('user');
         consumer.apply(checkJwt, checkRole([1])).forRoutes('role');
+        consumer.apply(checkJwt, checkRole([1])).forRoutes('user');
         consumer.apply(checkJwt, checkRole([1])).forRoutes('category');
         consumer.apply(checkJwt, checkRole([1])).forRoutes('category_log');
         consumer.apply(checkJwt, checkRole([1, 2])).forRoutes('warehouse');
