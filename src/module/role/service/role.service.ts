@@ -27,7 +27,6 @@ export class RoleService {
                 const lackingIds = RoleIds.filter(
                     (e) => !existedIds.includes(e)
                 );
-
                 const lackingRoles = Object.entries(initRoles)
                     .filter((e: any) => lackingIds.includes(e[1]))
                     .map((e) => {
@@ -36,7 +35,6 @@ export class RoleService {
                             name: e[0]
                         };
                     });
-
                 if (lackingRoles.length) {
                     await this.roleRepository.insert(<any>lackingRoles);
                 }
