@@ -63,30 +63,19 @@ export class BodyUpdateSale {
     @IsArray()
     item_id: Array<number>;
 
-    @ApiProperty({
-        description: 'Amount of item is reduced',
-        type: Number,
-        default: null
-    })
+    @ApiProperty({ description: 'Amount of item is reduced', type: Array })
     @IsOptional()
-    @IsInt()
-    @Min(0)
-    amount: number;
+    @IsArray()
+    amount: Array<number>;
 
-    @ApiProperty({
-        description: 'Percent is reduced',
-        type: Number
-    })
+    @ApiProperty({ description: 'Percent is reduced', type: Number })
     @IsOptional()
     @IsInt()
     @Min(0)
     @Max(100)
     discount: number;
 
-    @ApiProperty({
-        description: 'Sale start date',
-        type: Date
-    })
+    @ApiProperty({ description: 'Sale start date', type: Date })
     @IsOptional()
     @IsDateString()
     start_date: Date;

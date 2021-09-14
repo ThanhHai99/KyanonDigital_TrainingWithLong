@@ -3,7 +3,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 export class Warehouse1627548130703 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(
-            `insert into warehouse(id,expiration_date,amount,item_id) values(1,"2021-07-28 00:00:00",10,1);`
+            `insert into warehouse(id,expiration_date,amount,item_id) values(1,"2021-08-28 00:00:00",10,1);`
         );
         await queryRunner.query(
             `insert into warehouse(id,expiration_date,amount,item_id) values(2,"2021-06-30 00:00:00",20,2);`

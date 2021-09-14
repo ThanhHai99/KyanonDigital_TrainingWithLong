@@ -115,12 +115,22 @@ export class SaleController {
             newSale.user = res.locals.jwtPayload.userId; // Get from token
 
             const isNameExisting: boolean =
-                await this.saleService.isNameAlreadyInUse(newSale.name);
+                await this.saleService.isNameAndCodeAlreadyInUse(
+                    body.name,
+                    body.code
+                );
 
             if (isNameExisting) {
                 return res.status(409).json({
                     error: 1,
-                    data: 'Name already exists'
+                    data: 'Name or code already exists'
+                });
+            }
+
+            if (body.item_id.length !== body.amount.length) {
+                return res.status(409).json({
+                    error: 1,
+                    data: 'Item or amount of item invalid'
                 });
             }
 
@@ -203,7 +213,10 @@ export class SaleController {
             }
 
             const isNameExisting: boolean =
-                await this.saleService.isNameAlreadyInUse(body.name);
+                await this.saleService.isNameAndCodeAlreadyInUse(
+                    body.name,
+                    body.code
+                );
 
             if (isNameExisting) {
                 return res.status(409).json({
@@ -219,13 +232,50 @@ export class SaleController {
             _sale.end_date = !!body.end_date ? body.end_date : _sale.end_date;
             _sale.discount = !!body.discount ? body.discount : _sale.discount;
             _sale.applied = !!body.applied ? body.applied : _sale.applied;
+            _sale.code = !!body.code ? body.code : _sale.code;
             _sale.user = res.locals.jwtPayload.userId; // Get from token
 
-            const sale: Sale = await this.saleService.update(_sale);
+            const sale: Sale = await this.saleService.update(id, _sale);
             const t: SaleItem[] = await this.saleItemService.getBySaleId(
                 _sale.id
             );
+
             const sale_item: string = t.map((e) => e.item_id).toString();
+            const sale_amount: string = t.map((e) => e.amount).toString();
+
+            // // Update sale item
+            // if (
+            //     !!body.item_id &&
+            //     !!body.amount &&
+            //     body.item_id.length !== body.amount.length
+            // ) {
+            //     return res.status(409).json({
+            //         error: 1,
+            //         data: 'Item or amount of item invalid'
+            //     });
+            // }
+
+            // const itemArray: Array<number> = body.item_id;
+            // const amountArray: Array<number> = body.amount;
+
+            // for (const i in itemArray) {
+            //     if (Object.prototype.hasOwnProperty.call(itemArray, i)) {
+            //         let _saleItem =
+            //             await this.saleItemService.findByItemIdAndAmount(
+            //                 itemArray[i],
+            //                 amountArray[i]
+            //             );
+            //         // let newSaleItem = new SaleItem();
+            //         // newSaleItem.item_id = itemArray[i];
+            //         // newSaleItem.sale = <any>sale.id;
+            //         // newSaleItem.amount = amountArray[i];
+            //         await this.saleItemService.update(
+            //             _saleItem.id,
+            //             itemArray[i],
+            //             amountArray[i]
+            //         );
+            //     }
+            // }
 
             // Create sale log
             let newSaleLog: SaleLog = new SaleLog();
@@ -234,8 +284,9 @@ export class SaleController {
             newSaleLog.sale_item = sale_item;
             newSaleLog.start_date = sale.start_date;
             newSaleLog.end_date = sale.end_date;
-            // newSaleLog.amount = sale.amount;
+            newSaleLog.amount = sale_amount;
             newSaleLog.discount = sale.discount;
+            newSaleLog.code = sale.code;
             newSaleLog.applied = sale.applied;
             newSaleLog.created_by = res.locals.jwtPayload.userId; // Get from token
             await this.saleLogService.create(newSaleLog);

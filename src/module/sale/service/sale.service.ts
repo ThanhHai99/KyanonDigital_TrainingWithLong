@@ -10,12 +10,13 @@ export class SaleService {
         private saleRepository: Repository<Sale>
     ) {}
 
-    async isNameAlreadyInUse(name: string): Promise<boolean> {
+    async isNameAndCodeAlreadyInUse(
+        name: string,
+        code: string
+    ): Promise<boolean> {
         try {
             const sale = await this.saleRepository.findOneOrFail({
-                where: {
-                    name: name
-                }
+                where: [{ name: name }, { code: code }]
             });
             if (sale) return true;
             return false;
@@ -60,11 +61,33 @@ export class SaleService {
     }
 
     async create(sale: Sale): Promise<Sale> {
-        return await this.saleRepository.save(sale);
+        const tmp = await this.saleRepository.save(sale);
+        return await this.getById(tmp.id);
     }
 
-    async update(sale: Sale): Promise<Sale> {
-        await this.saleRepository.save(sale);
+    async update(id: number, sale: Sale): Promise<Sale> {
+        let _sale = await this.saleRepository.findOne(id);
+        _sale.name = !!sale.name ? sale.name : _sale.name;
+        _sale.start_date = !!sale.start_date
+            ? sale.start_date
+            : _sale.start_date;
+        _sale.end_date = !!sale.end_date ? sale.end_date : _sale.end_date;
+        _sale.discount = !!sale.discount ? sale.discount : _sale.discount;
+        _sale.applied = !!sale.applied ? sale.applied : _sale.applied;
+        _sale.code = !!sale.code ? sale.code : _sale.code;
+        _sale.user = !!sale.user ? sale.user : _sale.user;
+        await this.saleRepository.save(_sale);
+        // return await this.saleRepository.findOne(id, {
+        //     join: {
+        //         alias: 'sale',
+        //         leftJoinAndSelect: {
+        //             role: 'sale.sale_item'
+        //         }
+        //     }
+        // });
+
+        // await this.saleRepository.save(sale);
+
         return await this.getById(sale.id);
     }
 }

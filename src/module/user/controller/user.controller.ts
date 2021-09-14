@@ -122,7 +122,7 @@ export class UserController {
                 });
             }
 
-            if (body.role < 3) {
+            if (body.role > 3) {
                 return res.status(400).json({
                     error: 1,
                     message: 'Role is invalid.'

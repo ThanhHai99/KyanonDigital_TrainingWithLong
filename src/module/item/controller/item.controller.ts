@@ -132,7 +132,7 @@ export class ItemController {
                 });
             }
 
-            const item = await this.itemService.create(newItem);
+            const item: Item = await this.itemService.create(newItem);
             // Create item log
             let newItemLog = new ItemLog();
             newItemLog.item_id = item.id;
@@ -178,28 +178,40 @@ export class ItemController {
         @Response() res,
         @Param('id') id: number
     ): Promise<ResponseUpdateItem> {
-        let _item: Item = await this.itemService.getById(id);
-        _item.name = !!body.name ? body.name : _item.name;
-        _item.detail = !!body.detail ? body.detail : _item.detail;
-        _item.user_manual = !!body.user_manual
-            ? body.user_manual
-            : _item.user_manual;
-        _item.price = !!body.price ? body.price : _item.price;
-
-        const isNameExisting: boolean =
-            await this.itemService.isNameAlreadyInUse(_item.name);
-
-        if (isNameExisting) {
-            return res.status(409).json({
-                error: 1,
-                data: 'Name already exists'
-            });
-        }
+        const connection = getConnection();
+        const queryRunner = connection.createQueryRunner();
+        await queryRunner.connect();
+        // Start transaction
+        await queryRunner.startTransaction();
 
         try {
-            const item: Item = await this.itemService.update(_item);
+            let _item: Item = await this.itemService.getById(id);
 
-            console.log(item);
+            if (!_item) {
+                return res.status(404).json({
+                    error: 1,
+                    message: 'Item is not found'
+                });
+            }
+
+            _item.name = !!body.name ? body.name : _item.name;
+            _item.detail = !!body.detail ? body.detail : _item.detail;
+            _item.user_manual = !!body.user_manual
+                ? body.user_manual
+                : _item.user_manual;
+            _item.price = !!body.price ? body.price : _item.price;
+
+            const isNameExisting: boolean =
+                await this.itemService.isNameAlreadyInUse(body.name);
+
+            if (isNameExisting) {
+                return res.status(409).json({
+                    error: 1,
+                    data: 'Name already exists'
+                });
+            }
+
+            const item: Item = await this.itemService.update(id, _item);
 
             // Create item log
             let newItemLog = new ItemLog();
@@ -220,16 +232,20 @@ export class ItemController {
                 await this.priceLogService.create(newPriceLog);
             }
 
+            // commit transaction
+            await queryRunner.commitTransaction();
             return res.status(200).json({
                 error: 0,
                 data: item
             });
         } catch (error) {
-            console.log(error);
+            await queryRunner.rollbackTransaction();
             return res.status(500).json({
                 error: 1,
                 message: 'Server occurred an error'
             });
+        } finally {
+            await queryRunner.release();
         }
     }
 }

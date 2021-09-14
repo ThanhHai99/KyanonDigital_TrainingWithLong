@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Item } from '../entity/item.entity';
-import { getManager, Repository } from 'typeorm';
+import { getConnection, getManager, Repository } from 'typeorm';
 
 @Injectable()
 export class ItemService {
@@ -9,6 +9,24 @@ export class ItemService {
         @InjectRepository(Item)
         private itemRepository: Repository<Item>
     ) {}
+
+    async findOneAndSelectPrice(id: number): Promise<Item> {
+        return await this.itemRepository.findOne({
+            select: ["price"],
+            where: {
+                id: id
+            }
+        });
+    };
+
+    async findById(id: number): Promise<Item> {
+        return await getConnection()
+            .createQueryBuilder()
+            .from(Item, 'item')
+            .leftJoinAndSelect('item.category', 'category')
+            .where('item.id = :id', { id: id })
+            .getOne();
+    }
 
     async getAll(): Promise<Item[]> {
         const itemManager = getManager();
@@ -38,13 +56,13 @@ export class ItemService {
     async getById(id: number): Promise<Item> {
         const itemManager = getManager();
         return await itemManager.query(`
-            SELECT item.*, warehouse.amount, category.name AS category_name
+            SELECT item.*, warehouse.amount, category.name AS category_name, category.id AS category_id
             FROM item
             LEFT JOIN warehouse
             ON item.id = warehouse.item_id AND warehouse.amount >= 10
             LEFT JOIN category
             ON item.category_id = category.id
-            WHERE item.id = ${id}
+            WHERE item.id = '${id}'
         `);
     }
 
@@ -62,12 +80,26 @@ export class ItemService {
         }
     }
 
-    async create(category: Item): Promise<Item> {
-        return await this.itemRepository.save(category);
+    async create(item: Item): Promise<Item> {
+        return await this.itemRepository.save(item);
     }
 
-    async update(category: Item): Promise<Item> {
-        await this.itemRepository.save(category);
-        return await this.getById(category.id);
+    async update(id: number, item: Item): Promise<Item> {
+        let _item = await this.itemRepository.findOne(id);
+        _item.name = !!item.name ? item.name : _item.name;
+        _item.detail = !!item.detail ? item.detail : _item.detail;
+        _item.user_manual = !!item.user_manual
+            ? item.user_manual
+            : _item.user_manual;
+        _item.price = !!item.price ? item.price : _item.price;
+        await this.itemRepository.save(_item);
+        return await this.itemRepository.findOne(id, {
+            join: {
+                alias: 'item',
+                leftJoinAndSelect: {
+                    role: 'item.category'
+                }
+            }
+        });
     }
 }

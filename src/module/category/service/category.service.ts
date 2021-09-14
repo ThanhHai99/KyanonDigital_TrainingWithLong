@@ -36,8 +36,8 @@ export class CategoryService {
         return await this.categoryRepository.save(category);
     }
 
-    async update(category: Category): Promise<Category> {
-        await this.categoryRepository.save(category);
-        return await this.getById(category.id);
+    async update(id: number, category: Category): Promise<Category> {
+        await this.categoryRepository.update(id, category);
+        return await this.getById(id);
     }
 };

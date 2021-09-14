@@ -10,7 +10,7 @@ export class WarehouseLog extends BaseEntity {
     @Column({ type: 'enum', enum: ['+', '-'] })
     status: string;
 
-    @Column()
+    @Column({ default: null })
     price: number;
 
     @Column()

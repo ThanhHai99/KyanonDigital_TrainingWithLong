@@ -181,7 +181,9 @@ export class CategoryController {
                 });
             }
 
+
             const category: Category = await this.categoryService.update(
+                _category.id,
                 _category
             );
             // Create category log

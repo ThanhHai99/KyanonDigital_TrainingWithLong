@@ -49,16 +49,16 @@ export class WarehouseService {
         amount: number
     ): Promise<boolean> {
         // for (const i in item) {
-            // if (Object.prototype.hasOwnProperty.call(item, i)) {
-                // const e = item[i];
-                const { sumAmount } = await this.warehouseRepository
-                    .createQueryBuilder('warehouse')
-                    .select('SUM(amount)', 'sumAmount')
-                    .where('item_id = :item', { item })
-                    .andWhere('expiration_date > :condition', { condition })
-                    .getRawOne();
-                if (sumAmount < amount) return false;
-            // }
+        // if (Object.prototype.hasOwnProperty.call(item, i)) {
+        // const e = item[i];
+        const { sumAmount } = await this.warehouseRepository
+            .createQueryBuilder('warehouse')
+            .select('SUM(amount)', 'sumAmount')
+            .where('item_id = :item', { item })
+            .andWhere('expiration_date > :condition', { condition })
+            .getRawOne();
+        if (sumAmount < amount) return false;
+        // }
         // }
         return true;
     }
@@ -75,7 +75,7 @@ export class WarehouseService {
                 let _item = itemData[i];
                 let _amount = amountData[i];
                 while (_amount > 0) {
-                    const rs = await this.warehouseRepository
+                    const rs: any = await this.warehouseRepository
                         .createQueryBuilder('warehouse')
                         .where('item_id = :_item', { _item })
                         .andWhere('expiration_date > :condition', { condition })
@@ -84,42 +84,42 @@ export class WarehouseService {
                         .getRawOne();
 
                     const {
-                        warehouses_id,
-                        warehouses_amount,
-                        warehouses_expiration_date
+                        warehouse_id,
+                        warehouse_amount,
+                        warehouse_expiration_date
                     } = rs;
 
-                    if (warehouses_amount <= _amount) {
-                        await this.warehouseRepository.update(warehouses_id, {
+                    if (warehouse_amount <= _amount) {
+                        await this.warehouseRepository.update(warehouse_id, {
                             amount: 0
                         });
                         response_i =
-                            warehouses_id +
+                            warehouse_id +
                             ';' +
                             _item +
                             ';' +
-                            warehouses_amount +
+                            warehouse_amount +
                             ';' +
-                            moment(new Date(warehouses_expiration_date)).format(
+                            moment(new Date(warehouse_expiration_date)).format(
                                 'YYYY-MM-DD'
                             );
                     } else {
-                        await this.warehouseRepository.update(warehouses_id, {
-                            amount: warehouses_amount - _amount
+                        await this.warehouseRepository.update(warehouse_id, {
+                            amount: warehouse_amount - _amount
                         });
                         response_i =
-                            warehouses_id +
+                            warehouse_id +
                             ';' +
                             _item +
                             ';' +
                             _amount +
                             ';' +
-                            moment(new Date(warehouses_expiration_date)).format(
+                            moment(new Date(warehouse_expiration_date)).format(
                                 'YYYY-MM-DD'
                             );
                     }
 
-                    _amount -= warehouses_amount;
+                    _amount -= warehouse_amount;
                     response.push(response_i);
                 }
             }

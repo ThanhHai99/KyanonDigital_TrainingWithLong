@@ -37,6 +37,7 @@ import { WarehouseService } from '../../warehouse/service/warehouse.service';
 import { WarehouseLog } from '../../warehouse_log/entity/warehouse_log.entity';
 import { WarehouseLogService } from '../../warehouse_log/service/warehouse_log.service';
 import { getConnection } from 'typeorm';
+import { Item } from 'module/item/entity/item.entity';
 const moment = require('moment');
 
 @ApiTags('order')
@@ -248,7 +249,7 @@ export class OrderController {
                 _amountData
             );
 
-            // Create warehouse log
+            // // Create warehouse log
             for (let index = 0; index < responseExport.length; index++) {
                 let responseExport_i = responseExport[index]
                     .toString()
@@ -267,7 +268,10 @@ export class OrderController {
             let sumAmount = 30000;
             for (let i in _itemData) {
                 if (Object.prototype.hasOwnProperty.call(_itemData, i)) {
-                    let _item = await this.itemService.getById(_itemData[i]);
+                    let _item: Item =
+                        await this.itemService.findOneAndSelectPrice(
+                            _itemData[i]
+                        );
                     sumAmount += _item.price * _amountData[i];
                 }
             }

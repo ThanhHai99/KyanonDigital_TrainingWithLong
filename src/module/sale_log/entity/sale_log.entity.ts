@@ -25,7 +25,7 @@ export class SaleLog extends BaseEntity {
     })
     start_date: Date;
 
-    @Column()
+    @Column({ default: null })
     end_date: Date;
 
     @Column()

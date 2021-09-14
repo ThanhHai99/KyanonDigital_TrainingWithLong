@@ -22,7 +22,7 @@ export class Warehouse extends BaseEntity {
     @Column({ type: 'timestamp' })
     expiration_date: Date;
 
-    @Column()
+    @Column({ default: 0 })
     amount: number;
 
     @CreateDateColumn({
