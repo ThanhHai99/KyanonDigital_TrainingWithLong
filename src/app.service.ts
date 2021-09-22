@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { User } from 'module/user/entity/user.entity';
+import { User } from '@module/user/entity/user.entity';
 import * as bcrypt from 'bcryptjs';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -51,8 +51,4 @@ export class AppService {
             }
         }
     }
-
-    // getHello(): string {
-    //     return 'Hello World!';
-    // }
 }
