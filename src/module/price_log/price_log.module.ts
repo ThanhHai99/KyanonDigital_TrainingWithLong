@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PriceLogController } from './controller/price_log.controller';
-import { PriceLog } from './entity/price_log.entity';
-import { PriceLogService } from './service/price_log.service';
+import { PriceLogController } from '@module/price_log/controller/price_log.controller';
+import { PriceLog } from '@module/price_log/entity/price_log.entity';
+import { PriceLogService } from '@module/price_log/service/price_log.service';
 
 @Module({
     imports: [TypeOrmModule.forFeature([PriceLog])],

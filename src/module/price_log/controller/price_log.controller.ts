@@ -4,8 +4,8 @@ import {
     ApiSecurity,
     ApiTags
 } from '@nestjs/swagger';
-import { PriceLog } from '../entity/price_log.entity';
-import { PriceLogService } from '../service/price_log.service';
+import { PriceLog } from '@module/price_log/entity/price_log.entity';
+import { PriceLogService } from '@module/price_log/service/price_log.service';
 
 @ApiTags('price_log')
 @ApiSecurity('JwtAuthGuard')

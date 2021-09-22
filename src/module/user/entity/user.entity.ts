@@ -11,11 +11,11 @@ import {
     BeforeUpdate
 } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
-import { Category } from '../../category/entity/category.entity';
-import { Sale } from '../../sale/entity/sale.entity';
-import { Item } from '../../item/entity/item.entity';
-import { Order } from '../../order/entity/order.entity';
-import { Role } from '../../role/entity/role.entity';
+import { Category } from '@module/category/entity/category.entity';
+import { Sale } from '@module/sale/entity/sale.entity';
+import { Item } from '@module/item/entity/item.entity';
+import { Order } from '@module/order/entity/order.entity';
+import { Role } from '@module/role/entity/role.entity';
 
 @Entity({ name: 'user' })
 export class User extends BaseEntity {

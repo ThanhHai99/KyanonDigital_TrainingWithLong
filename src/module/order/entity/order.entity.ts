@@ -8,10 +8,10 @@ import {
     ManyToOne,
     JoinColumn
 } from 'typeorm';
-import { Invoice } from '../../invoice/entity/invoice.entity';
-import { PAY } from '../../../helpers/paymentMethod';
-import { ItemOrder } from '../../item_order/entity/item_order.entity';
-import { User } from '../../user/entity/user.entity';
+import { Invoice } from '@module/invoice/entity/invoice.entity';
+import { PAY } from '@module/../helpers/paymentMethod';
+import { ItemOrder } from '@module/item_order/entity/item_order.entity';
+import { User } from '@module/user/entity/user.entity';
 
 @Entity({ name: 'order' })
 export class Order extends BaseEntity {

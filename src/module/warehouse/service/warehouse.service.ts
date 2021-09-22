@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Raw, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Warehouse } from '../entity/warehouse.entity';
+import { Warehouse } from '@module/warehouse/entity/warehouse.entity';
 const moment = require('moment');
 
 @Injectable()

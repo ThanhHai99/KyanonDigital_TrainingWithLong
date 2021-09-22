@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { PriceLog } from '../entity/price_log.entity';
+import { PriceLog } from '@module/price_log/entity/price_log.entity';
 
 @Injectable()
 export class PriceLogService {

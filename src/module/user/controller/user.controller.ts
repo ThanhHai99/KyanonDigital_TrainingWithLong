@@ -9,8 +9,8 @@ import {
     Query,
     Param
 } from '@nestjs/common';
-import { User } from '../entity/user.entity';
-import { UserService } from '../service/user.service';
+import { User } from '@module/user/entity/user.entity';
+import { UserService } from '@module/user/service/user.service';
 import {
     ApiBody,
     ApiCreatedResponse,
@@ -25,7 +25,7 @@ import {
     ResponseLockUser,
     ResponseUpdateUser,
     UpdateUserDto
-} from '../dto/user.dto';
+} from '@module/user/dto/user.dto';
 import { getConnection } from 'typeorm';
 
 @ApiTags('user')

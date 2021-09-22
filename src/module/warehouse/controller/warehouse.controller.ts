@@ -6,16 +6,16 @@ import {
     ApiSecurity,
     ApiTags
 } from '@nestjs/swagger';
-import { WarehouseLog } from '../../warehouse_log/entity/warehouse_log.entity';
-import { WarehouseLogService } from '../../warehouse_log/service/warehouse_log.service';
+import { WarehouseLog } from '@module/warehouse_log/entity/warehouse_log.entity';
+import { WarehouseLogService } from '@module/warehouse_log/service/warehouse_log.service';
 import { getConnection } from 'typeorm';
 import {
     BodyImporting,
     ResponseGetWarehouse,
     ResponseImporting
-} from '../dto/warehouse.dto';
-import { Warehouse } from '../entity/warehouse.entity';
-import { WarehouseService } from '../service/warehouse.service';
+} from '@module/warehouse/dto/warehouse.dto';
+import { Warehouse } from '@module/warehouse/entity/warehouse.entity';
+import { WarehouseService } from '@module/warehouse/service/warehouse.service';
 const moment = require('moment');
 
 @ApiTags('warehouse')

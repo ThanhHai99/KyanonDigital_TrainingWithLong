@@ -1,16 +1,16 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { OrderController } from './controller/order.controller';
-import { Order } from './entity/order.entity';
-import { OrderService } from './service/order.service';
-import { InvoiceModule } from '../invoice/invoice.module';
-import { ItemModule } from '../item/item.module';
-import { ItemOrderModule } from '../item_order/item_order.module';
-import { SaleModule } from '../sale/sale.module';
-import { SaleItemModule } from '../sale_item/sale_item.module';
-import { UserModule } from '../user/user.module';
-import { WarehouseModule } from '../warehouse/warehouse.module';
-import { WarehouseLogModule } from '../warehouse_log/warehouse_log.module';
+import { OrderController } from '@module/order/controller/order.controller';
+import { Order } from '@module/order/entity/order.entity';
+import { OrderService } from '@module/order/service/order.service';
+import { InvoiceModule } from '@module/invoice/invoice.module';
+import { ItemModule } from '@module/item/item.module';
+import { ItemOrderModule } from '@module/item_order/item_order.module';
+import { SaleModule } from '@module/sale/sale.module';
+import { SaleItemModule } from '@module/sale_item/sale_item.module';
+import { UserModule } from '@module/user/user.module';
+import { WarehouseModule } from '@module/warehouse/warehouse.module';
+import { WarehouseLogModule } from '@module/warehouse_log/warehouse_log.module';
 
 @Module({
     imports: [

@@ -1,6 +1,6 @@
 import { JoinColumn, ManyToOne, BaseEntity, Column, Entity } from 'typeorm';
 import { UpdateDateColumn, CreateDateColumn } from 'typeorm';
-import { Warehouse } from '../../warehouse/entity/warehouse.entity';
+import { Warehouse } from '@module/warehouse/entity/warehouse.entity';
 
 @Entity({ name: 'warehouse_log' })
 export class WarehouseLog extends BaseEntity {

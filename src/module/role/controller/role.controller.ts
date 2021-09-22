@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Response } from '@nestjs/common';
 import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { Role } from '../entity/role.entity';
-import { RoleService } from '../service/role.service';
+import { Role } from '@module/role/entity/role.entity';
+import { RoleService } from '@module/role/service/role.service';
 
 @ApiTags('role')
 @ApiSecurity('JwtAuthGuard')

@@ -1,4 +1,4 @@
-import { Item } from '../../item/entity/item.entity';
+import { Item } from '@module/item/entity/item.entity';
 import {
     JoinColumn,
     ManyToOne,
@@ -8,7 +8,7 @@ import {
     OneToMany
 } from 'typeorm';
 import { UpdateDateColumn, CreateDateColumn } from 'typeorm';
-import { WarehouseLog } from '../../warehouse_log/entity/warehouse_log.entity';
+import { WarehouseLog } from '@module/warehouse_log/entity/warehouse_log.entity';
 
 @Entity({ name: 'warehouse' })
 export class Warehouse extends BaseEntity {

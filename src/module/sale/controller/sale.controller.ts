@@ -15,19 +15,19 @@ import {
     ApiTags
 } from '@nestjs/swagger';
 import { getConnection } from 'typeorm';
-import { SaleItem } from '../../sale_item/entity/sale_items.entity';
-import { SaleItemService } from '../../sale_item/service/sale_item.service';
-import { SaleLog } from '../../sale_log/entity/sale_log.entity';
-import { SaleLogService } from '../../sale_log/service/sale_log.service';
+import { SaleItem } from '@module/sale_item/entity/sale_items.entity';
+import { SaleItemService } from '@module/sale_item/service/sale_item.service';
+import { SaleLog } from '@module/sale_log/entity/sale_log.entity';
+import { SaleLogService } from '@module/sale_log/service/sale_log.service';
 import {
     BodyCreateSale,
     BodyUpdateSale,
     ResponseCreateSale,
     ResponseGetSale,
     ResponseUpdateSale
-} from '../dto/sale.dto';
-import { Sale } from '../entity/sale.entity';
-import { SaleService } from '../service/sale.service';
+} from '@module/sale/dto/sale.dto';
+import { Sale } from '@module/sale/entity/sale.entity';
+import { SaleService } from '@module/sale/service/sale.service';
 
 @ApiTags('sale')
 @ApiSecurity('JwtAuthGuard')

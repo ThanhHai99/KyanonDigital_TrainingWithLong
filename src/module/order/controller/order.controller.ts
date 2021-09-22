@@ -15,29 +15,29 @@ import {
     ApiSecurity,
     ApiTags
 } from '@nestjs/swagger';
-import { Invoice } from '../../invoice/entity/invoice.entity';
-import { InvoiceService } from '../../invoice/service/invoice.service';
-import { ItemService } from '../../item/service/item.service';
-import { ItemOrder } from '../../item_order/entity/item_order.entity';
-import { ItemOrderService } from '../../item_order/service/item_order.service';
+import { Invoice } from '@module/invoice/entity/invoice.entity';
+import { InvoiceService } from '@module/invoice/service/invoice.service';
+import { ItemService } from '@module/item/service/item.service';
+import { ItemOrder } from '@module/item_order/entity/item_order.entity';
+import { ItemOrderService } from '@module/item_order/service/item_order.service';
 import {
     BodyPayment,
     ResponseCreateOrder,
     ResponseExport,
     ResponseGetOrder,
     ResponsePayment
-} from '../dto/order.dto';
-import { BodyCreateOrder } from '../dto/order.dto';
-import { Order } from '../entity/order.entity';
-import { OrderService } from '../service/order.service';
-import { SaleService } from '../../sale/service/sale.service';
-import { SaleItemService } from '../../sale_item/service/sale_item.service';
-import { UserService } from '../../user/service/user.service';
-import { WarehouseService } from '../../warehouse/service/warehouse.service';
-import { WarehouseLog } from '../../warehouse_log/entity/warehouse_log.entity';
-import { WarehouseLogService } from '../../warehouse_log/service/warehouse_log.service';
+} from '@module/order/dto/order.dto';
+import { BodyCreateOrder } from '@module/order/dto/order.dto';
+import { Order } from '@module/order/entity/order.entity';
+import { OrderService } from '@module/order/service/order.service';
+import { SaleService } from '@module/sale/service/sale.service';
+import { SaleItemService } from '@module/sale_item/service/sale_item.service';
+import { UserService } from '@module/user/service/user.service';
+import { WarehouseService } from '@module/warehouse/service/warehouse.service';
+import { WarehouseLog } from '@module/warehouse_log/entity/warehouse_log.entity';
+import { WarehouseLogService } from '@module/warehouse_log/service/warehouse_log.service';
 import { getConnection } from 'typeorm';
-import { Item } from 'module/item/entity/item.entity';
+import { Item } from '@module/item/entity/item.entity';
 const moment = require('moment');
 
 @ApiTags('order')

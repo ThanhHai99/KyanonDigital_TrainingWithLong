@@ -7,7 +7,7 @@ import {
     ManyToOne,
     JoinColumn
 } from 'typeorm';
-import { Sale } from '../../sale/entity/sale.entity';
+import { Sale } from '@module/sale/entity/sale.entity';
 
 @Entity({ name: 'sale_item' })
 export class SaleItem extends BaseEntity {
