@@ -6,9 +6,9 @@ import {
     ResponseLogin,
     ResponseRegister
 } from '../dto/auth.dto';
-import { AuthService } from '../service/auth.service';
-import { UserService } from '../../user/service/user.service';
-import { User } from '../../user/entity/user.entity';
+import { AuthService } from '@module/auth/service/auth.service';
+import { UserService } from '@module/user/service/user.service';
+import { User } from '@module/user/entity/user.entity';
 import {
     ApiBody,
     ApiCreatedResponse,
@@ -17,7 +17,7 @@ import {
     ApiTags,
     ApiUnauthorizedResponse
 } from '@nestjs/swagger';
-require('dotenv').config();
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('authentication')
 @Controller('auth')
@@ -61,6 +61,8 @@ export class AuthController {
             });
         }
 
+        // verify email
+
         // Get roleId
         const { role } = user;
         // Sing jwt
@@ -73,8 +75,11 @@ export class AuthController {
                     username: user.username,
                     roleId: id
                 },
-                process.env.jwtSecret,
-                { expiresIn: process.env.tokenLifetime }
+                ConfigService.prototype.get<string>('jwt.secret'),
+                {
+                    expiresIn:
+                        ConfigService.prototype.get<string>('jwt.expires_in')
+                }
             );
         } else {
             token = jwt.sign(
@@ -83,8 +88,11 @@ export class AuthController {
                     username: user.username,
                     roleId: null
                 },
-                process.env.jwtSecret,
-                { expiresIn: process.env.tokenLifetime }
+                ConfigService.prototype.get<string>('jwt.secret'),
+                {
+                    expiresIn:
+                        ConfigService.prototype.get<string>('jwt.expires_in')
+                }
             );
         }
 

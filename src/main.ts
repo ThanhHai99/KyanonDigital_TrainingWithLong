@@ -1,11 +1,15 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
-require('dotenv').config();
+import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
+    const configService = app.get(ConfigService);
+    const port = configService.get<number>('port');
+
     app.useGlobalPipes(new ValidationPipe());
     const config = new DocumentBuilder()
         .setTitle('Shopping Online')
@@ -25,7 +29,9 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('/', app, document);
 
-    let port = process.env.APP_PORT || 3000;
-    await app.listen(port);
+    app.enableCors();
+    await app.listen(port).then(() => {
+        Logger.log(`Server is listening on ${port}`);
+    });
 }
 bootstrap();

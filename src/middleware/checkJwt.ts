@@ -1,6 +1,6 @@
+import { ConfigService } from '@nestjs/config';
 import { Request, Response, NextFunction } from 'express';
 import * as jwt from 'jsonwebtoken';
-require('dotenv').config();
 
 export const checkJwt = (req: Request, res: Response, next: NextFunction) => {
     // Get the jwt token from the head
@@ -23,7 +23,7 @@ export const checkJwt = (req: Request, res: Response, next: NextFunction) => {
     // We want to send a new token on every request
     const { userId, username, roleId } = jwtPayload;
     const newToken = jwt.sign({ userId, username, roleId }, jwtSecret, {
-        expiresIn: process.env.tokenLifetime
+        expiresIn: ConfigService.prototype.get<string>('jwt.expires_in')
     });
     res.setHeader('token', newToken);
 

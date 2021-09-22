@@ -1,8 +1,8 @@
 import { Controller, Get, Response, Param } from '@nestjs/common';
 import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { ResponseGetInvoice } from '../dto/invoice.dto';
-import { Invoice } from '../entity/invoice.entity';
-import { InvoiceService } from '../service/invoice.service';
+import { ResponseGetInvoice } from '@module/invoice/dto/invoice.dto';
+import { Invoice } from '@module/invoice/entity/invoice.entity';
+import { InvoiceService } from '@module/invoice/service/invoice.service';
 
 @ApiTags('invoice')
 @ApiSecurity('JwtAuthGuard')

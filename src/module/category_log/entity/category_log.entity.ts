@@ -6,7 +6,7 @@ import {
     ManyToOne,
     JoinColumn
 } from 'typeorm';
-import { Category } from '../../category/entity/category.entity';
+import { Category } from '@module/category/entity/category.entity';
 
 @Entity({ name: 'category_log' })
 export class CategoryLog extends BaseEntity {

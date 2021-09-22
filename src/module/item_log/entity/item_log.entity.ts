@@ -6,7 +6,7 @@ import {
     ManyToOne,
     JoinColumn
 } from 'typeorm';
-import { Item } from '../../item/entity/item.entity';
+import { Item } from '@module/item/entity/item.entity';
 
 @Entity({ name: 'item_log' })
 export class ItemLog extends BaseEntity {

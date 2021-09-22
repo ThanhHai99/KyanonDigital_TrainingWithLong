@@ -1,3 +1,6 @@
+import { SaleItem } from '@module/sale_item/entity/sale_items.entity';
+import { SaleLog } from '@module/sale_log/entity/sale_log.entity';
+import { User } from '@module/user/entity/user.entity';
 import {
     JoinColumn,
     ManyToOne,
@@ -8,9 +11,6 @@ import {
     Entity,
     OneToMany
 } from 'typeorm';
-import { SaleItem } from '../../sale_item/entity/sale_items.entity';
-import { SaleLog } from '../../sale_log/entity/sale_log.entity';
-import { User } from '../../user/entity/user.entity';
 
 @Entity({ name: 'sale' })
 export class Sale extends BaseEntity {

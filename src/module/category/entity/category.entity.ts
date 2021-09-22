@@ -8,9 +8,9 @@ import {
     UpdateDateColumn,
     ManyToOne
 } from 'typeorm';
-import { CategoryLog } from '../../category_log/entity/category_log.entity';
-import { Item } from '../../item/entity/item.entity';
-import { User } from '../../user/entity/user.entity';
+import { CategoryLog } from '@module/category_log/entity/category_log.entity';
+import { Item } from '@module/item/entity/item.entity';
+import { User } from '@module/user/entity/user.entity';
 
 @Entity({ name: 'category' })
 export class Category extends BaseEntity {

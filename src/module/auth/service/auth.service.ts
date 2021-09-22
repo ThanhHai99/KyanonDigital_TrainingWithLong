@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ApiParam } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '../../user/entity/user.entity';
+import { User } from '@module/user/entity/user.entity';
 
 @Injectable()
 export class AuthService {

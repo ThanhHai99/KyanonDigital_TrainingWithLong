@@ -20,13 +20,13 @@ import {
     ResponseGetItem,
     ResponseUpdateItem,
     BodyUpdateItem
-} from '../dto/item.dto';
-import { Item } from '../entity/item.entity';
-import { ItemLog } from '../../item_log/entity/item_log.entity';
-import { PriceLog } from '../../price_log/entity/price_log.entity';
-import { ItemService } from '../service/item.service';
-import { ItemLogService } from '../../item_log/service/item_log.service';
-import { PriceLogService } from '../../price_log/service/price_log.service';
+} from '@module/item/dto/item.dto';
+import { Item } from '@module/item/entity/item.entity';
+import { ItemLog } from '@module/item_log/entity/item_log.entity';
+import { PriceLog } from '@module/price_log/entity/price_log.entity';
+import { ItemService } from '@module/item/service/item.service';
+import { ItemLogService } from '@module/item_log/service/item_log.service';
+import { PriceLogService } from '@module/price_log/service/price_log.service';
 import { getConnection } from 'typeorm';
 
 @ApiTags('item')

@@ -11,9 +11,11 @@
         "outDir": "./dist",
         "baseUrl": "./src",
         "incremental": true,
-        "skipLibCheck": true,
+        // "skipLibCheck": true,
         "paths": {
-            "@constant/*": ["constant/*"]
+            "@constant/*": ["constant/*"],
+            "@module/*": ["module/*"],
+            "@middleware/*": ["middleware/*"]
         }
     }
 }

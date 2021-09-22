@@ -8,11 +8,11 @@ import {
     Column,
     Entity
 } from 'typeorm';
-import { User } from '../../user/entity/user.entity';
-import { ItemOrder } from '../../item_order/entity/item_order.entity';
-import { Category } from '../../category/entity/category.entity';
-import { Warehouse } from '../../warehouse/entity/warehouse.entity';
-import { ItemLog } from '../../item_log/entity/item_log.entity';
+import { User } from '@module/user/entity/user.entity';
+import { ItemOrder } from '@module/item_order/entity/item_order.entity';
+import { Category } from '@module/category/entity/category.entity';
+import { Warehouse } from '@module/warehouse/entity/warehouse.entity';
+import { ItemLog } from '@module/item_log/entity/item_log.entity';
 
 @Entity({ name: 'item' })
 export class Item extends BaseEntity {

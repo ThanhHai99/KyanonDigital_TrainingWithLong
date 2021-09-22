@@ -14,17 +14,17 @@ import {
     ApiSecurity,
     ApiTags
 } from '@nestjs/swagger';
-import { Category } from '../entity/category.entity';
-import { CategoryService } from '../service/category.service';
-import { CategoryLogService } from '../../category_log/service/category_log.service';
-import { CategoryLog } from '../../category_log/entity/category_log.entity';
+import { Category } from '@module/category/entity/category.entity';
+import { CategoryService } from '@module/category/service/category.service';
+import { CategoryLogService } from '@module/category_log/service/category_log.service';
+import { CategoryLog } from '@module/category_log/entity/category_log.entity';
 import {
     BodyCreateCategory,
     BodyUpdateCategory,
     ResponseCreateCategory,
     ResponseGetCategory,
     ResponseUpdateCategory
-} from '../dto/category.dto';
+} from '@module/category/dto/category.dto';
 import { getConnection } from 'typeorm';
 
 @ApiTags('category')
