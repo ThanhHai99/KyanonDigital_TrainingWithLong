@@ -3,9 +3,12 @@ import * as bcrypt from 'bcryptjs';
 
 export class Users1627548027316 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
-        // await queryRunner.query(
-        //     `insert into user(id,username,password,name,phone,address,is_locked,role_id) values (1,'hai',"${bcrypt.hashSync("Aa@123456", 8)}",'Tran Viet Thanh Hai','0333771800','Tp.HCM',0,1);`
-        // );
+        await queryRunner.query(
+            `insert into user(id,username,password,name,phone,address,is_locked,role_id) values (1,'hai',"${bcrypt.hashSync(
+                'Aa@123456',
+                8
+            )}",'Tran Viet Thanh Hai','0333771800','Tp.HCM',0,1);`
+        );
         await queryRunner.query(
             `insert into user(id,username,password,name,phone,address,is_locked,role_id) values (2,'hien',"${bcrypt.hashSync(
                 'Aa@123456',

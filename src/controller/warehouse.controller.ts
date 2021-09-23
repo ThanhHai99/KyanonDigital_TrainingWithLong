@@ -23,8 +23,8 @@ const moment = require('moment');
 @Controller('warehouse')
 export class WarehouseController {
     constructor(
-        private warehouseService: WarehouseService,
-        private warehouseLogService: WarehouseLogService
+        private readonly warehouseService: WarehouseService,
+        private readonly warehouseLogService: WarehouseLogService
     ) {}
 
     @ApiOkResponse({ description: 'Get all item in warehouses' })

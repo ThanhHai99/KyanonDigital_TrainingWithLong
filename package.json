@@ -20,8 +20,8 @@
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
         "test:e2e": "jest --config ./test/jest-e2e.json",
         "typeorm:cli": "ts-node --transpile-only ./node_modules/typeorm/cli.js",
-        "db:drop": "npm run typeorm:cli schema:drop",
         "migration:generate": "typeorm migration:create -n",
+        "db:drop": "npm run typeorm:cli schema:drop",
         "db:migrate": "npm run typeorm:cli migration:run",
         "db:revert": "npm run typeorm:cli migration:revert",
         "db:sync": "npm run typeorm:cli schema:sync && npm run db:migrate"

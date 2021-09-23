@@ -34,9 +34,9 @@ import { SaleService } from '@service/sale.service';
 @Controller('sale')
 export class SaleController {
     constructor(
-        private saleService: SaleService,
-        private saleLogService: SaleLogService,
-        private saleItemService: SaleItemService
+        private readonly saleService: SaleService,
+        private readonly saleLogService: SaleLogService,
+        private readonly saleItemService: SaleItemService
     ) {}
 
     @ApiOkResponse({ description: 'Get all sales' })
