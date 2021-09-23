@@ -29,7 +29,7 @@ import {
 } from './order.dto';
 import { BodyCreateOrder } from './order.dto';
 import { Order } from './order.entity';
-import { OrderService } from '@module/order/order.service';
+import { OrderService } from './order.service';
 import { SaleService } from '@module/sale/sale.service';
 import { SaleItemService } from '@module/sale_item/sale_item.service';
 import { UserService } from '@module/user/user.service';

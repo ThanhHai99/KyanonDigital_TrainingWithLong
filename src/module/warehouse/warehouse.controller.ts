@@ -14,8 +14,8 @@ import {
     ResponseGetWarehouse,
     ResponseImporting
 } from './warehouse.dto';
-import { Warehouse } from '@module/warehouse/warehouse.entity';
-import { WarehouseService } from '@module/warehouse/warehouse.service';
+import { Warehouse } from './warehouse.entity';
+import { WarehouseService } from './warehouse.service';
 const moment = require('moment');
 
 @ApiTags('warehouse')

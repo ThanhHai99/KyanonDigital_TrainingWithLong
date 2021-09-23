@@ -15,7 +15,7 @@ import {
     ApiTags
 } from '@nestjs/swagger';
 import { Category } from './category.entity';
-import { CategoryService } from '@module/category/category.service';
+import { CategoryService } from './category.service';
 import { CategoryLogService } from '@module/category_log/category_log.service';
 import { CategoryLog } from '@module/category_log/category_log.entity';
 import {

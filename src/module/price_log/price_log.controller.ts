@@ -1,7 +1,7 @@
 import { Controller, Get, Response, Param } from '@nestjs/common';
 import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { PriceLog } from './price_log.entity';
-import { PriceLogService } from '@module/price_log/price_log.service';
+import { PriceLogService } from './price_log.service';
 
 @ApiTags('price_log')
 @ApiSecurity('JwtAuthGuard')

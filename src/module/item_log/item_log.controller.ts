@@ -2,7 +2,7 @@ import { Controller, Get, Response, Param } from '@nestjs/common';
 import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { ResponseGetItemLog } from './item_log.dto';
 import { ItemLog } from './item_log.entity';
-import { ItemLogService } from '@module/item_log/item_log.service';
+import { ItemLogService } from './item_log.service';
 
 @ApiTags('item_log')
 @ApiSecurity('JwtAuthGuard')

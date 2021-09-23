@@ -22,9 +22,9 @@ import {
     BodyUpdateItem
 } from './item.dto';
 import { Item } from './item.entity';
+import { ItemService } from './item.service';
 import { ItemLog } from '@module/item_log/item_log.entity';
 import { PriceLog } from '@module/price_log/price_log.entity';
-import { ItemService } from '@module/item/item.service';
 import { ItemLogService } from '@module/item_log/item_log.service';
 import { PriceLogService } from '@module/price_log/price_log.service';
 import { getConnection } from 'typeorm';

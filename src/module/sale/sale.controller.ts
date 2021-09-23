@@ -27,7 +27,7 @@ import {
     ResponseUpdateSale
 } from './sale.dto';
 import { Sale } from './sale.entity';
-import { SaleService } from '@module/sale/sale.service';
+import { SaleService } from './sale.service';
 
 @ApiTags('sale')
 @ApiSecurity('JwtAuthGuard')

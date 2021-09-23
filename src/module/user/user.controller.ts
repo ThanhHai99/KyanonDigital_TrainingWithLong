@@ -10,7 +10,7 @@ import {
     Param
 } from '@nestjs/common';
 import { User } from './user.entity';
-import { UserService } from '@module/user/user.service';
+import { UserService } from './user.service';
 import {
     ApiBody,
     ApiCreatedResponse,

@@ -6,8 +6,6 @@ import {
     ResponseLogin,
     ResponseRegister
 } from './auth.dto';
-import { UserService } from '@module/user/user.service';
-import { User } from '@module/user/user.entity';
 import {
     ApiBody,
     ApiCreatedResponse,
@@ -16,8 +14,11 @@ import {
     ApiTags,
     ApiUnauthorizedResponse
 } from '@nestjs/swagger';
+
+import { UserService } from '@module/user/user.service';
+import { User } from '@module/user/user.entity';
 import { ConfigService } from '@nestjs/config';
-import { AuthService } from '@module/auth/auth.service';
+import { AuthService } from './auth.service';
 
 @ApiTags('authentication')
 @Controller('auth')

@@ -1,7 +1,7 @@
 import { Controller, Get, Response, Query, Param } from '@nestjs/common';
 import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { CategoryLog } from './category_log.entity';
-import { CategoryLogService } from '@module/category_log/category_log.service';
+import { CategoryLogService } from './category_log.service';
 
 @ApiTags('category_log')
 @ApiSecurity('JwtAuthGuard')
