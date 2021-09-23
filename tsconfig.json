@@ -15,11 +15,7 @@
         "paths": {
             "@constant/*": ["constant/*"],
             "@module/*": ["module/*"],
-            "@middleware/*": ["middleware/*"],
-            "@service/*": ["service/*"],
-            "@controller/*": ["controller/*"],
-            "@entity/*": ["entity/*"],
-            "@dto/*": ["dto/*"]
+            "@middleware/*": ["middleware/*"]
         }
     }
 }
