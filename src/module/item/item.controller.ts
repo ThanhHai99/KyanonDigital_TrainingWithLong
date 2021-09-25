@@ -12,7 +12,6 @@ import {
     ApiBody,
     ApiCreatedResponse,
     ApiOkResponse,
-    ApiSecurity,
     ApiTags
 } from '@nestjs/swagger';
 import {
@@ -30,7 +29,6 @@ import { PriceLogService } from '@module/price_log/price_log.service';
 import { getConnection } from 'typeorm';
 
 @ApiTags('item')
-@ApiSecurity('JwtAuthGuard')
 @Controller('item')
 export class ItemController {
     constructor(
@@ -41,7 +39,7 @@ export class ItemController {
 
     @ApiOkResponse({ description: 'Get all items' })
     @Get()
-    async readAll(@Response() res, @Query() query): Promise<ResponseGetItem> {
+    async getAll(@Response() res, @Query() query): Promise<ResponseGetItem> {
         try {
             const { name } = query;
             let item: any;
@@ -72,7 +70,7 @@ export class ItemController {
 
     @ApiOkResponse({ description: "Get a item by item's id" })
     @Get(':id')
-    async readById(
+    async getById(
         @Response() res,
         @Param('id') id: number
     ): Promise<ResponseGetItem> {

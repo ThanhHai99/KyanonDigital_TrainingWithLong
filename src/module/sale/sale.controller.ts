@@ -11,7 +11,6 @@ import {
     ApiBody,
     ApiCreatedResponse,
     ApiOkResponse,
-    ApiSecurity,
     ApiTags
 } from '@nestjs/swagger';
 import { getConnection } from 'typeorm';
@@ -30,7 +29,6 @@ import { Sale } from './sale.entity';
 import { SaleService } from './sale.service';
 
 @ApiTags('sale')
-@ApiSecurity('JwtAuthGuard')
 @Controller('sale')
 export class SaleController {
     constructor(
@@ -41,7 +39,7 @@ export class SaleController {
 
     @ApiOkResponse({ description: 'Get all sales' })
     @Get()
-    async readAll(@Response() res): Promise<ResponseGetSale> {
+    async getAll(@Response() res): Promise<ResponseGetSale> {
         try {
             const sales: Sale[] = await this.saleService.getAll();
             if (!sales || sales.length === 0) {
@@ -64,7 +62,7 @@ export class SaleController {
 
     @ApiOkResponse({ description: "Get a sale by sale's id" })
     @Get(':id')
-    async readById(
+    async getById(
         @Response() res,
         @Param('id') id: number
     ): Promise<ResponseGetSale> {

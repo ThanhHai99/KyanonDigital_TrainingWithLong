@@ -1,10 +1,9 @@
 import { Controller, Get, Param, Response } from '@nestjs/common';
-import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Role } from './role.entity';
 import { RoleService } from './role.service';
 
 @ApiTags('role')
-@ApiSecurity('JwtAuthGuard')
 @Controller('role')
 export class RoleController {
     constructor(private roleService: RoleService) {}
@@ -36,7 +35,7 @@ export class RoleController {
 
     @ApiOkResponse({ description: "Get role by role's id" })
     @Get(':id')
-    async readById(@Response() res, @Param('id') id: number) {
+    async getById(@Response() res, @Param('id') id: number) {
         try {
             const role: Role = await this.roleService.getById(id);
 

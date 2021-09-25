@@ -1,14 +1,14 @@
 import {
-    BaseEntity,
-    Column,
-    Entity,
-    CreateDateColumn,
-    UpdateDateColumn,
-    ManyToOne,
-    JoinColumn,
-    OneToMany,
-    BeforeInsert,
-    BeforeUpdate
+  BaseEntity,
+  Column,
+  Entity,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+  BeforeInsert,
+  BeforeUpdate
 } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { Category } from '@module/category/category.entity';
@@ -19,63 +19,63 @@ import { Role } from '@module/role/role.entity';
 
 @Entity({ name: 'user' })
 export class User extends BaseEntity {
-    @Column({ primary: true, generated: true })
-    id: number;
+  @Column({ primary: true, generated: true })
+  id: number;
 
-    @Column({ unique: true })
-    username: string;
+  @Column({ unique: true })
+  username: string;
 
-    @Column()
-    password: string;
+  @Column()
+  password: string;
 
-    @Column()
-    name: string;
+  @Column()
+  name: string;
 
-    @Column()
-    phone: string;
+  @Column()
+  phone: string;
 
-    @Column()
-    address: string;
+  @Column()
+  address: string;
 
-    @ManyToOne((type) => Role, (role) => role.users)
-    @JoinColumn({ name: 'role_id' })
-    role: Role;
+  @ManyToOne((type) => Role, (role) => role.users)
+  @JoinColumn({ name: 'role_id' })
+  role: Role;
 
-    @Column({ default: false })
-    is_locked: boolean;
+  @Column({ default: false })
+  is_locked: boolean;
 
-    @CreateDateColumn({
-        type: 'timestamp',
-        default: () => 'CURRENT_TIMESTAMP(6)'
-    })
-    created_at: Date;
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)'
+  })
+  created_at: Date;
 
-    @UpdateDateColumn({
-        type: 'timestamp',
-        default: () => 'CURRENT_TIMESTAMP(6)',
-        onUpdate: 'CURRENT_TIMESTAMP(6)'
-    })
-    updated_at: Date;
+  @UpdateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+    onUpdate: 'CURRENT_TIMESTAMP(6)'
+  })
+  updated_at: Date;
 
-    @OneToMany((type) => Category, (category) => category.user)
-    categories: Category[];
+  @OneToMany((type) => Category, (category) => category.user)
+  categories: Category[];
 
-    @OneToMany((type) => Sale, (sale) => sale.user)
-    sales: Sale[];
+  @OneToMany((type) => Sale, (sale) => sale.user)
+  sales: Sale[];
 
-    @OneToMany((type) => Order, (order) => order.user)
-    orders: Order[];
+  @OneToMany((type) => Order, (order) => order.user)
+  orders: Order[];
 
-    @OneToMany((type) => Item, (item) => item.user)
-    items: Item[];
+  @OneToMany((type) => Item, (item) => item.user)
+  items: Item[];
 
-    @BeforeInsert()
-    @BeforeUpdate()
-    hashPassword() {
-        this.password = bcrypt.hashSync(this.password, 8);
-    }
+  @BeforeInsert()
+  @BeforeUpdate()
+  hashPassword() {
+    this.password = bcrypt.hashSync(this.password, 8);
+  }
 
-    checkIfUnencryptedPasswordIsValid(unencryptedPassword: string): boolean {
-        return bcrypt.compareSync(unencryptedPassword, this.password);
-    }
+  isPasswordValid(unencryptedPassword: string): boolean {
+    return bcrypt.compareSync(unencryptedPassword, this.password);
+  }
 }

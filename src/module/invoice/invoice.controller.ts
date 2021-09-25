@@ -1,18 +1,17 @@
 import { Controller, Get, Response, Param } from '@nestjs/common';
-import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ResponseGetInvoice } from './invoice.dto';
 import { Invoice } from './invoice.entity';
 import { InvoiceService } from './invoice.service';
 
 @ApiTags('invoice')
-@ApiSecurity('JwtAuthGuard')
 @Controller('invoice')
 export class InvoiceController {
     constructor(private readonly invoiceService: InvoiceService) {}
 
     @ApiOkResponse({ description: 'Get all invoices' })
     @Get()
-    async readAll(@Response() res): Promise<ResponseGetInvoice> {
+    async getAll(@Response() res): Promise<ResponseGetInvoice> {
         try {
             let invoices: Invoice[] = await this.invoiceService.getAll();
             if (!invoices || invoices.length === 0) {
@@ -35,7 +34,7 @@ export class InvoiceController {
 
     @ApiOkResponse({ description: "Get a invoice by invoice's id" })
     @Get(':id')
-    async readById(
+    async getById(
         @Response() res,
         @Param('id') id: number
     ): Promise<ResponseGetInvoice> {

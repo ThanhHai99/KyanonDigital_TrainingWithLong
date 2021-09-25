@@ -15,7 +15,6 @@ import {
     ApiBody,
     ApiCreatedResponse,
     ApiOkResponse,
-    ApiSecurity,
     ApiTags
 } from '@nestjs/swagger';
 import {
@@ -29,7 +28,6 @@ import {
 import { getConnection } from 'typeorm';
 
 @ApiTags('user')
-@ApiSecurity('JwtAuthGuard')
 @Controller('user')
 export class UserController {
     constructor(private userService: UserService) {}
@@ -87,83 +85,83 @@ export class UserController {
         }
     }
 
-    @ApiCreatedResponse({
-        type: BodyCreateUser,
-        description: 'The record has been successfully created.'
-    })
-    @ApiBody({ type: BodyCreateUser })
-    @Post()
-    @ApiCreatedResponse({
-        description: '0',
-        type: User
-    })
-    async create(
-        @Body() body: BodyCreateUser,
-        @Response() res
-    ): Promise<ResponseCreateUser> {
-        const connection = getConnection();
-        const queryRunner = connection.createQueryRunner();
-        await queryRunner.connect();
-        // Start transaction
-        await queryRunner.startTransaction();
-        try {
-            let newUser = new User();
-            newUser.username = body.username;
-            newUser.password = body.password;
-            newUser.name = body.name;
-            newUser.phone = body.phone;
-            newUser.address = body.address;
-            newUser.role = <any>body.role;
+    // @ApiCreatedResponse({
+    //     type: BodyCreateUser,
+    //     description: 'The record has been successfully created.'
+    // })
+    // @ApiBody({ type: BodyCreateUser })
+    // @Post()
+    // @ApiCreatedResponse({
+    //     description: '0',
+    //     type: User
+    // })
+    // async create(
+    //     @Body() body: BodyCreateUser,
+    //     @Response() res
+    // ): Promise<ResponseCreateUser> {
+    //     const connection = getConnection();
+    //     const queryRunner = connection.createQueryRunner();
+    //     await queryRunner.connect();
+    //     // Start transaction
+    //     await queryRunner.startTransaction();
+    //     try {
+    //         let newUser = new User();
+    //         newUser.username = body.username;
+    //         newUser.password = body.password;
+    //         newUser.name = body.name;
+    //         newUser.phone = body.phone;
+    //         newUser.address = body.address;
+    //         newUser.role = <any>body.role;
 
-            if (body.role === null) {
-                return res.status(400).json({
-                    error: 1,
-                    message: 'Not allowed to create customers'
-                });
-            }
+    //         if (body.role === null) {
+    //             return res.status(400).json({
+    //                 error: 1,
+    //                 message: 'Not allowed to create customers'
+    //             });
+    //         }
 
-            if (body.role > 3) {
-                return res.status(400).json({
-                    error: 1,
-                    message: 'Role is invalid.'
-                });
-            }
+    //         if (body.role > 3) {
+    //             return res.status(400).json({
+    //                 error: 1,
+    //                 message: 'Role is invalid.'
+    //             });
+    //         }
 
-            if (newUser.role == <any>1) {
-                return res.status(400).json({
-                    error: 1,
-                    message: 'Not allowed to create another super admin'
-                });
-            }
+    //         if (newUser.role == <any>1) {
+    //             return res.status(400).json({
+    //                 error: 1,
+    //                 message: 'Not allowed to create another super admin'
+    //             });
+    //         }
 
-            const isUsernameExisting =
-                await this.userService.isUsernameAlreadyInUse(newUser.username);
+    //         const isUsernameExisting =
+    //             await this.userService.isUsernameAlreadyInUse(newUser.username);
 
-            if (isUsernameExisting) {
-                return res.status(409).json({
-                    error: 1,
-                    data: 'Username already exists'
-                });
-            }
+    //         if (isUsernameExisting) {
+    //             return res.status(409).json({
+    //                 error: 1,
+    //                 data: 'Username already exists'
+    //             });
+    //         }
 
-            const user = await this.userService.create(newUser);
+    //         const user = await this.userService.create(newUser);
 
-            // commit transaction
-            await queryRunner.commitTransaction();
-            return res.status(201).json({
-                error: 0,
-                data: user
-            });
-        } catch (error) {
-            await queryRunner.rollbackTransaction();
-            return res.status(500).json({
-                error: 1,
-                message: 'Server occurred an error'
-            });
-        } finally {
-            await queryRunner.release();
-        }
-    }
+    //         // commit transaction
+    //         await queryRunner.commitTransaction();
+    //         return res.status(201).json({
+    //             error: 0,
+    //             data: user
+    //         });
+    //     } catch (error) {
+    //         await queryRunner.rollbackTransaction();
+    //         return res.status(500).json({
+    //             error: 1,
+    //             message: 'Server occurred an error'
+    //         });
+    //     } finally {
+    //         await queryRunner.release();
+    //     }
+    // }
 
     @ApiCreatedResponse({
         type: UpdateUserDto,

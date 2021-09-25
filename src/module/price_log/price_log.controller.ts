@@ -1,17 +1,16 @@
 import { Controller, Get, Response, Param } from '@nestjs/common';
-import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PriceLog } from './price_log.entity';
 import { PriceLogService } from './price_log.service';
 
 @ApiTags('price_log')
-@ApiSecurity('JwtAuthGuard')
 @Controller('price_log')
 export class PriceLogController {
     constructor(private priceLogService: PriceLogService) {}
 
     @ApiOkResponse({ description: 'Get all prices log' })
     @Get()
-    async readAll(@Response() res) {
+    async getAll(@Response() res) {
         try {
             let priceLog: PriceLog[] = await this.priceLogService.getAll();
             if (!priceLog || priceLog.length === 0) {
@@ -34,7 +33,7 @@ export class PriceLogController {
 
     @ApiOkResponse({ description: 'Get a price log by id' })
     @Get(':id')
-    async readById(@Response() res, @Param('id') id: number) {
+    async getById(@Response() res, @Param('id') id: number) {
         try {
             let priceLog: PriceLog = await this.priceLogService.getById(id);
 

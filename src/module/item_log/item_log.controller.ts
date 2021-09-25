@@ -1,18 +1,17 @@
 import { Controller, Get, Response, Param } from '@nestjs/common';
-import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ResponseGetItemLog } from './item_log.dto';
 import { ItemLog } from './item_log.entity';
 import { ItemLogService } from './item_log.service';
 
 @ApiTags('item_log')
-@ApiSecurity('JwtAuthGuard')
 @Controller('item_log')
 export class ItemLogController {
     constructor(private itemLogService: ItemLogService) {}
 
     @ApiOkResponse({ description: 'Get all items log' })
     @Get()
-    async readAll(@Response() res): Promise<ResponseGetItemLog> {
+    async getAll(@Response() res): Promise<ResponseGetItemLog> {
         try {
             let itemLog: ItemLog[] = await this.itemLogService.getAll();
             if (!itemLog || itemLog.length === 0) {
@@ -35,7 +34,7 @@ export class ItemLogController {
 
     @ApiOkResponse({ description: 'Get a item log by id' })
     @Get(':id')
-    async readById(
+    async getById(
         @Response() res,
         @Param('id') id: number
     ): Promise<ResponseGetItemLog> {

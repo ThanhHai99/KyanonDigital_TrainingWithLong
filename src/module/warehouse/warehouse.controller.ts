@@ -3,7 +3,6 @@ import {
     ApiBody,
     ApiCreatedResponse,
     ApiOkResponse,
-    ApiSecurity,
     ApiTags
 } from '@nestjs/swagger';
 import { WarehouseLog } from '@module/warehouse_log/warehouse_log.entity';
@@ -19,7 +18,6 @@ import { WarehouseService } from './warehouse.service';
 const moment = require('moment');
 
 @ApiTags('warehouse')
-@ApiSecurity('JwtAuthGuard')
 @Controller('warehouse')
 export class WarehouseController {
     constructor(
@@ -29,7 +27,7 @@ export class WarehouseController {
 
     @ApiOkResponse({ description: 'Get all item in warehouses' })
     @Get()
-    async readAll(@Response() res): Promise<ResponseGetWarehouse> {
+    async getAll(@Response() res): Promise<ResponseGetWarehouse> {
         try {
             const warehouses: Warehouse[] =
                 await this.warehouseService.getAll();
@@ -53,7 +51,7 @@ export class WarehouseController {
 
     // @ApiOkResponse({ description: "Get a warehouse by warehouse's id" })
     // @Get(':id')
-    // async readById(
+    // async getById(
     //     @Response() res,
     //     @Param('id') id: number
     // ): Promise<ResponseGetWarehouse> {

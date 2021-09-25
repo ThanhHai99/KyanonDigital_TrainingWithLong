@@ -12,7 +12,6 @@ import {
     ApiBody,
     ApiCreatedResponse,
     ApiOkResponse,
-    ApiSecurity,
     ApiTags
 } from '@nestjs/swagger';
 import { Invoice } from '@module/invoice/invoice.entity';
@@ -41,7 +40,6 @@ import { Item } from '@module/item/item.entity';
 const moment = require('moment');
 
 @ApiTags('order')
-@ApiSecurity('JwtAuthGuard')
 @Controller('order')
 export class OrderController {
     constructor(
@@ -58,7 +56,7 @@ export class OrderController {
 
     @ApiOkResponse({ description: 'Get all orders' })
     @Get()
-    async readAll(@Response() res): Promise<ResponseGetOrder> {
+    async getAll(@Response() res): Promise<ResponseGetOrder> {
         try {
             let categories: Order[] = await this.orderService.getAll();
             if (!categories || categories.length === 0) {
@@ -81,7 +79,7 @@ export class OrderController {
 
     @ApiOkResponse({ description: "Get a order by order's id" })
     @Get(':id')
-    async readById(
+    async getById(
         @Response() res,
         @Param('id') id: number
     ): Promise<ResponseGetOrder> {
