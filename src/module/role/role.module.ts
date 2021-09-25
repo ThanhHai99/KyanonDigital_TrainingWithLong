@@ -5,9 +5,9 @@ import { RoleService } from './role.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Role])],
-    controllers: [RoleController],
-    providers: [RoleService],
-    exports: [TypeOrmModule.forFeature([Role]), RoleService]
+  imports: [TypeOrmModule.forFeature([Role])],
+  controllers: [RoleController],
+  providers: [RoleService],
+  exports: [TypeOrmModule, RoleService]
 })
 export class RoleModule {}

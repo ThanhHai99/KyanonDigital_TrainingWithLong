@@ -28,8 +28,8 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Incorrect email or password!' })
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Body() body: BodyLogin, @Response() res): Promise<any> {
-    return res.status(HttpStatus.OK).json(this.authService.login(body));
+  async login(@Body() body: BodyLogin): Promise<any> {
+    return this.authService.login(body);
   }
 
   @ApiOkResponse({ description: 'Logout is successful!' })

@@ -18,14 +18,11 @@ import {
     ApiTags
 } from '@nestjs/swagger';
 import {
-    BodyCreateUser,
-    ResponseCreateUser,
     ResponseGetUser,
     ResponseLockUser,
     ResponseUpdateUser,
     UpdateUserDto
 } from './user.dto';
-import { getConnection } from 'typeorm';
 
 @ApiTags('user')
 @Controller('user')
