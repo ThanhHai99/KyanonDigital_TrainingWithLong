@@ -45,6 +45,10 @@ export class RoleService {
   }
 
   getById(id: number): Promise<Role> {
-    return this.roleRepository.findOne(id);
+    return this.roleRepository.findOne({
+      where: {
+        id: id
+      }
+    });
   }
 }

@@ -15,7 +15,11 @@ export class ItemLogService {
     }
 
     async getById(id: number): Promise<ItemLog> {
-        return await this.itemLogRepository.findOne(id);
+        return await this.itemLogRepository.findOne({
+            where: {
+                id: id
+            }
+        });
     }
 
     async create(itemLog: ItemLog): Promise<ItemLog> {

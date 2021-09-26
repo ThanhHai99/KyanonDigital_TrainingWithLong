@@ -5,20 +5,24 @@ import { WarehouseLog } from './warehouse_log.entity';
 
 @Injectable()
 export class WarehouseLogService {
-    constructor(
-        @InjectRepository(WarehouseLog)
-        private warehouseLogRepository: Repository<WarehouseLog>
-    ) {}
+  constructor(
+    @InjectRepository(WarehouseLog)
+    private warehouseLogRepository: Repository<WarehouseLog>
+  ) {}
 
-    async getAll(): Promise<WarehouseLog[]> {
-        return await this.warehouseLogRepository.find();
-    }
+  async getAll(): Promise<WarehouseLog[]> {
+    return await this.warehouseLogRepository.find();
+  }
 
-    async getById(id: number): Promise<WarehouseLog> {
-        return await this.warehouseLogRepository.findOne(id);
-    }
+  async getById(id: number): Promise<WarehouseLog> {
+    return await this.warehouseLogRepository.findOne({
+      where: {
+        id: id
+      }
+    });
+  }
 
-    async create(warehouseLog: WarehouseLog): Promise<WarehouseLog> {
-        return await this.warehouseLogRepository.save(warehouseLog);
-    }
+  async create(warehouseLog: WarehouseLog): Promise<WarehouseLog> {
+    return await this.warehouseLogRepository.save(warehouseLog);
+  }
 }

@@ -23,7 +23,10 @@ export class WarehouseService {
     }
 
     async getById(id: number): Promise<Warehouse> {
-        return await this.warehouseRepository.findOne(id, {
+        return await this.warehouseRepository.findOne({
+            where: {
+                id: id
+            },
             join: {
                 alias: 'warehouse',
                 leftJoinAndSelect: {

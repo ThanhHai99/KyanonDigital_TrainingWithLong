@@ -50,7 +50,10 @@ export class SaleService {
     }
 
     async getById(id: number): Promise<Sale> {
-        return this.saleRepository.findOne(id, {
+        return this.saleRepository.findOne({
+            where: {
+                id: id
+            },
             join: {
                 alias: 'sale',
                 leftJoinAndSelect: {
@@ -66,7 +69,11 @@ export class SaleService {
     }
 
     async update(id: number, sale: Sale): Promise<Sale> {
-        let _sale = await this.saleRepository.findOne(id);
+        let _sale = await this.saleRepository.findOne({
+            where: {
+                id: id
+            }
+        });
         _sale.name = !!sale.name ? sale.name : _sale.name;
         _sale.start_date = !!sale.start_date
             ? sale.start_date

@@ -15,7 +15,11 @@ export class CategoryLogService {
     }
 
     async getById(id: number): Promise<CategoryLog> {
-        return await this.categoryLogRepository.findOne(id);
+        return await this.categoryLogRepository.findOne({
+            where: {
+                id: id
+            }
+        });
     }
 
     async getByName(name: string): Promise<CategoryLog[]> {

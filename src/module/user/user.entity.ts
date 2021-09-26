@@ -4,11 +4,11 @@ import {
   Entity,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToOne,
   JoinColumn,
   OneToMany,
   BeforeInsert,
-  BeforeUpdate
+  BeforeUpdate,
+  ManyToOne
 } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { Category } from '@module/category/category.entity';
@@ -39,7 +39,7 @@ export class User extends BaseEntity {
 
   @ManyToOne((type) => Role, (role) => role.users)
   @JoinColumn({ name: 'role_id' })
-  role: Role;
+  role: Role | number;
 
   @Column({ default: false })
   is_locked: boolean;
@@ -75,7 +75,7 @@ export class User extends BaseEntity {
     this.password = bcrypt.hashSync(this.password, 8);
   }
 
-  isPasswordValid(unencryptedPassword: string): boolean {
-    return bcrypt.compareSync(unencryptedPassword, this.password);
+  isPasswordValid(password: string): boolean {
+    return bcrypt.compareSync(password, this.password);
   }
 }

@@ -1,13 +1,14 @@
 import {
   Controller,
   Get,
-  Response,
+  Res,
   Param,
   Post,
   Body,
   Patch,
   UseGuards,
-  Request
+  Request,
+  HttpStatus
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -42,18 +43,18 @@ export class CategoryController {
 
   @ApiOkResponse({ description: 'Get all categories' })
   @Get()
-  async getAll(@Response() res, @Request() req): Promise<ResponseGetCategory> {
+  async getAll(@Res() res, @Request() req): Promise<ResponseGetCategory> {
     try {
       console.log('req.user');
       console.log(req.user);
       let categories: Category[] = await this.categoryService.getAll();
       if (!categories || categories.length === 0) {
-        return res.status(200).json({
+        return res.status(HttpStatus.OK).json({
           error: 0,
           data: 0
         });
       }
-      return res.status(200).json({
+      return res.status(HttpStatus.OK).json({
         errors: 0,
         data: categories
       });
@@ -68,19 +69,19 @@ export class CategoryController {
   @ApiOkResponse({ description: "Get a category by category's id" })
   @Get(':id')
   async getById(
-    @Response() res,
+    @Res() res,
     @Param('id') id: number
   ): Promise<ResponseGetCategory> {
     try {
       let category: Category = await this.categoryService.getById(id);
 
       if (!category) {
-        return res.status(200).json({
+        return res.status(HttpStatus.OK).json({
           error: 0,
           data: 0
         });
       }
-      return res.status(200).json({
+      return res.status(HttpStatus.OK).json({
         errors: 0,
         data: category
       });
@@ -100,7 +101,7 @@ export class CategoryController {
   @Post()
   async create(
     @Body() body: BodyCreateCategory,
-    @Response() res
+    @Res() res
   ): Promise<ResponseCreateCategory> {
     const connection = getConnection();
     const queryRunner = connection.createQueryRunner();
@@ -156,7 +157,7 @@ export class CategoryController {
   @Patch(':id')
   async update(
     @Body() body: BodyUpdateCategory,
-    @Response() res,
+    @Res() res,
     @Param('id') id: number
   ): Promise<ResponseUpdateCategory> {
     const connection = getConnection();
@@ -200,7 +201,7 @@ export class CategoryController {
 
       // commit transaction
       await queryRunner.commitTransaction();
-      return res.status(200).json({
+      return res.status(HttpStatus.OK).json({
         error: 0,
         data: category
       });

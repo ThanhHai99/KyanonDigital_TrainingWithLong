@@ -2,7 +2,7 @@ import {
   Controller,
   Post,
   Body,
-  Response,
+  Res,
   UseGuards,
   Get,
   HttpStatus
@@ -34,7 +34,7 @@ export class AuthController {
 
   @ApiOkResponse({ description: 'Logout is successful!' })
   @Get('logout')
-  async logout(@Response() res) {}
+  async logout(@Res() res) {}
 
   @ApiCreatedResponse({
     type: ResponseRegister,
@@ -44,7 +44,7 @@ export class AuthController {
     type: BodyRegister
   })
   @Post('register')
-  async register(@Body() body: BodyRegister, @Response() res): Promise<any> {
+  async register(@Body() body: BodyRegister, @Res() res): Promise<any> {
     const { username, password, name, phone, address } = body;
     await this.authService.create(username, password, name, phone, address);
     return res.status(HttpStatus.CREATED).json({

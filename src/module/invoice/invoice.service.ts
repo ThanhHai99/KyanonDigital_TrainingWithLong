@@ -15,7 +15,11 @@ export class InvoiceService {
     }
 
     async getById(id: number): Promise<Invoice> {
-        return await this.invoiceRepository.findOne(id);
+        return await this.invoiceRepository.findOne({
+            where: {
+                id: id
+            }
+        });
     }
 
     async create(category: Invoice): Promise<Invoice> {

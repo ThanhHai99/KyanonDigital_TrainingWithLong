@@ -15,7 +15,11 @@ export class OrderService {
     }
 
     async getById(id: number): Promise<Order> {
-        return await this.orderRepository.findOne(id);
+        return await this.orderRepository.findOne({
+            where: {
+                id: id
+            }
+        });
     }
 
     async isPaid(id: number): Promise<boolean> {

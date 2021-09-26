@@ -15,7 +15,11 @@ export class PriceLogService {
     }
 
     async getById(id: number): Promise<PriceLog> {
-        return await this.priceLogRepository.findOne(id);
+        return await this.priceLogRepository.findOne({
+            where: {
+                id: id
+            }
+        });
     }
 
     async create(categoryLog: PriceLog): Promise<PriceLog> {

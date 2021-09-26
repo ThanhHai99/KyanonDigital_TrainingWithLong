@@ -15,7 +15,11 @@ export class ItemOrderService {
     }
 
     async getById(id: number): Promise<ItemOrder> {
-        return await this.itemOrderRepository.findOne(id);
+        return await this.itemOrderRepository.findOne({
+            where: {
+                id: id
+            }
+        });
     }
 
     async getByOrderId(orderId: number): Promise<any> {

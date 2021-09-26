@@ -85,7 +85,11 @@ export class ItemService {
     }
 
     async update(id: number, item: Item): Promise<Item> {
-        let _item = await this.itemRepository.findOne(id);
+        let _item = await this.itemRepository.findOne({
+            where: {
+                id: id
+            }
+        });
         _item.name = !!item.name ? item.name : _item.name;
         _item.detail = !!item.detail ? item.detail : _item.detail;
         _item.user_manual = !!item.user_manual
@@ -93,7 +97,10 @@ export class ItemService {
             : _item.user_manual;
         _item.price = !!item.price ? item.price : _item.price;
         await this.itemRepository.save(_item);
-        return await this.itemRepository.findOne(id, {
+        return await this.itemRepository.findOne({
+            where: {
+                id: id
+            },
             join: {
                 alias: 'item',
                 leftJoinAndSelect: {

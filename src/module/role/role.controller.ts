@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Response } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Param, Res } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { RoleService } from './role.service';
 
@@ -7,10 +7,10 @@ import { RoleService } from './role.service';
 export class RoleController {
   constructor(private roleService: RoleService) {}
 
-  @ApiOkResponse({ description: 'Get all role' })
+  @ApiOkResponse({ description: 'Get all roles' })
   @Get()
-  async getAll(@Response() res) {
-    return res.status(200).json({
+  async getAll(@Res() res) {
+    return res.status(HttpStatus.OK).json({
       errors: 0,
       data: await this.roleService.getAll()
     });
@@ -18,8 +18,8 @@ export class RoleController {
 
   @ApiOkResponse({ description: 'Get role by id' })
   @Get(':id')
-  async getById(@Response() res, @Param('id') id: number) {
-    return res.status(200).json({
+  async getById(@Res() res, @Param('id') id: number) {
+    return res.status(HttpStatus.OK).json({
       errors: 0,
       data: await this.roleService.getById(id)
     });
