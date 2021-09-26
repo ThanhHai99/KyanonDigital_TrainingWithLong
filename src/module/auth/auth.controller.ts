@@ -2,12 +2,11 @@ import {
   Controller,
   Post,
   Body,
-  Res,
   UseGuards,
-  Get,
-  HttpStatus
+  HttpStatus,
+  Res
 } from '@nestjs/common';
-import { BodyLogin, BodyRegister, ResponseRegister } from './auth.dto';
+import { BodyLogin, BodyRegister } from './auth.dto';
 import {
   ApiBody,
   ApiCreatedResponse,
@@ -32,12 +31,7 @@ export class AuthController {
     return this.authService.login(body);
   }
 
-  @ApiOkResponse({ description: 'Logout is successful!' })
-  @Get('logout')
-  async logout(@Res() res) {}
-
   @ApiCreatedResponse({
-    type: ResponseRegister,
     description: 'The record has been successfully created.'
   })
   @ApiBody({

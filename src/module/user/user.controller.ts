@@ -7,7 +7,8 @@ import {
   Query,
   Param,
   HttpStatus,
-  Post
+  Post,
+  UseGuards
 } from '@nestjs/common';
 import { User } from './user.entity';
 import { UserService } from './user.service';
@@ -18,9 +19,11 @@ import {
   ApiTags
 } from '@nestjs/swagger';
 import { BodyCreateUser, BodyUpdateUser } from './user.dto';
+import { JwtAuthGuard } from '@module/auth/guard/jwt.guard';
 
 @ApiTags('user')
 @Controller('user')
+@UseGuards(JwtAuthGuard)
 export class UserController {
   constructor(private userService: UserService) {}
 
@@ -81,8 +84,7 @@ export class UserController {
     @Res() res,
     @Param('id') id: number
   ): Promise<any> {
-    const { password, name, phone, address, is_locked, role_id } =
-      body;
+    const { password, name, phone, address, is_locked, role_id } = body;
     await this.userService.update(
       id,
       password,

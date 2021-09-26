@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InsertResult } from 'typeorm';
 import { UserService } from '@module/user/user.service';
 import { JwtService } from '@nestjs/jwt';
+import { User } from '@module/user/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -37,12 +38,10 @@ export class AuthService {
   }
 
   async login(user: any): Promise<any> {
+    const _user: User = await this.userService.findOne(user.username);
     const payload = {
-      id: user.id,
-      username: user.username,
-      name: user.name,
-      phone: user.phone,
-      address: 'user.address'
+      username: _user.username,
+      id: _user.id
     };
     return {
       access_token: this.jwtService.sign(payload)
