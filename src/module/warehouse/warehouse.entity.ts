@@ -17,7 +17,7 @@ export class Warehouse extends BaseEntity {
 
     @ManyToOne((type) => Item, (item) => item.warehouses)
     @JoinColumn({ name: 'item_id' })
-    item: Item;
+    item: Item | number;
 
     @Column({ type: 'timestamp' })
     expiration_date: Date;

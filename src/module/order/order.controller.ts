@@ -244,17 +244,17 @@ export class OrderController {
       );
 
       // // Create warehouse log
-      for (let index = 0; index < responseExport.length; index++) {
-        let responseExport_i = responseExport[index].toString().split(';');
-        let newWarehouseLog = new WarehouseLog();
-        newWarehouseLog.status = '-';
-        newWarehouseLog.warehouse = <any>responseExport_i[0];
-        newWarehouseLog.item_id = <any>responseExport_i[1];
-        newWarehouseLog.amount = <any>responseExport_i[2];
-        newWarehouseLog.expiration_date = <any>responseExport_i[3];
-        newWarehouseLog.created_by = res.locals.jwtPayload.userId; // Get from token
-        await this.warehouseLogService.create(newWarehouseLog);
-      }
+      // for (let index = 0; index < responseExport.length; index++) {
+      //   let responseExport_i = responseExport[index].toString().split(';');
+      //   let newWarehouseLog = new WarehouseLog();
+      //   newWarehouseLog.status = '-';
+      //   newWarehouseLog.warehouse = <any>responseExport_i[0];
+      //   newWarehouseLog.item_id = <any>responseExport_i[1];
+      //   newWarehouseLog.amount = <any>responseExport_i[2];
+      //   newWarehouseLog.expiration_date = <any>responseExport_i[3];
+      //   newWarehouseLog.created_by = res.locals.jwtPayload.userId; // Get from token
+      //   await this.warehouseLogService.create(newWarehouseLog);
+      // }
 
       // Sum total order amount
       let sumAmount = 30000;
