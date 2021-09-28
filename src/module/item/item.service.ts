@@ -1,112 +1,149 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Item } from './item.entity';
-import { getConnection, getManager, Repository } from 'typeorm';
+import { getManager, InsertResult, Repository, UpdateResult } from 'typeorm';
+import { ItemLog } from '@module/item_log/item_log.entity';
+import { PriceLog } from '@module/price_log/price_log.entity';
 
 @Injectable()
 export class ItemService {
-    constructor(
-        @InjectRepository(Item)
-        private itemRepository: Repository<Item>
-    ) {}
+  constructor(
+    @InjectRepository(Item)
+    private itemRepository: Repository<Item>,
 
-    async findOneAndSelectPrice(id: number): Promise<Item> {
-        return await this.itemRepository.findOne({
-            select: ['price'],
-            where: {
-                id: id
-            }
-        });
+    @InjectRepository(ItemLog)
+    private itemLogRepository: Repository<ItemLog>,
+
+    @InjectRepository(PriceLog)
+    private priceLogRepository: Repository<PriceLog>
+  ) {}
+
+  async findOne(name: string): Promise<Item> {
+    return await this.itemRepository.findOne({ where: { name: name } });
+  }
+
+  async getAll(name?: string): Promise<Item[]> {
+    const itemManager = getManager();
+    if (name)
+      return await itemManager.query(`
+        SELECT item.*, SUM(warehouse.amount) AS remaining
+        FROM item
+        LEFT JOIN warehouse
+        ON item.id = warehouse.item_id AND expiration_date > DATE_SUB(DATE(NOW()), INTERVAL 1 MONTH)
+        WHERE item.name LIKE '%${name}%'
+        GROUP BY item.name
+    `);
+    return await itemManager.query(`
+        SELECT item.*, SUM(warehouse.amount) AS remaining
+        FROM item
+        LEFT JOIN warehouse
+        ON item.id = warehouse.item_id AND expiration_date > DATE_SUB(DATE(NOW()), INTERVAL 1 MONTH)
+        GROUP BY item.name
+    `);
+  }
+
+  async getById(id: number): Promise<Item> {
+    const itemManager = getManager();
+    return await itemManager.query(`
+        SELECT item.*, SUM(warehouse.amount) AS remaining
+        FROM item
+        LEFT JOIN warehouse
+        ON item.id = warehouse.item_id AND expiration_date > DATE_SUB(DATE(NOW()), INTERVAL 1 MONTH)
+        WHERE item.id = ${id}
+        GROUP BY item.name
+    `);
+  }
+
+  async create(
+    name: string,
+    category_id: number,
+    detail: string,
+    user_manual: string,
+    price: number,
+    user_id: number
+  ): Promise<InsertResult> {
+    const isItemExists = await this.findOne(name);
+    if (isItemExists)
+      throw new HttpException('The item already in use', HttpStatus.CONFLICT);
+
+    const newItem = new Item();
+    newItem.name = name;
+    newItem.category = category_id;
+    newItem.detail = detail;
+    newItem.user_manual = user_manual;
+    newItem.price = price;
+    newItem.user = user_id;
+    const result = await this.itemRepository.insert(newItem);
+    if (!result) {
+      throw new HttpException(
+        'The item cannot create',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
 
-    async findById(id: number): Promise<Item> {
-        return await getConnection()
-            .createQueryBuilder()
-            .from(Item, 'item')
-            .leftJoinAndSelect('item.category', 'category')
-            .where('item.id = :id', { id: id })
-            .getOne();
+    const newItemLog = new ItemLog();
+    newItemLog.item = result.raw.insertId;
+    newItemLog.name = name;
+    newItemLog.category = category_id;
+    newItemLog.detail = detail;
+    newItemLog.user_manual = user_manual;
+    newItemLog.created_by = user_id;
+    await this.itemLogRepository.insert(newItemLog);
+
+    const newPriceLog = new PriceLog();
+    newPriceLog.item_id = result.raw.insertId;
+    newPriceLog.price = newItem.price;
+    newPriceLog.created_by = user_id;
+    await this.priceLogRepository.insert(newPriceLog);
+
+    return result;
+  }
+
+  async update(
+    id: number,
+    name: string,
+    category_id: number,
+    detail: string,
+    user_manual: string,
+    price: number,
+    user_id: number
+  ): Promise<UpdateResult> {
+    const isItemExists = await this.findOne(name);
+    if (isItemExists)
+      throw new HttpException('The item already in use', HttpStatus.CONFLICT);
+
+    const item = await this.itemRepository.findOne({ where: { id: id } });
+    item.name = name || item.name;
+    item.category = category_id || item.category;
+    item.detail = detail || item.detail;
+    item.user_manual = user_manual || item.user_manual;
+    item.price = price || item.price;
+    item.user = user_id;
+    const result = await this.itemRepository.update(id, item);
+    if (!result) {
+      throw new HttpException(
+        'The item cannot update',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
 
-    async getAll(): Promise<Item[]> {
-        const itemManager = getManager();
-        return await itemManager.query(`
-            SELECT item.*, warehouse.amount, category.name AS category_name
-            FROM item
-            LEFT JOIN warehouse
-            ON item.id = warehouse.item_id AND warehouse.amount >= 10
-            LEFT JOIN category
-            ON item.category_id = category.id
-        `);
+    const newItemLog = new ItemLog();
+    newItemLog.item_id = item.id;
+    newItemLog.name = item.name;
+    newItemLog.category = item.category;
+    newItemLog.detail = detail;
+    newItemLog.user_manual = user_manual;
+    newItemLog.created_by = user_id;
+    await this.itemLogRepository.insert(newItemLog);
+
+    if (price) {
+      const newPriceLog = new PriceLog();
+      newPriceLog.item_id = id;
+      newPriceLog.price = item.price;
+      newPriceLog.created_by = user_id;
+      await this.priceLogRepository.insert(newPriceLog);
     }
 
-    async getByName(name: string): Promise<Item[]> {
-        const itemManager = getManager();
-        return await itemManager.query(`
-            SELECT item.*, warehouse.amount, category.name AS category_name
-            FROM item
-            LEFT JOIN warehouse
-            ON item.id = warehouse.item_id AND warehouse.amount >= 10
-            LEFT JOIN category
-            ON item.category_id = category.id
-            WHERE item.name LIKE '%${name}%'
-        `);
-    }
-
-    async getById(id: number): Promise<Item> {
-        const itemManager = getManager();
-        return await itemManager.query(`
-            SELECT item.*, warehouse.amount, category.name AS category_name, category.id AS category_id
-            FROM item
-            LEFT JOIN warehouse
-            ON item.id = warehouse.item_id AND warehouse.amount >= 10
-            LEFT JOIN category
-            ON item.category_id = category.id
-            WHERE item.id = '${id}'
-        `);
-    }
-
-    async isNameAlreadyInUse(name: string): Promise<boolean> {
-        try {
-            const user = await this.itemRepository.findOneOrFail({
-                where: {
-                    name: name
-                }
-            });
-            if (user) return true;
-            return false;
-        } catch (error) {
-            return false;
-        }
-    }
-
-    async create(item: Item): Promise<Item> {
-        return await this.itemRepository.save(item);
-    }
-
-    async update(id: number, item: Item): Promise<Item> {
-        let _item = await this.itemRepository.findOne({
-            where: {
-                id: id
-            }
-        });
-        _item.name = !!item.name ? item.name : _item.name;
-        _item.detail = !!item.detail ? item.detail : _item.detail;
-        _item.user_manual = !!item.user_manual
-            ? item.user_manual
-            : _item.user_manual;
-        _item.price = !!item.price ? item.price : _item.price;
-        await this.itemRepository.save(_item);
-        return await this.itemRepository.findOne({
-            where: {
-                id: id
-            },
-            join: {
-                alias: 'item',
-                leftJoinAndSelect: {
-                    role: 'item.category'
-                }
-            }
-        });
-    }
+    return result;
+  }
 }

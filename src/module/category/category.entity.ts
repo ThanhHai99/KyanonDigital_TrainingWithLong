@@ -11,6 +11,7 @@ import {
 import { CategoryLog } from '@module/category_log/category_log.entity';
 import { Item } from '@module/item/item.entity';
 import { User } from '@module/user/user.entity';
+import { ItemLog } from '@module/item_log/item_log.entity';
 
 @Entity({ name: 'category' })
 export class Category extends BaseEntity {
@@ -42,4 +43,7 @@ export class Category extends BaseEntity {
 
     @OneToMany((type) => CategoryLog, (log) => log.category)
     category_logs: CategoryLog[];
+
+    @OneToMany((type) => ItemLog, (log) => log.item)
+    item_logs: ItemLog[];
 }

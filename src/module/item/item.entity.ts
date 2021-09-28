@@ -24,7 +24,7 @@ export class Item extends BaseEntity {
 
     @ManyToOne((type) => Category, (category) => category.items)
     @JoinColumn({ name: 'category_id' })
-    category: Category;
+    category: Category | number;
 
     @Column()
     detail: string;
@@ -37,7 +37,7 @@ export class Item extends BaseEntity {
 
     @ManyToOne((type) => User, (user) => user.items)
     @JoinColumn({ name: 'created_by' })
-    user: User;
+    user: User | number;
 
     @CreateDateColumn({
         type: 'timestamp',
