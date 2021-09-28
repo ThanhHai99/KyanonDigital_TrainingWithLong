@@ -8,6 +8,6 @@ import { SaleLogService } from './sale_log.service';
     imports: [TypeOrmModule.forFeature([SaleLog])],
     controllers: [SaleLogController],
     providers: [SaleLogService],
-    exports: [SaleLogService]
+    exports: [SaleLogService, TypeOrmModule]
 })
 export class SaleLogModule {}

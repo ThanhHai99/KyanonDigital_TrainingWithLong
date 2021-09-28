@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InsertResult, Repository } from 'typeorm';
 import { SaleLog } from './sale_log.entity';
 
 @Injectable()
@@ -20,9 +20,5 @@ export class SaleLogService {
         id: id
       }
     });
-  }
-
-  async create(saleLog: SaleLog): Promise<SaleLog> {
-    return await this.saleLogRepository.save(saleLog);
   }
 }
