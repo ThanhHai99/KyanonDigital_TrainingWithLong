@@ -68,13 +68,6 @@ export class CategoryService {
     name: string,
     user_id: number
   ): Promise<UpdateResult> {
-    let _category = await this.categoryRepository.findOne({
-      where: { id: id }
-    });
-
-    if (!_category)
-      throw new HttpException('Category is not found', HttpStatus.NOT_FOUND);
-
     const isCategoryExists = await this.findOne(name);
     if (isCategoryExists) {
       throw new HttpException(
@@ -83,10 +76,16 @@ export class CategoryService {
       );
     }
 
-    _category.name = name || _category.name;
-    _category.user = user_id;
+    const category = await this.categoryRepository.findOne({
+      where: { id: id }
+    });
+    if (!category)
+      throw new HttpException('Category is not found', HttpStatus.NOT_FOUND);
 
-    const result = await this.categoryRepository.update(id, _category);
+    category.name = name || category.name;
+    category.user = user_id;
+
+    const result = await this.categoryRepository.update(id, category);
 
     if (!result) {
       throw new HttpException(
@@ -95,9 +94,8 @@ export class CategoryService {
       );
     }
 
-    const category = await this.getById(id);
     const newCategoryLog = new CategoryLog();
-    newCategoryLog.category_id = category.id;
+    newCategoryLog.category_id = id;
     newCategoryLog.name = category.name;
     newCategoryLog.created_by = user_id;
     await this.categoryLogRepository.insert(newCategoryLog);
