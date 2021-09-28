@@ -5,24 +5,20 @@ import { PriceLog } from './price_log.entity';
 
 @Injectable()
 export class PriceLogService {
-    constructor(
-        @InjectRepository(PriceLog)
-        private priceLogRepository: Repository<PriceLog>
-    ) {}
+  constructor(
+    @InjectRepository(PriceLog)
+    private priceLogRepository: Repository<PriceLog>
+  ) {}
 
-    async getAll(): Promise<PriceLog[]> {
-        return await this.priceLogRepository.find();
-    }
+  async getAll(): Promise<PriceLog[]> {
+    return await this.priceLogRepository.find();
+  }
 
-    async getById(id: number): Promise<PriceLog> {
-        return await this.priceLogRepository.findOne({
-            where: {
-                id: id
-            }
-        });
-    }
-
-    async create(categoryLog: PriceLog): Promise<PriceLog> {
-        return await this.priceLogRepository.save(categoryLog);
-    }
+  async getById(id: number): Promise<PriceLog> {
+    return await this.priceLogRepository.findOne({
+      where: {
+        id: id
+      }
+    });
+  }
 }

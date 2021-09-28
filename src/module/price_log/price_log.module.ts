@@ -5,9 +5,9 @@ import { PriceLog } from './price_log.entity';
 import { PriceLogService } from './price_log.service';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([PriceLog])],
-    controllers: [PriceLogController],
-    providers: [PriceLogService],
-    exports: [PriceLogService]
+  imports: [TypeOrmModule.forFeature([PriceLog])],
+  controllers: [PriceLogController],
+  providers: [PriceLogService],
+  exports: [PriceLogService, TypeOrmModule]
 })
 export class PriceLogModule {}
