@@ -5,32 +5,24 @@ import { Like, Repository } from 'typeorm';
 
 @Injectable()
 export class CategoryLogService {
-    constructor(
-        @InjectRepository(CategoryLog)
-        private categoryLogRepository: Repository<CategoryLog>
-    ) {}
+  constructor(
+    @InjectRepository(CategoryLog)
+    private categoryLogRepository: Repository<CategoryLog>
+  ) {}
 
-    async getAll(): Promise<CategoryLog[]> {
-        return await this.categoryLogRepository.find();
-    }
+  async getAll(name?: string): Promise<CategoryLog[]> {
+    if (name)
+      return await this.categoryLogRepository.find({
+        where: { name: Like('%' + name + '%') }
+      });
+    return await this.categoryLogRepository.find();
+  }
 
-    async getById(id: number): Promise<CategoryLog> {
-        return await this.categoryLogRepository.findOne({
-            where: {
-                id: id
-            }
-        });
-    }
-
-    async getByName(name: string): Promise<CategoryLog[]> {
-        return await this.categoryLogRepository.find({
-            where: {
-                name: Like('%' + name + '%')
-            }
-        });
-    }
-
-    async create(categoryLog: CategoryLog): Promise<CategoryLog> {
-        return await this.categoryLogRepository.save(categoryLog);
-    }
+  async getById(id: number): Promise<CategoryLog> {
+    return await this.categoryLogRepository.findOne({
+      where: {
+        id: id
+      }
+    });
+  }
 }

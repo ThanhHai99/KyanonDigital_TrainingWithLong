@@ -22,7 +22,7 @@ export class Category extends BaseEntity {
 
     @ManyToOne((type) => User, (user) => user.categories)
     @JoinColumn({ name: 'created_by' })
-    user: User;
+    user: User | number;
 
     @CreateDateColumn({
         type: 'timestamp',
