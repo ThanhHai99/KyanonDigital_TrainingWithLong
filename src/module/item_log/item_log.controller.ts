@@ -1,10 +1,11 @@
-import { Controller, Get, Res, Param, HttpStatus } from '@nestjs/common';
+import { JwtAuthGuard } from '@module/auth/guard/jwt.guard';
+import { Controller, Get, Res, Param, HttpStatus, UseGuards } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { ItemLog } from './item_log.entity';
 import { ItemLogService } from './item_log.service';
 
 @ApiTags('item_log')
 @Controller('item_log')
+@UseGuards(JwtAuthGuard)
 export class ItemLogController {
   constructor(private itemLogService: ItemLogService) {}
 

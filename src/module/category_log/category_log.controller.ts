@@ -1,9 +1,11 @@
-import { Controller, Get, Res, Query, Param, HttpStatus } from '@nestjs/common';
+import { JwtAuthGuard } from '@module/auth/guard/jwt.guard';
+import { Controller, Get, Res, Query, Param, HttpStatus, UseGuards } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { CategoryLogService } from './category_log.service';
 
 @ApiTags('category_log')
 @Controller('category_log')
+@UseGuards(JwtAuthGuard)
 export class CategoryLogController {
   constructor(private categoryLogService: CategoryLogService) {}
 

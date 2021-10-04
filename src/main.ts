@@ -15,20 +15,12 @@ async function bootstrap() {
     .setTitle('Shopping Online')
     .setDescription('The API Description')
     .setVersion('1.0.0')
-    // .addTag('v1.0.0')
+    .addTag('v1.0.0')
     .addBearerAuth(
       { in: 'header', type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
       'JWT-auth'
     )
     .build();
-  // .addApiKey(
-  //     {
-  //         type: 'apiKey',
-  //         name: 'auth',
-  //         in: 'header'
-  //     },
-  //     'JwtAuthGuard'
-  // )
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('/', app, document);

@@ -5,11 +5,17 @@ import { SaleService } from './sale.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SaleLogModule } from '@module/sale_log/sale_log.module';
 import { SaleItemModule } from '@module/sale_item/sale_item.module';
+import { ItemModule } from '@module/item/item.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Sale]), SaleLogModule, SaleItemModule],
-    controllers: [SaleController],
-    providers: [SaleService],
-    exports: [TypeOrmModule.forFeature([Sale]), SaleService]
+  imports: [
+    TypeOrmModule.forFeature([Sale]),
+    SaleLogModule,
+    SaleItemModule,
+    ItemModule
+  ],
+  controllers: [SaleController],
+  providers: [SaleService],
+  exports: [TypeOrmModule, SaleService]
 })
 export class SaleModule {}

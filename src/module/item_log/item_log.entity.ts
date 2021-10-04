@@ -15,9 +15,6 @@ export class ItemLog extends BaseEntity {
   id: number;
 
   @Column()
-  item_id: number;
-
-  @Column()
   name: string;
 
   @Column()

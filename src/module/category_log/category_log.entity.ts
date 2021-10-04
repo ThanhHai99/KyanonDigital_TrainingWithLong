@@ -14,9 +14,6 @@ export class CategoryLog extends BaseEntity {
     id: number;
 
     @Column()
-    category_id: number;
-
-    @Column()
     name: string;
 
     @Column()
@@ -30,5 +27,5 @@ export class CategoryLog extends BaseEntity {
 
     @ManyToOne((type) => Category, (category) => category.category_logs)
     @JoinColumn({ name: 'category_id' })
-    category: Category;
+    category: Category | number;
 }

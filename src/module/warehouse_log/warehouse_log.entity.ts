@@ -1,6 +1,7 @@
 import { JoinColumn, ManyToOne, BaseEntity, Column, Entity } from 'typeorm';
 import { UpdateDateColumn, CreateDateColumn } from 'typeorm';
 import { Warehouse } from '@module/warehouse/warehouse.entity';
+import { Item } from '@module/item/item.entity';
 
 @Entity({ name: 'warehouse_log' })
 export class WarehouseLog extends BaseEntity {
@@ -13,8 +14,8 @@ export class WarehouseLog extends BaseEntity {
   @Column({ default: null })
   price: number;
 
-  @Column()
-  item_id: number;
+  // @Column()
+  // item_id: number;
 
   @Column({ type: 'timestamp' })
   expiration_date: Date;
@@ -41,4 +42,8 @@ export class WarehouseLog extends BaseEntity {
   @ManyToOne((type) => Warehouse, (warehouse) => warehouse.warehouse_logs)
   @JoinColumn({ name: 'warehouse_id' })
   warehouse: Warehouse | number;
+
+  @ManyToOne((type) => Item, (item) => item.warehouse_logs)
+  @JoinColumn({ name: 'item_id' })
+  item: Item | number;
 }

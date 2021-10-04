@@ -59,9 +59,8 @@ export class CategoryController {
     @Res() res,
     @Req() req
   ): Promise<any> {
-    const { name } = body;
-    await this.categoryService.create(name, req.user.id);
-    return res.status(201).json({
+    await this.categoryService.create(body.name, req.user.id);
+    return res.status(HttpStatus.CREATED).json({
       error: 0,
       data: 'Category is created'
     });
@@ -80,8 +79,7 @@ export class CategoryController {
     @Req() req,
     @Param('id') id: number
   ): Promise<any> {
-    const { name } = body;
-    await this.categoryService.update(id, name, req.user.id);
+    await this.categoryService.update(id, body.name, req.user.id);
     return res.status(HttpStatus.OK).json({
       error: 0,
       data: 'Category is updated'

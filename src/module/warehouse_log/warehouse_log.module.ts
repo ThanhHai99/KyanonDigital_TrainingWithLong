@@ -8,6 +8,6 @@ import { WarehouseLogService } from './warehouse_log.service';
   imports: [TypeOrmModule.forFeature([WarehouseLog])],
   providers: [WarehouseLogService],
   controllers: [WarehouseLogController],
-  exports: [WarehouseLogService, TypeOrmModule]
+  exports: [TypeOrmModule, WarehouseLogService]
 })
 export class WarehouseLogModule {}

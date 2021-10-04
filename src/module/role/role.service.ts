@@ -40,15 +40,15 @@ export class RoleService {
     }
   }
 
-  getAll(): Promise<Role[]> {
-    return this.roleRepository.find();
+  async findById(id: number): Promise<Role> {
+    return await this.roleRepository.findOne(id);
   }
 
-  getById(id: number): Promise<Role> {
-    return this.roleRepository.findOne({
-      where: {
-        id: id
-      }
-    });
+  async getAll(): Promise<Role[]> {
+    return await this.roleRepository.find();
+  }
+
+  async getById(id: number): Promise<Role> {
+    return await this.roleRepository.findOne(id);
   }
 }

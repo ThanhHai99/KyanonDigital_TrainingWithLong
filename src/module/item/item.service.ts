@@ -2,24 +2,25 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Item } from './item.entity';
 import { getManager, InsertResult, Repository, UpdateResult } from 'typeorm';
-import { ItemLog } from '@module/item_log/item_log.entity';
-import { PriceLog } from '@module/price_log/price_log.entity';
+import { ItemLogService } from '@module/item_log/item_log.service';
+import { PriceLogService } from '@module/price_log/price_log.service';
 
 @Injectable()
 export class ItemService {
   constructor(
+    private readonly itemLogService: ItemLogService,
+    private readonly priceLogService: PriceLogService,
+
     @InjectRepository(Item)
-    private itemRepository: Repository<Item>,
-
-    @InjectRepository(ItemLog)
-    private itemLogRepository: Repository<ItemLog>,
-
-    @InjectRepository(PriceLog)
-    private priceLogRepository: Repository<PriceLog>
+    private itemRepository: Repository<Item>
   ) {}
 
-  async findOne(name: string): Promise<Item> {
+  async findOneByName(name: string): Promise<Item> {
     return await this.itemRepository.findOne({ where: { name: name } });
+  }
+
+  async findById(id: number): Promise<Item> {
+    return await this.itemRepository.findOne(id);
   }
 
   async getAll(name?: string): Promise<Item[]> {
@@ -56,23 +57,25 @@ export class ItemService {
 
   async create(
     name: string,
-    category_id: number,
+    categoryId: number,
     detail: string,
-    user_manual: string,
+    userManual: string,
     price: number,
-    user_id: number
+    userId: number
   ): Promise<InsertResult> {
-    const isItemExists = await this.findOne(name);
+    // Check item name exists
+    const isItemExists = await this.findOneByName(name);
     if (isItemExists)
       throw new HttpException('The item already in use', HttpStatus.CONFLICT);
 
+    // Create item
     const newItem = new Item();
     newItem.name = name;
-    newItem.category = category_id;
+    newItem.category = categoryId;
     newItem.detail = detail;
-    newItem.user_manual = user_manual;
+    newItem.user_manual = userManual;
     newItem.price = price;
-    newItem.user = user_id;
+    newItem.user = userId;
     const result = await this.itemRepository.insert(newItem);
     if (!result) {
       throw new HttpException(
@@ -81,20 +84,22 @@ export class ItemService {
       );
     }
 
-    const newItemLog = new ItemLog();
-    newItemLog.item = result.raw.insertId;
-    newItemLog.name = name;
-    newItemLog.category = category_id;
-    newItemLog.detail = detail;
-    newItemLog.user_manual = user_manual;
-    newItemLog.created_by = user_id;
-    await this.itemLogRepository.insert(newItemLog);
+    // Create item log
+    await this.itemLogService.create(
+      result.raw.insertId,
+      name,
+      categoryId,
+      detail,
+      userManual,
+      userId
+    );
 
-    const newPriceLog = new PriceLog();
-    newPriceLog.item_id = result.raw.insertId;
-    newPriceLog.price = newItem.price;
-    newPriceLog.created_by = user_id;
-    await this.priceLogRepository.insert(newPriceLog);
+    // Create price log
+    await this.priceLogService.create(
+      result.raw.insertId,
+      newItem.price,
+      userId
+    );
 
     return result;
   }
@@ -102,47 +107,47 @@ export class ItemService {
   async update(
     id: number,
     name: string,
-    category_id: number,
+    categoryId: number,
     detail: string,
-    user_manual: string,
+    userManual: string,
     price: number,
-    user_id: number
+    userId: number
   ): Promise<UpdateResult> {
-    const isItemExists = await this.findOne(name);
+    // Check item exists
+    const isItemExists = await this.findOneByName(name);
     if (isItemExists)
       throw new HttpException('The item already in use', HttpStatus.CONFLICT);
 
-    const item = await this.itemRepository.findOne({ where: { id: id } });
+    // Update item
+    const item = await this.findById(id);
+    if (!item)
+      throw new HttpException('The item is not found', HttpStatus.NOT_FOUND);
+
     item.name = name || item.name;
-    item.category = category_id || item.category;
+    item.category = categoryId || item.category;
     item.detail = detail || item.detail;
-    item.user_manual = user_manual || item.user_manual;
+    item.user_manual = userManual || item.user_manual;
     item.price = price || item.price;
-    item.user = user_id;
+    item.user = userId;
     const result = await this.itemRepository.update(id, item);
-    if (!result) {
+    if (!result)
       throw new HttpException(
         'The item cannot update',
         HttpStatus.INTERNAL_SERVER_ERROR
       );
-    }
 
-    const newItemLog = new ItemLog();
-    newItemLog.item_id = item.id;
-    newItemLog.name = item.name;
-    newItemLog.category = item.category;
-    newItemLog.detail = detail;
-    newItemLog.user_manual = user_manual;
-    newItemLog.created_by = user_id;
-    await this.itemLogRepository.insert(newItemLog);
+    // Create item log
+    await this.itemLogService.create(
+      item.id,
+      item.name,
+      item.category,
+      item.detail,
+      item.user_manual,
+      userId
+    );
 
-    if (price) {
-      const newPriceLog = new PriceLog();
-      newPriceLog.item_id = id;
-      newPriceLog.price = item.price;
-      newPriceLog.created_by = user_id;
-      await this.priceLogRepository.insert(newPriceLog);
-    }
+    // Create price log
+    if (price) await this.priceLogService.create(id, item.price, userId);
 
     return result;
   }

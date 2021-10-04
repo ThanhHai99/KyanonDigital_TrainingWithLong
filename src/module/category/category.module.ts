@@ -4,14 +4,9 @@ import { CategoryController } from './category.controller';
 import { Category } from './category.entity';
 import { CategoryService } from './category.service';
 import { CategoryLogModule } from '@module/category_log/category_log.module';
-import { UserModule } from '@module/user/user.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Category]),
-    CategoryLogModule,
-    UserModule
-  ],
+  imports: [TypeOrmModule.forFeature([Category]), CategoryLogModule],
   controllers: [CategoryController],
   providers: [CategoryService]
 })

@@ -1,100 +1,226 @@
-import { Injectable } from '@nestjs/common';
+import { ItemService } from '@module/item/item.service';
+import { ItemOrder } from '@module/item_order/item_order.entity';
+import { SaleItem } from '@module/sale_item/sale_item.entity';
+import { SaleItemService } from '@module/sale_item/sale_item.service';
+import { SaleLogService } from '@module/sale_log/sale_log.service';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Raw, Repository } from 'typeorm';
+import { InsertResult, Raw, Repository, UpdateResult } from 'typeorm';
 import { Sale } from './sale.entity';
 
 @Injectable()
 export class SaleService {
-    constructor(
-        @InjectRepository(Sale)
-        private saleRepository: Repository<Sale>
-    ) {}
+  constructor(
+    private readonly saleLogService: SaleLogService,
+    private readonly saleItemService: SaleItemService,
+    private readonly itemService: ItemService,
 
-    async isNameAndCodeAlreadyInUse(
-        name: string,
-        code: string
-    ): Promise<boolean> {
-        try {
-            const sale = await this.saleRepository.findOneOrFail({
-                where: [{ name: name }, { code: code }]
-            });
-            if (sale) return true;
-            return false;
-        } catch (error) {
-            return false;
+    @InjectRepository(Sale)
+    private saleRepository: Repository<Sale>,
+
+    @InjectRepository(SaleItem)
+    private saleItemRepository: Repository<SaleItem>
+  ) {}
+
+  async findByCode(code: string): Promise<Sale> {
+    return await this.saleRepository.findOne({
+      where: {
+        code: code
+      }
+    });
+  }
+
+  async getAll(): Promise<Sale[]> {
+    return this.saleRepository.find({
+      join: {
+        alias: 'sale',
+        leftJoinAndSelect: {
+          sale_item: 'sale.sale_item'
         }
+      }
+    });
+  }
+
+  async getById(id: number): Promise<Sale> {
+    return this.saleRepository.findOne({
+      where: {
+        id: id
+      },
+      join: {
+        alias: 'sale',
+        leftJoinAndSelect: {
+          sale_item: 'sale.sale_item'
+        }
+      }
+    });
+  }
+
+  async create(
+    name: string,
+    startDate: Date,
+    endDate: Date,
+    discount: number,
+    applied: boolean,
+    code: string,
+    userId: number,
+    itemId: Array<number>,
+    amount: Array<number>
+  ): Promise<InsertResult> {
+    // Check sale code exists
+    const isSaleExists = await this.saleRepository.findOne({
+      where: { code: code }
+    });
+    if (isSaleExists)
+      throw new HttpException('The sale already in use', HttpStatus.CONFLICT);
+
+    // Validate item length vs amount length
+    if (itemId.length < 1 && itemId.length !== amount.length)
+      throw new HttpException(
+        'Item or amount of item invalid',
+        HttpStatus.CONFLICT
+      );
+
+    // Create a sale
+    const newSale = new Sale();
+    newSale.name = name;
+    newSale.start_date = startDate;
+    newSale.end_date = endDate;
+    newSale.discount = discount;
+    newSale.applied = applied;
+    newSale.code = code;
+    newSale.user = userId;
+    const result = await this.saleRepository.insert(newSale);
+    if (!result)
+      throw new HttpException(
+        'The sale cannot create',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+
+    // Create sale item
+    for (let i = 0; i < itemId.length; i++) {
+      await this.saleItemService.create(
+        result.raw.insertId,
+        itemId[i],
+        amount[i]
+      );
     }
 
-    async getSaleStillApply(sale_code: string): Promise<Sale> {
-        const _sale = await this.saleRepository.findOne({
-            where: {
-                end_date: Raw(
-                    (alias) => `${alias} IS NULL OR ${alias} > NOW()`
-                ),
-                code: sale_code
-            }
-        });
-        if (!_sale) return null;
-        return _sale;
+    // Create a sale log
+    await this.saleLogService.create(
+      name,
+      result.raw.insertId,
+      itemId.toString(),
+      startDate,
+      endDate,
+      amount.toString(),
+      discount,
+      applied,
+      code,
+      userId
+    );
+
+    return result;
+  }
+
+  async update(
+    id: number,
+    name: string,
+    startDate: Date,
+    endDate: Date,
+    discount: number,
+    applied: boolean,
+    code: string,
+    userId: number
+  ): Promise<UpdateResult> {
+    const sale = await this.saleRepository.findOne({ where: { id: id } });
+    if (!sale)
+      throw new HttpException('Sale is not found', HttpStatus.NOT_FOUND);
+
+    if (sale.applied)
+      throw new HttpException('Sale is applied', HttpStatus.NO_CONTENT);
+
+    if (code) {
+      const isCodeExists = await this.saleRepository.findOne({
+        where: { code: code }
+      });
+      if (isCodeExists)
+        throw new HttpException('The code already in use', HttpStatus.CONFLICT);
     }
 
-    async getAll(): Promise<Sale[]> {
-        return this.saleRepository.find({
-            join: {
-                alias: 'sale',
-                leftJoinAndSelect: {
-                    sale_item: 'sale.sale_item'
-                }
-            }
-        });
+    // Update a sale
+    sale.name = name || sale.name;
+    sale.start_date = startDate || sale.start_date;
+    sale.end_date = endDate || sale.end_date;
+    sale.discount = discount || sale.discount;
+    sale.applied = applied || sale.applied;
+    sale.code = code || sale.code;
+    sale.user = userId;
+    const result = await this.saleRepository.update(id, sale);
+
+    // Create a sale log
+    const t: SaleItem[] = await this.saleItemRepository.find({
+      select: ['item', 'amount'],
+      where: {
+        sale: sale.id
+      }
+    });
+    const sale_item: string = t.map((e) => e.item).toString();
+    const amount: string = t.map((e) => e.amount).toString();
+    await this.saleLogService.create(
+      name,
+      id,
+      sale_item.toString(),
+      startDate,
+      endDate,
+      amount.toString(),
+      discount,
+      applied,
+      code,
+      userId
+    );
+
+    return result;
+  }
+
+  async isSaleStillApply(code: string): Promise<boolean> {
+    const sale = await this.saleRepository.findOne({
+      where: {
+        applied: 1,
+        code: code,
+        start_date: Raw((alias) => `${alias} IS NULL OR ${alias} <= NOW()`),
+        end_date: Raw((alias) => `${alias} IS NULL OR ${alias} > NOW()`)
+      }
+    });
+    if (sale) return true;
+    return false;
+  }
+
+  async totalDecreaseCostByCode(
+    itemInOrder: ItemOrder[],
+    code: string
+  ): Promise<number> {
+    const isSaleStillApply = await this.isSaleStillApply(code);
+    if (!isSaleStillApply) return 0;
+    const sale = await this.findByCode(code);
+
+    let total = 0;
+    for (let i = 0; i < itemInOrder.length; i++) {
+      const { item: itemId, amount } = itemInOrder[i];
+      const isItemStillOnSale = await this.saleItemService.isItemStillOnSale(
+        sale.id,
+        <number>itemId
+      );
+      if (isItemStillOnSale) {
+        const item = await this.itemService.findById(<number>itemId);
+        total += ((item.price * sale.discount) / 100) * amount;
+        await this.saleItemService.updateAmount(
+          sale.id,
+          <number>itemId,
+          amount
+        );
+      }
     }
 
-    async getById(id: number): Promise<Sale> {
-        return this.saleRepository.findOne({
-            where: {
-                id: id
-            },
-            join: {
-                alias: 'sale',
-                leftJoinAndSelect: {
-                    sale_item: 'sale.sale_item'
-                }
-            }
-        });
-    }
-
-    async create(sale: Sale): Promise<Sale> {
-        const tmp = await this.saleRepository.save(sale);
-        return await this.getById(tmp.id);
-    }
-
-    async update(id: number, sale: Sale): Promise<Sale> {
-        let _sale = await this.saleRepository.findOne({
-            where: {
-                id: id
-            }
-        });
-        _sale.name = !!sale.name ? sale.name : _sale.name;
-        _sale.start_date = !!sale.start_date
-            ? sale.start_date
-            : _sale.start_date;
-        _sale.end_date = !!sale.end_date ? sale.end_date : _sale.end_date;
-        _sale.discount = !!sale.discount ? sale.discount : _sale.discount;
-        _sale.applied = !!sale.applied ? sale.applied : _sale.applied;
-        _sale.code = !!sale.code ? sale.code : _sale.code;
-        _sale.user = !!sale.user ? sale.user : _sale.user;
-        await this.saleRepository.save(_sale);
-        // return await this.saleRepository.findOne(id, {
-        //     join: {
-        //         alias: 'sale',
-        //         leftJoinAndSelect: {
-        //             role: 'sale.sale_item'
-        //         }
-        //     }
-        // });
-
-        // await this.saleRepository.save(sale);
-
-        return await this.getById(sale.id);
-    }
+    return total;
+  }
 }

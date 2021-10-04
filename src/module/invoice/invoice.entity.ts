@@ -25,10 +25,7 @@ export class Invoice extends BaseEntity {
   phone: string;
 
   @Column()
-  amount: number;
-
-  @Column({ default: 30000 })
-  shipping: number;
+  cost: number;
 
   @Column()
   created_by: number;

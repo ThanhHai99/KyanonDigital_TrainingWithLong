@@ -1,9 +1,18 @@
-import { Controller, Get, Res, Param, HttpStatus } from '@nestjs/common';
+import { JwtAuthGuard } from '@module/auth/guard/jwt.guard';
+import {
+  Controller,
+  Get,
+  Res,
+  Param,
+  HttpStatus,
+  UseGuards
+} from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PriceLogService } from './price_log.service';
 
 @ApiTags('price_log')
 @Controller('price_log')
+@UseGuards(JwtAuthGuard)
 export class PriceLogController {
   constructor(private priceLogService: PriceLogService) {}
 

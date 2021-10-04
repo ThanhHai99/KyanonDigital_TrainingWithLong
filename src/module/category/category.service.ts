@@ -2,19 +2,18 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './category.entity';
 import { InsertResult, Like, Repository, UpdateResult } from 'typeorm';
-import { CategoryLog } from '@module/category_log/category_log.entity';
+import { CategoryLogService } from '@module/category_log/category_log.service';
 
 @Injectable()
 export class CategoryService {
   constructor(
-    @InjectRepository(Category)
-    private categoryRepository: Repository<Category>,
+    private readonly categoryLogService: CategoryLogService,
 
-    @InjectRepository(CategoryLog)
-    private categoryLogRepository: Repository<CategoryLog>
+    @InjectRepository(Category)
+    private categoryRepository: Repository<Category>
   ) {}
 
-  async findOne(name: string): Promise<Category | undefined> {
+  async findByName(name: string): Promise<Category | undefined> {
     return await this.categoryRepository.findOne({ where: { name: name } });
   }
 
@@ -27,15 +26,12 @@ export class CategoryService {
   }
 
   async getById(id: number): Promise<Category> {
-    return await this.categoryRepository.findOne({
-      where: {
-        id: id
-      }
-    });
+    return await this.categoryRepository.findOne(id);
   }
 
-  async create(name: string, user_id: number): Promise<InsertResult> {
-    const isCategoryExists = await this.findOne(name);
+  async create(name: string, userId: number): Promise<InsertResult> {
+    // Check category exists
+    const isCategoryExists = await this.findByName(name);
     if (isCategoryExists) {
       throw new HttpException(
         'The category already in use',
@@ -43,9 +39,10 @@ export class CategoryService {
       );
     }
 
+    // Create category
     let newCategory = new Category();
     newCategory.name = name;
-    newCategory.user = user_id;
+    newCategory.user = userId;
     const result = await this.categoryRepository.insert(newCategory);
     if (!result) {
       throw new HttpException(
@@ -53,12 +50,9 @@ export class CategoryService {
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
-    const category = await this.getById(result.raw.insertId);
-    const newCategoryLog = new CategoryLog();
-    newCategoryLog.category_id = category.id;
-    newCategoryLog.name = category.name;
-    newCategoryLog.created_by = user_id;
-    await this.categoryLogRepository.insert(newCategoryLog);
+
+    // Create category log
+    await this.categoryLogService.create(result.raw.insertId, name, userId);
 
     return result;
   }
@@ -66,9 +60,10 @@ export class CategoryService {
   async update(
     id: number,
     name: string,
-    user_id: number
+    userId: number
   ): Promise<UpdateResult> {
-    const isCategoryExists = await this.findOne(name);
+    // Check category name exists
+    const isCategoryExists = await this.findByName(name);
     if (isCategoryExists) {
       throw new HttpException(
         'The category already in use',
@@ -76,29 +71,30 @@ export class CategoryService {
       );
     }
 
+    // Check category exists
     const category = await this.categoryRepository.findOne({
       where: { id: id }
     });
     if (!category)
       throw new HttpException('Category is not found', HttpStatus.NOT_FOUND);
 
+    // Update category
     category.name = name || category.name;
-    category.user = user_id;
-
+    category.user = userId;
     const result = await this.categoryRepository.update(id, category);
-
-    if (!result) {
+    if (!result.affected) {
       throw new HttpException(
         'The category cannot update',
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
 
-    const newCategoryLog = new CategoryLog();
-    newCategoryLog.category_id = id;
-    newCategoryLog.name = category.name;
-    newCategoryLog.created_by = user_id;
-    await this.categoryLogRepository.insert(newCategoryLog);
+    // Create category log
+    await this.categoryLogService.create(
+      result.raw.insertId,
+      category.name,
+      userId
+    );
 
     return result;
   }

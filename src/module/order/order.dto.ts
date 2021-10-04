@@ -1,62 +1,51 @@
+import { PaymentMethodIds } from '@constant/payment/method.constant';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsIn, IsInt, IsNotEmpty, IsOptional } from 'class-validator';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsIn,
+  IsNotEmpty,
+  IsOptional
+} from 'class-validator';
 
 export class BodyCreateOrder {
-    @ApiProperty({
-        description: 'Item list',
-        type: Array
-    })
-    @IsArray()
-    item: Array<number>;
+  @ApiProperty({
+    description: 'Item list',
+    type: Array
+  })
+  @IsArray()
+  @ArrayMinSize(1)
+  item: Array<number>;
 
-    @ApiProperty({
-        description: 'Amount list of each product',
-        type: Array
-    })
-    @IsArray()
-    amount: Array<number>;
+  @ApiProperty({
+    description: 'Amount list of each product',
+    type: Array
+  })
+  @IsArray()
+  @ArrayMinSize(1)
+  amount: Array<number>;
 
-    @ApiProperty({
-        description: 'The delivery address',
-        type: String
-    })
-    @IsNotEmpty()
-    delivery_address: string;
+  @ApiProperty({
+    description: 'The delivery address',
+    type: String
+  })
+  @IsNotEmpty()
+  delivery_address: string;
 
-    @ApiProperty({
-        description: 'The payment method',
-        type: String
-    })
-    @IsOptional()
-    @IsIn(['COD', 'MOMO'])
-    payment_method: string;
+  @ApiProperty({
+    description: 'The payment method',
+    type: String
+  })
+  @IsOptional()
+  @IsIn(PaymentMethodIds)
+  payment_method: number;
 }
 
 export class BodyPayment {
-    @ApiProperty({
-        description: 'The sale code',
-        type: String
-    })
-    @IsOptional()
-    sale_code: string;
+  @ApiProperty({
+    description: 'The sale code',
+    type: String
+  })
+  @IsOptional()
+  sale_code: string;
 }
-
-export class ResponseGetOrder {
-    @ApiProperty({ description: 'Error status', type: Number })
-    @IsIn([0, 1])
-    error: number;
-
-    @ApiProperty({ description: 'Message is returned', type: String })
-    @IsOptional()
-    message: string;
-
-    @ApiProperty({ description: 'Data is returned' })
-    @IsOptional()
-    data: any;
-}
-
-export class ResponseCreateOrder extends ResponseGetOrder {}
-
-export class ResponseExport extends ResponseCreateOrder {}
-
-export class ResponsePayment extends ResponseCreateOrder {}

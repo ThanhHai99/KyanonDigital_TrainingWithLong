@@ -31,10 +31,9 @@ export class ItemController {
   @ApiOkResponse({ description: 'Get all items' })
   @Get()
   async getAll(@Res() res, @Query() query): Promise<any> {
-    const { name } = query;
     return res.status(HttpStatus.OK).json({
       errors: 0,
-      data: await this.itemService.getAll(name)
+      data: await this.itemService.getAll(query.name)
     });
   }
 

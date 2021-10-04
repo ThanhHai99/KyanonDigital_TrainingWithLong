@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   HttpStatus,
-  Param,
   Post,
   Req,
   Res,
@@ -15,21 +14,15 @@ import {
   ApiOkResponse,
   ApiTags
 } from '@nestjs/swagger';
-import { WarehouseLogService } from '@module/warehouse_log/warehouse_log.service';
 import { BodyImporting } from './warehouse.dto';
-import { Warehouse } from './warehouse.entity';
 import { WarehouseService } from './warehouse.service';
 import { JwtAuthGuard } from '@module/auth/guard/jwt.guard';
-const moment = require('moment');
 
 @ApiTags('warehouse')
 @Controller('warehouse')
 @UseGuards(JwtAuthGuard)
 export class WarehouseController {
-  constructor(
-    private readonly warehouseService: WarehouseService,
-    private readonly warehouseLogService: WarehouseLogService
-  ) {}
+  constructor(private readonly warehouseService: WarehouseService) {}
 
   @ApiOkResponse({ description: 'Get all item in warehouse' })
   @Get()
@@ -55,10 +48,9 @@ export class WarehouseController {
   @ApiOkResponse({ description: 'Get all item inventory' })
   @Get('inventory')
   async getInventory(@Res() res): Promise<any> {
-    const sub = moment().subtract(1, 'months').format('YYYY-MM-DD');
     return res.status(HttpStatus.OK).json({
       error: 0,
-      data: await this.warehouseService.getInventory(sub.toString())
+      data: await this.warehouseService.getInventory()
     });
   }
 
@@ -74,26 +66,17 @@ export class WarehouseController {
     @Req() req
   ): Promise<any> {
     const { item_id, amount, expiration_date, price } = body;
-    const warehouse: Warehouse = await this.warehouseService.create(
+    await this.warehouseService.create(
       item_id,
       amount,
-      expiration_date
-    );
-
-    const { id: warehouse_id } = warehouse;
-    await this.warehouseLogService.create(
-      '+',
-      item_id,
-      warehouse_id,
-      amount,
-      price,
       expiration_date,
+      price,
       req.user.id
     );
 
-    return res.status(201).json({
+    return res.status(HttpStatus.CREATED).json({
       error: 0,
-      data: warehouse
+      data: 'The warehouse is created'
     });
   }
 }

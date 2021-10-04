@@ -41,6 +41,9 @@ export class User extends BaseEntity {
   @JoinColumn({ name: 'role_id' })
   role: Role | number;
 
+  @Column({ default: null })
+  role_id: number;
+
   @Column({ default: false })
   is_locked: boolean;
 

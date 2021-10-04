@@ -3,10 +3,10 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 export class Invoices1627548123574 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(
-            `insert into invoice(id,name,phone,amount,shipping,created_by,order_id) values(1,"Tran Viet Thanh Hai","0333771800",2000,30000,1,1);`
+            `insert into invoice(id,name,phone,cost,created_by,order_id) values(1,"Tran Viet Thanh Hai","0333771800",2000,1,1);`
         );
         await queryRunner.query(
-            `insert into invoice(id,name,phone,amount,shipping,created_by,order_id) values(2,"Tran Thi Thao Hien","0333771801",3000,30000,2,2);`
+            `insert into invoice(id,name,phone,cost,created_by,order_id) values(2,"Tran Thi Thao Hien","0333771801",3000,2,2);`
         );
     }
 

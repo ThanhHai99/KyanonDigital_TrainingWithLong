@@ -1,4 +1,5 @@
-import { Role } from '@module/role/role.entity';
+import { RoleIds } from '@constant/role/role.constant';
+import { RoleService } from '@module/role/role.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InsertResult, Repository, UpdateResult } from 'typeorm';
@@ -7,15 +8,14 @@ import { User } from './user.entity';
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private readonly roleService: RoleService,
 
-    @InjectRepository(Role)
-    private readonly roleRepository: Repository<Role>
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>
   ) {}
 
   async findOne(username: string): Promise<User | undefined> {
-    return this.userRepository.findOne({ where: { username: username } });
+    return await this.userRepository.findOne({ where: { username: username } });
   }
 
   async getAll(filter: any = {}): Promise<any> {
@@ -27,11 +27,7 @@ export class UserService {
   }
 
   async getById(id: number): Promise<User> {
-    const user: User = await this.userRepository.findOne({
-      where: {
-        id: id
-      }
-    });
+    const user: User = await this.userRepository.findOne(id);
     delete user.password;
     return user;
   }
@@ -43,14 +39,15 @@ export class UserService {
     phone: string,
     address: string
   ): Promise<InsertResult> {
+    // Check username exists
     const isUserExists = await this.findOne(username);
-    if (isUserExists) {
+    if (isUserExists)
       throw new HttpException(
         'The account already in use',
         HttpStatus.CONFLICT
       );
-    }
 
+    // Create user
     const newUser = new User();
     newUser.username = username;
     newUser.password = password;
@@ -64,6 +61,7 @@ export class UserService {
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+
     return result;
   }
 
@@ -73,31 +71,31 @@ export class UserService {
     name: string,
     phone: string,
     address: string,
-    is_locked: boolean,
-    role_id: number
+    isLocked: boolean,
+    roleId: number
   ): Promise<InsertResult> {
+    // Check user name exists
     const isUserExists = await this.findOne(username);
-    const thisRole = await this.roleRepository.findOne({
-      where: {
-        id: role_id
-      }
-    });
-    if (!thisRole || thisRole.id === 1)
-      throw new HttpException('Role is incorrect', HttpStatus.NOT_FOUND);
     if (isUserExists)
       throw new HttpException(
         'The account already in use',
         HttpStatus.CONFLICT
       );
 
+    // Check role valid
+    const thisRole = await this.roleService.findById(roleId);
+    if (!thisRole || thisRole.id === 1)
+      throw new HttpException('Role is incorrect', HttpStatus.NOT_FOUND);
+
+    // Create user
     const newUser = new User();
     newUser.username = username;
     newUser.password = password;
     newUser.name = name;
     newUser.phone = phone;
     newUser.address = address;
-    newUser.role = role_id;
-    newUser.is_locked = is_locked || false;
+    newUser.role = roleId;
+    newUser.is_locked = isLocked || false;
     const result = await this.userRepository.insert(newUser);
     if (!result) {
       throw new HttpException(
@@ -108,49 +106,49 @@ export class UserService {
     return result;
   }
 
+  async isEmployee(userId: number): Promise<boolean> {
+    const user = await this.userRepository.findOne(userId);
+    const { role_id } = user;
+    if (RoleIds.includes(role_id)) return true;
+    return false;
+  }
+
   async update(
     id: number,
     password: string,
     name: string,
     phone: string,
     address: string,
-    is_locked: boolean,
-    role_id: number
+    isLocked: boolean,
+    roleId: number
   ): Promise<UpdateResult> {
-    const user = await this.userRepository.findOne({
-      where: {
-        id: id
-      }
-    });
-
+    // Check user exists
+    const user = await this.userRepository.findOne(id);
     if (!user)
       throw new HttpException('User is not found', HttpStatus.NOT_FOUND);
 
-    user.password = password || user.password;
-    user.name = name || user.name;
-    user.phone = phone || user.phone;
-    user.address = address || user.address;
-    user.is_locked = is_locked || user.is_locked;
-    user.role = role_id || user.role;
-
     // Check role
-    if (role_id) {
-      const thisRole = await this.roleRepository.findOne({
-        where: {
-          id: role_id
-        }
-      });
+    if (roleId) {
+      const thisRole = await this.roleService.findById(roleId);
       if (!thisRole || id === 1)
         throw new HttpException('Role is incorrect', HttpStatus.NOT_FOUND);
     }
 
+    // Update user
+    user.password = password || user.password;
+    user.name = name || user.name;
+    user.phone = phone || user.phone;
+    user.address = address || user.address;
+    user.is_locked = isLocked || user.is_locked;
+    user.role = roleId || user.role;
     const result = await this.userRepository.update(id, user);
-    if (!result) {
+    if (!result.affected) {
       throw new HttpException(
         'The account cannot update',
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+
     return result;
   }
 }

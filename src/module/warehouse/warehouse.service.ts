@@ -1,12 +1,18 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Raw, Repository } from 'typeorm';
+import { getManager, MoreThan, Raw, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Warehouse } from './warehouse.entity';
-const moment = require('moment');
+import { ItemOrder } from '@module/item_order/item_order.entity';
+import { WarehouseLogService } from '@module/warehouse_log/warehouse_log.service';
+import { ItemService } from '@module/item/item.service';
+import { isArraysSameLength } from '@shared/utils/array';
 
 @Injectable()
 export class WarehouseService {
   constructor(
+    private readonly warehouseLogService: WarehouseLogService,
+    private readonly itemService: ItemService,
+
     @InjectRepository(Warehouse)
     private warehouseRepository: Repository<Warehouse>
   ) {}
@@ -36,105 +42,110 @@ export class WarehouseService {
     });
   }
 
-  async getInventory(condition: Date): Promise<Warehouse[]> {
+  async getInventory(): Promise<Warehouse[]> {
     return await this.warehouseRepository.find({
-      expiration_date: Raw((alias) => `${alias} < '${condition}'`)
+      expiration_date: Raw(
+        (alias) => `${alias} < DATE_SUB(DATE(NOW()), INTERVAL 1 MONTH)`
+      )
     });
   }
 
   async create(
-    item: number,
-    amount: number,
-    expiration_date: Date
-  ): Promise<Warehouse> {
-    const newWarehouse = new Warehouse();
-    newWarehouse.item = item;
-    newWarehouse.amount = amount;
-    newWarehouse.expiration_date = expiration_date;
-    const warehouse = await this.warehouseRepository.save(newWarehouse);
-    if (!warehouse) {
-      throw new HttpException(
-        'The account cannot create',
-        HttpStatus.INTERNAL_SERVER_ERROR
+    itemId: Array<number>,
+    amount: Array<number>,
+    expirationDate: Array<Date>,
+    price: Array<number>,
+    userId: number
+  ): Promise<any> {
+    if (!isArraysSameLength(itemId, amount, expirationDate, price))
+      throw new HttpException('The data is invalid', HttpStatus.CONFLICT);
+
+    for (let i = 0; i < itemId.length; i++) {
+      // Create a warehouse
+      const newWarehouse = new Warehouse();
+      newWarehouse.item = itemId[i];
+      newWarehouse.amount = amount[i];
+      newWarehouse.expiration_date = expirationDate[i];
+      let result = await this.warehouseRepository.insert(newWarehouse);
+      if (!result) {
+        throw new HttpException(
+          'The warehouse cannot create',
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      }
+
+      // Create a warehouse log
+      await this.warehouseLogService.create(
+        '+',
+        price[i],
+        result.raw.insertId,
+        itemId[i],
+        amount[i],
+        expirationDate[i],
+        userId
       );
     }
-    return warehouse;
   }
 
-  async isEnoughItemToExport(
-    condition: Date,
-    item: number,
-    amount: number
-  ): Promise<boolean> {
-    // for (const i in item) {
-    // if (Object.prototype.hasOwnProperty.call(item, i)) {
-    // const e = item[i];
-    const { sumAmount } = await this.warehouseRepository
-      .createQueryBuilder('warehouse')
-      .select('SUM(amount)', 'sumAmount')
-      .where('item_id = :item', { item })
-      .andWhere('expiration_date > :condition', { condition })
-      .getRawOne();
-    if (sumAmount < amount) return false;
-    // }
-    // }
+  /**
+   * Check if the number of products in the order is enough to be shipped or not?
+   * @returns
+   */
+  async isEnoughQuantityToExport(itemInOrder: ItemOrder[]): Promise<boolean> {
+    const itemOrderManager = getManager();
+    for (let i = 0; i < itemInOrder.length; i++) {
+      const { item, amount } = itemInOrder[i];
+      const currentQuantityOfItem = await itemOrderManager.query(`
+        SELECT SUM(amount) as sumAmount
+        FROM warehouse
+        WHERE item_id = ${item}
+        AND expiration_date > DATE_SUB(DATE(NOW()), INTERVAL 1 MONTH)
+      `);
+
+      if (currentQuantityOfItem[0].sumAmount < amount)
+        throw new HttpException('Item quantity is not enough', HttpStatus.OK);
+    }
     return true;
   }
 
-  async exportItemByAmount(
-    condition: Date,
-    itemData: Array<number>,
-    amountData: Array<number>
-  ): Promise<Array<string>> {
-    let response = [];
-    for (const i in itemData) {
-      let response_i = '';
-      if (Object.prototype.hasOwnProperty.call(itemData, i)) {
-        let _item = itemData[i];
-        let _amount = amountData[i];
-        while (_amount > 0) {
-          const rs: any = await this.warehouseRepository
-            .createQueryBuilder('warehouse')
-            .where('item_id = :_item', { _item })
-            .andWhere('expiration_date > :condition', { condition })
-            .andWhere('amount > 0')
-            .orderBy('expiration_date', 'ASC')
-            .getRawOne();
+  async exportProduct(itemInOrder: ItemOrder[], userId: number): Promise<any> {
+    for (let i = 0; i < itemInOrder.length; i++) {
+      const { item: itemId, amount } = itemInOrder[i];
+      let _amount = amount;
+      const warehouse = await this.warehouseRepository.find({
+        where: {
+          item_id: itemId,
+          amount: MoreThan(0),
+          expiration_date: Raw(
+            (e) => `${e} > DATE_SUB(DATE(NOW()), INTERVAL 1 MONTH)`
+          )
+        },
+        order: { expiration_date: 'ASC' }
+      });
 
-          const { warehouse_id, warehouse_amount, warehouse_expiration_date } =
-            rs;
+      // Update warehouse
+      for (let j = 0; j < warehouse.length; j++) {
+        let tmpAmount = warehouse[j].amount;
+        warehouse[j].amount =
+          warehouse[j].amount <= _amount ? 0 : warehouse[j].amount - _amount;
+        await this.warehouseRepository.update(warehouse[j].id, warehouse[j]);
 
-          if (warehouse_amount <= _amount) {
-            await this.warehouseRepository.update(warehouse_id, {
-              amount: 0
-            });
-            response_i =
-              warehouse_id +
-              ';' +
-              _item +
-              ';' +
-              warehouse_amount +
-              ';' +
-              moment(new Date(warehouse_expiration_date)).format('YYYY-MM-DD');
-          } else {
-            await this.warehouseRepository.update(warehouse_id, {
-              amount: warehouse_amount - _amount
-            });
-            response_i =
-              warehouse_id +
-              ';' +
-              _item +
-              ';' +
-              _amount +
-              ';' +
-              moment(new Date(warehouse_expiration_date)).format('YYYY-MM-DD');
-          }
+        // Create a warehouse log
+        const item = await this.itemService.findById(<number>warehouse[j].item);
+        await this.warehouseLogService.create(
+          '-',
+          item.price,
+          warehouse[j].id,
+          warehouse[j].item,
+          _amount,
+          warehouse[j].expiration_date,
+          userId
+        );
 
-          _amount -= warehouse_amount;
-          response.push(response_i);
-        }
+        _amount -= tmpAmount;
+        if (_amount <= 0) break;
       }
     }
-    return response;
+    return;
   }
 }
