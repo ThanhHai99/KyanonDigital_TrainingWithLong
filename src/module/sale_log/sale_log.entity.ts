@@ -19,10 +19,7 @@ export class SaleLog extends BaseEntity {
   @Column()
   sale_item: string;
 
-  @CreateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)'
-  })
+  @Column({ type: 'date' })
   start_date: Date;
 
   @Column({ default: null })

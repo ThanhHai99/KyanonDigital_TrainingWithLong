@@ -20,13 +20,13 @@ export class Sale extends BaseEntity {
   @Column({ unique: true })
   name: string;
 
-  @CreateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)'
+  @Column({
+    type: 'date',
+    default: () => '(CURRENT_DATE)'
   })
   start_date: Date;
 
-  @Column({ type: 'timestamp', nullable: true, default: null })
+  @Column({ type: 'date', nullable: true, default: () => null })
   end_date: Date;
 
   @Column()

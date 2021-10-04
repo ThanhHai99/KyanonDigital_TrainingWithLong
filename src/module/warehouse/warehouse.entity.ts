@@ -19,7 +19,7 @@ export class Warehouse extends BaseEntity {
   @JoinColumn({ name: 'item_id' })
   item: Item | number;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'date' })
   expiration_date: Date;
 
   @Column({ default: 0 })

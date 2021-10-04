@@ -14,10 +14,7 @@ export class WarehouseLog extends BaseEntity {
   @Column({ default: null })
   price: number;
 
-  // @Column()
-  // item_id: number;
-
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'date' })
   expiration_date: Date;
 
   @Column()
