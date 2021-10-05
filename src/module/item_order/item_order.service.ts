@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { InsertResult, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ItemOrder } from './item_order.entity';
 
 @Injectable()
@@ -22,12 +22,12 @@ export class ItemOrderService {
     itemId: number,
     amount: number,
     orderId: number
-  ): Promise<InsertResult> {
+  ): Promise<ItemOrder> {
     const newItemOrder = new ItemOrder();
     newItemOrder.item = itemId;
     newItemOrder.amount = amount;
     newItemOrder.order_id = orderId;
-    const result = await this.itemOrderRepository.insert(newItemOrder);
+    const result = await this.itemOrderRepository.save(newItemOrder);
     if (!result)
       throw new HttpException(
         'The order cannot create',

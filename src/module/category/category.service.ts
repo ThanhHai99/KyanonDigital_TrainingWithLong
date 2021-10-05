@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './category.entity';
-import { InsertResult, Like, Repository, UpdateResult } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { CategoryLogService } from '@module/category_log/category_log.service';
 
 @Injectable()
@@ -29,7 +29,7 @@ export class CategoryService {
     return await this.categoryRepository.findOne(id);
   }
 
-  async create(name: string, userId: number): Promise<InsertResult> {
+  async create(name: string, userId: number): Promise<Category> {
     // Check category exists
     const isCategoryExists = await this.findByName(name);
     if (isCategoryExists) {
@@ -43,7 +43,7 @@ export class CategoryService {
     let newCategory = new Category();
     newCategory.name = name;
     newCategory.user = userId;
-    const result = await this.categoryRepository.insert(newCategory);
+    const result = await this.categoryRepository.save(newCategory);
     if (!result) {
       throw new HttpException(
         'The category cannot create',
@@ -52,16 +52,12 @@ export class CategoryService {
     }
 
     // Create category log
-    await this.categoryLogService.create(result.raw.insertId, name, userId);
+    await this.categoryLogService.create(result.id, name, userId);
 
     return result;
   }
 
-  async update(
-    id: number,
-    name: string,
-    userId: number
-  ): Promise<UpdateResult> {
+  async update(id: number, name: string, userId: number): Promise<Category> {
     // Check category name exists
     const isCategoryExists = await this.findByName(name);
     if (isCategoryExists) {
@@ -81,8 +77,8 @@ export class CategoryService {
     // Update category
     category.name = name || category.name;
     category.user = userId;
-    const result = await this.categoryRepository.update(id, category);
-    if (!result.affected) {
+    const result = await this.categoryRepository.save(category);
+    if (!result) {
       throw new HttpException(
         'The category cannot update',
         HttpStatus.INTERNAL_SERVER_ERROR
@@ -90,11 +86,7 @@ export class CategoryService {
     }
 
     // Create category log
-    await this.categoryLogService.create(
-      result.raw.insertId,
-      category.name,
-      userId
-    );
+    await this.categoryLogService.create(id, category.name, userId);
 
     return result;
   }

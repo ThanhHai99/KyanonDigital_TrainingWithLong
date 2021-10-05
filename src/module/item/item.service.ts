@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Item } from './item.entity';
-import { getManager, InsertResult, Repository, UpdateResult } from 'typeorm';
+import { getManager, Repository } from 'typeorm';
 import { ItemLogService } from '@module/item_log/item_log.service';
 import { PriceLogService } from '@module/price_log/price_log.service';
 
@@ -62,7 +62,7 @@ export class ItemService {
     userManual: string,
     price: number,
     userId: number
-  ): Promise<InsertResult> {
+  ): Promise<Item> {
     // Check item name exists
     const isItemExists = await this.findOneByName(name);
     if (isItemExists)
@@ -76,7 +76,7 @@ export class ItemService {
     newItem.user_manual = userManual;
     newItem.price = price;
     newItem.user = userId;
-    const result = await this.itemRepository.insert(newItem);
+    const result = await this.itemRepository.save(newItem);
     if (!result) {
       throw new HttpException(
         'The item cannot create',
@@ -86,7 +86,7 @@ export class ItemService {
 
     // Create item log
     await this.itemLogService.create(
-      result.raw.insertId,
+      result.id,
       name,
       categoryId,
       detail,
@@ -95,11 +95,7 @@ export class ItemService {
     );
 
     // Create price log
-    await this.priceLogService.create(
-      result.raw.insertId,
-      newItem.price,
-      userId
-    );
+    await this.priceLogService.create(result.id, newItem.price, userId);
 
     return result;
   }
@@ -112,7 +108,7 @@ export class ItemService {
     userManual: string,
     price: number,
     userId: number
-  ): Promise<UpdateResult> {
+  ): Promise<Item> {
     // Check item exists
     const isItemExists = await this.findOneByName(name);
     if (isItemExists)
@@ -129,7 +125,7 @@ export class ItemService {
     item.user_manual = userManual || item.user_manual;
     item.price = price || item.price;
     item.user = userId;
-    const result = await this.itemRepository.update(id, item);
+    const result = await this.itemRepository.save(item);
     if (!result)
       throw new HttpException(
         'The item cannot update',

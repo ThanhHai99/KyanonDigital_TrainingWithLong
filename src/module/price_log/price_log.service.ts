@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, UpdateResult } from 'typeorm';
+import { Repository } from 'typeorm';
 import { PriceLog } from './price_log.entity';
 
 @Injectable()
@@ -22,12 +22,12 @@ export class PriceLogService {
     itemId: number,
     price: number,
     userId: number
-  ): Promise<UpdateResult> {
+  ): Promise<PriceLog> {
     const newPriceLog = new PriceLog();
     newPriceLog.item_id = itemId;
     newPriceLog.price = price;
     newPriceLog.created_by = userId;
-    const result = await this.priceLogRepository.insert(newPriceLog);
+    const result = await this.priceLogRepository.save(newPriceLog);
     if (!result)
       throw new HttpException(
         'The price log cannot create',

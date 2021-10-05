@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { InsertResult, Raw, Repository, UpdateResult } from 'typeorm';
+import { Raw, Repository } from 'typeorm';
 import { SaleItem } from './sale_item.entity';
 
 @Injectable()
@@ -28,12 +28,12 @@ export class SaleItemService {
     saleId: number,
     itemId: number,
     amount: number
-  ): Promise<InsertResult> {
+  ): Promise<SaleItem> {
     const newSaleItem = new SaleItem();
     newSaleItem.sale = saleId;
     newSaleItem.item = itemId;
     newSaleItem.amount = amount;
-    const result = await this.saleItemRepository.insert(newSaleItem);
+    const result = await this.saleItemRepository.save(newSaleItem);
     if (!result)
       throw new HttpException(
         'The sale item cannot create',
@@ -59,7 +59,7 @@ export class SaleItemService {
     saleId: number,
     itemId: number,
     amount: number
-  ): Promise<UpdateResult> {
+  ): Promise<SaleItem> {
     const saleItem = await this.saleItemRepository.findOne({
       where: {
         sale: saleId,
@@ -68,11 +68,8 @@ export class SaleItemService {
     });
 
     if (!saleItem.amount) return null;
-
-    const newAmount = saleItem.amount - amount;
-    const result = await this.saleItemRepository.update(saleItem.id, {
-      amount: newAmount
-    });
+    saleItem.amount -= amount;
+    const result = await this.saleItemRepository.save(saleItem);
     if (!result)
       throw new HttpException(
         'The sale item cannot update',

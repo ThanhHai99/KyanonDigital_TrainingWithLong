@@ -1,13 +1,12 @@
 import { Item } from '@module/item/item.entity';
 import { ItemService } from '@module/item/item.service';
 import { ItemOrder } from '@module/item_order/item_order.entity';
-import { SaleItem } from '@module/sale_item/sale_item.entity';
 import { SaleItemService } from '@module/sale_item/sale_item.service';
 import { SaleLogService } from '@module/sale_log/sale_log.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isArraysSameLength } from '@shared/utils/array';
-import { InsertResult, Raw, Repository, UpdateResult } from 'typeorm';
+import { Raw, Repository } from 'typeorm';
 import { Sale } from './sale.entity';
 
 @Injectable()
@@ -64,7 +63,7 @@ export class SaleService {
     userId: number,
     itemId: Array<number>,
     amount: Array<number>
-  ): Promise<InsertResult> {
+  ): Promise<Sale> {
     // Check sale code exists
     const isSaleExists = await this.findByCode(code);
     if (isSaleExists)
@@ -86,7 +85,7 @@ export class SaleService {
     newSale.applied = applied;
     newSale.code = code;
     newSale.user = userId;
-    const result = await this.saleRepository.insert(newSale);
+    const result = await this.saleRepository.save(newSale);
     if (!result)
       throw new HttpException(
         'The sale cannot create',
@@ -95,17 +94,13 @@ export class SaleService {
 
     // Create item of sale
     for (let i = 0; i < itemId.length; i++) {
-      await this.saleItemService.create(
-        result.raw.insertId,
-        itemId[i],
-        amount[i]
-      );
+      await this.saleItemService.create(result.id, itemId[i], amount[i]);
     }
 
     // Create a sale log
     await this.saleLogService.create(
       name,
-      result.raw.insertId,
+      result.id,
       itemId.toString(),
       startDate,
       endDate,
@@ -128,7 +123,7 @@ export class SaleService {
     applied: boolean,
     code: string,
     userId: number
-  ): Promise<UpdateResult> {
+  ): Promise<Sale> {
     const sale = await this.saleRepository.findOne(id);
     if (!sale)
       throw new HttpException('Sale is not found', HttpStatus.NOT_FOUND);
@@ -150,7 +145,7 @@ export class SaleService {
     sale.applied = applied || sale.applied;
     sale.code = code || sale.code;
     sale.user = userId;
-    const result = await this.saleRepository.update(id, sale);
+    const result = await this.saleRepository.save(sale);
 
     // Create a sale log
     const t = await this.saleItemService.findItemAndAmountBySaleId(id);

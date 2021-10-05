@@ -9,7 +9,7 @@ import { WarehouseService } from '@module/warehouse/warehouse.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isArraysSameLength } from '@shared/utils/array';
-import { InsertResult, Repository, UpdateResult } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Order } from './order.entity';
 
 @Injectable()
@@ -52,13 +52,13 @@ export class OrderService {
     item: Array<number>,
     amount: Array<number>,
     userId: number
-  ): Promise<InsertResult> {
+  ): Promise<Order> {
     // Create order
     const newOrder = new Order();
     newOrder.payment_method = paymentMethod;
     newOrder.delivery_address = deliveryAddress;
     newOrder.created_by = userId;
-    const result = await this.orderRepository.insert(newOrder);
+    const result = await this.orderRepository.save(newOrder);
     if (!result) {
       throw new HttpException(
         'The order cannot create',
@@ -72,21 +72,13 @@ export class OrderService {
 
     // Create a item of order
     for (let i = 0; i < item.length; i++) {
-      await this.itemOrderService.create(
-        item[i],
-        amount[i],
-        result.raw.insertId
-      );
+      await this.itemOrderService.create(item[i], amount[i], result.id);
     }
 
     return result;
   }
 
-  async update(
-    id: number,
-    saleCode: string,
-    userId: number
-  ): Promise<UpdateResult> {
+  async update(id: number, saleCode: string, userId: number): Promise<Order> {
     // Check exists order
     const order = await this.orderRepository.findOne({ where: { id: id } });
     if (!order)
@@ -122,7 +114,7 @@ export class OrderService {
     const isEmployee = await this.userService.isEmployee(userId);
     if (isEmployee) {
       costOrder -= (costOrder * 20) / 100;
-      console.log('Discounted by sale employee: ' + costOrder);
+      console.log('Discounted by employee: ' + costOrder);
     }
 
     // Create a invoice
@@ -135,7 +127,7 @@ export class OrderService {
       id
     );
 
-    const result = await this.orderRepository.update(id, order); //khong can
+    const result = await this.orderRepository.save(order); //khong can
     if (!result)
       throw new HttpException(
         'The order cannot update',
@@ -158,8 +150,13 @@ export class OrderService {
     return total;
   }
 
-  async delete(id: number): Promise<UpdateResult> {
-    const result = await this.orderRepository.update(id, { paid: true });
+  async delete(id: number): Promise<Order> {
+    // Check exists order
+    const order = await this.orderRepository.findOne({ where: { id: id } });
+    if (!order)
+      throw new HttpException('The order not found', HttpStatus.NOT_FOUND);
+    order.paid = true;
+    const result = await this.orderRepository.save(order);
     if (!result) {
       throw new HttpException(
         'The order cannot update',

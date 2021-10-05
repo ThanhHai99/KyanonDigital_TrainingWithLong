@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { InsertResult } from 'typeorm';
 import { UserService } from '@module/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@module/user/user.entity';
@@ -17,7 +16,7 @@ export class AuthService {
     name: string,
     phone: string,
     address: string
-  ): Promise<InsertResult> {
+  ): Promise<User> {
     const result = await this.userService.create(
       username,
       password,

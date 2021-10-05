@@ -2,7 +2,7 @@ import { RoleIds } from '@constant/role/role.constant';
 import { RoleService } from '@module/role/role.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { InsertResult, Repository, UpdateResult } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from './user.entity';
 
 @Injectable()
@@ -38,7 +38,7 @@ export class UserService {
     name: string,
     phone: string,
     address: string
-  ): Promise<InsertResult> {
+  ): Promise<User> {
     // Check username exists
     const isUserExists = await this.findOne(username);
     if (isUserExists)
@@ -54,7 +54,7 @@ export class UserService {
     newUser.name = name;
     newUser.phone = phone;
     newUser.address = address;
-    const result = await this.userRepository.insert(newUser);
+    const result = await this.userRepository.save(newUser);
     if (!result) {
       throw new HttpException(
         'The account cannot create',
@@ -73,7 +73,7 @@ export class UserService {
     address: string,
     isLocked: boolean,
     roleId: number
-  ): Promise<InsertResult> {
+  ): Promise<User> {
     // Check user name exists
     const isUserExists = await this.findOne(username);
     if (isUserExists)
@@ -96,7 +96,7 @@ export class UserService {
     newUser.address = address;
     newUser.role = roleId;
     newUser.is_locked = isLocked || false;
-    const result = await this.userRepository.insert(newUser);
+    const result = await this.userRepository.save(newUser);
     if (!result) {
       throw new HttpException(
         'The account cannot create',
@@ -121,7 +121,7 @@ export class UserService {
     address: string,
     isLocked: boolean,
     roleId: number
-  ): Promise<UpdateResult> {
+  ): Promise<User> {
     // Check user exists
     const user = await this.userRepository.findOne(id);
     if (!user)
@@ -141,8 +141,8 @@ export class UserService {
     user.address = address || user.address;
     user.is_locked = isLocked || user.is_locked;
     user.role = roleId || user.role;
-    const result = await this.userRepository.update(id, user);
-    if (!result.affected) {
+    const result = await this.userRepository.save(user);
+    if (!result) {
       throw new HttpException(
         'The account cannot update',
         HttpStatus.INTERNAL_SERVER_ERROR

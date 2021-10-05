@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { InsertResult, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { SaleLog } from './sale_log.entity';
 
 @Injectable()
@@ -29,7 +29,7 @@ export class SaleLogService {
     applied: boolean,
     code: string,
     userId: number
-  ): Promise<InsertResult> {
+  ): Promise<SaleLog> {
     const newSaleLog = new SaleLog();
     newSaleLog.name = name;
     newSaleLog.sale = saleId;
@@ -41,7 +41,7 @@ export class SaleLogService {
     newSaleLog.applied = applied;
     newSaleLog.code = code;
     newSaleLog.created_by = userId;
-    const result = await this.saleLogRepository.insert(newSaleLog);
+    const result = await this.saleLogRepository.save(newSaleLog);
     if (!result)
       throw new HttpException(
         'The sale log cannot create',
