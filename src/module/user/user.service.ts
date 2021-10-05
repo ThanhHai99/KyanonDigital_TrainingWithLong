@@ -1,4 +1,5 @@
 import { RoleIds } from '@constant/role/role.constant';
+import { Role } from '@module/role/role.entity';
 import { RoleService } from '@module/role/role.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,8 +15,19 @@ export class UserService {
     private readonly userRepository: Repository<User>
   ) {}
 
-  async findOne(username: string): Promise<User | undefined> {
+  async findAndSelectRole(username: string): Promise<User> {
+    return await this.userRepository.findOne({
+      where: { username: username },
+      relations: ['role']
+    });
+  }
+
+  async findByUsername(username: string): Promise<User> {
     return await this.userRepository.findOne({ where: { username: username } });
+  }
+
+  async findById(id: number): Promise<User> {
+    return await this.userRepository.findOne(id);
   }
 
   async getAll(filter: any = {}): Promise<any> {
@@ -40,7 +52,7 @@ export class UserService {
     address: string
   ): Promise<User> {
     // Check username exists
-    const isUserExists = await this.findOne(username);
+    const isUserExists = await this.findByUsername(username);
     if (isUserExists)
       throw new HttpException(
         'The account already in use',
@@ -75,7 +87,7 @@ export class UserService {
     roleId: number
   ): Promise<User> {
     // Check user name exists
-    const isUserExists = await this.findOne(username);
+    const isUserExists = await this.findByUsername(username);
     if (isUserExists)
       throw new HttpException(
         'The account already in use',
@@ -108,8 +120,11 @@ export class UserService {
 
   async isEmployee(userId: number): Promise<boolean> {
     const user = await this.userRepository.findOne(userId);
-    const { role_id } = user;
-    if (RoleIds.includes(role_id)) return true;
+    const { role } = user;
+    const _role = <Role>role;
+    const { id: roleId } = _role;
+
+    if (RoleIds.includes(roleId)) return true;
     return false;
   }
 

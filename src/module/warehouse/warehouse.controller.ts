@@ -17,14 +17,18 @@ import {
 import { BodyImporting } from './warehouse.dto';
 import { WarehouseService } from './warehouse.service';
 import { JwtAuthGuard } from '@module/auth/guard/jwt.guard';
+import { Roles } from 'decorator/role/role.decorator';
+import { EnumRole as Role } from '@constant/role/role.constant';
+import { RolesGuard } from '@module/role/guards/role.guard';
 
 @ApiTags('warehouse')
 @Controller('warehouse')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class WarehouseController {
   constructor(private readonly warehouseService: WarehouseService) {}
 
   @ApiOkResponse({ description: 'Get all item in warehouse' })
+  @Roles(Role.super_admin)
   @Get()
   async getAll(@Res() res): Promise<any> {
     return res.status(HttpStatus.OK).json({
@@ -34,6 +38,7 @@ export class WarehouseController {
   }
 
   // @ApiOkResponse({ description: "Get a warehouse by warehouse's id" })
+  // @Roles(Role.super_admin)
   // @Get(':id')
   // async getById(
   //   @Res() res,
@@ -46,6 +51,7 @@ export class WarehouseController {
   // }
 
   @ApiOkResponse({ description: 'Get all item inventory' })
+  @Roles(Role.super_admin)
   @Get('inventory')
   async getInventory(@Res() res): Promise<any> {
     return res.status(HttpStatus.OK).json({
@@ -59,6 +65,7 @@ export class WarehouseController {
     description: 'The record has been successfully created.'
   })
   @ApiBody({ type: BodyImporting })
+  @Roles(Role.super_admin)
   @Post('importing')
   async importing(
     @Body() body: BodyImporting,

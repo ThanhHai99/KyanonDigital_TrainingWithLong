@@ -21,17 +21,21 @@ import {
 import { CategoryService } from './category.service';
 import { BodyCreateCategory, BodyUpdateCategory } from './category.dto';
 import { JwtAuthGuard } from '@module/auth/guard/jwt.guard';
+import { RolesGuard } from '@module/role/guards/role.guard';
+import { Roles } from 'decorator/role/role.decorator';
+import { EnumRole as Role } from '@constant/role/role.constant';
 
 @ApiTags('category')
 @Controller('category')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth('JWT-auth')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @ApiOkResponse({ description: 'Get all categories' })
+  @Roles(Role.super_admin)
   @Get()
-  async getAll(@Res() res, @Query() query): Promise<any> {
+  async getAll(@Req() req, @Res() res, @Query() query): Promise<any> {
     const { name } = query;
     return res.status(HttpStatus.OK).json({
       errors: 0,
@@ -40,6 +44,7 @@ export class CategoryController {
   }
 
   @ApiOkResponse({ description: 'Get a category by id' })
+  @Roles(Role.super_admin)
   @Get(':id')
   async getById(@Res() res, @Param('id') id: number): Promise<any> {
     return res.status(HttpStatus.OK).json({
@@ -54,6 +59,7 @@ export class CategoryController {
   })
   @ApiBody({ type: BodyCreateCategory })
   @Post()
+  @Roles(Role.super_admin)
   async create(
     @Body() body: BodyCreateCategory,
     @Res() res,
@@ -72,6 +78,7 @@ export class CategoryController {
   })
   @ApiOkResponse({ description: 'Update a category' })
   @ApiBody({ type: BodyUpdateCategory })
+  @Roles(Role.super_admin)
   @Patch(':id')
   async update(
     @Body() body: BodyUpdateCategory,

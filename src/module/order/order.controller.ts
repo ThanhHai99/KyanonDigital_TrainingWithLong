@@ -22,14 +22,18 @@ import { BodyCreateOrder } from './order.dto';
 import { Order } from './order.entity';
 import { OrderService } from './order.service';
 import { JwtAuthGuard } from '@module/auth/guard/jwt.guard';
+import { RolesGuard } from '@module/role/guards/role.guard';
+import { Roles } from 'decorator/role/role.decorator';
+import { EnumRole as Role } from '@constant/role/role.constant';
 
 @ApiTags('order')
 @Controller('order')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @ApiOkResponse({ description: 'Get all orders' })
+  @Roles(Role.super_admin)
   @Get()
   async getAll(@Res() res): Promise<any> {
     return res.status(HttpStatus.OK).json({
@@ -39,6 +43,7 @@ export class OrderController {
   }
 
   @ApiOkResponse({ description: 'Get a order by id' })
+  @Roles(Role.super_admin)
   @Get(':id')
   async getById(@Res() res, @Param('id') id: number): Promise<any> {
     return res.status(HttpStatus.OK).json({
@@ -97,6 +102,7 @@ export class OrderController {
   }
 
   @ApiOkResponse({ description: 'Pay a order' })
+  @Roles(Role.super_admin)
   @Delete(':id')
   async delete(@Res() res, @Param('id') id: number): Promise<any> {
     await this.orderService.delete(id);

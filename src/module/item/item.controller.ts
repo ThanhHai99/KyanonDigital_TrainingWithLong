@@ -21,14 +21,18 @@ import { BodyCreateItem, BodyUpdateItem } from './item.dto';
 import { Item } from './item.entity';
 import { ItemService } from './item.service';
 import { JwtAuthGuard } from '@module/auth/guard/jwt.guard';
+import { Roles } from 'decorator/role/role.decorator';
+import { EnumRole as Role } from '@constant/role/role.constant';
+import { RolesGuard } from '@module/role/guards/role.guard';
 
 @ApiTags('item')
 @Controller('item')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class ItemController {
   constructor(private readonly itemService: ItemService) {}
 
   @ApiOkResponse({ description: 'Get all items' })
+  @Roles(Role.super_admin)
   @Get()
   async getAll(@Res() res, @Query() query): Promise<any> {
     return res.status(HttpStatus.OK).json({
@@ -38,6 +42,7 @@ export class ItemController {
   }
 
   @ApiOkResponse({ description: 'Get a item by id' })
+  @Roles(Role.super_admin)
   @Get(':id')
   async getById(@Res() res, @Param('id') id: number): Promise<any> {
     return res.status(HttpStatus.OK).json({
@@ -51,6 +56,7 @@ export class ItemController {
     description: 'The record has been successfully created.'
   })
   @ApiBody({ type: BodyCreateItem })
+  @Roles(Role.super_admin)
   @Post()
   @ApiCreatedResponse({
     description: '0',
@@ -82,6 +88,7 @@ export class ItemController {
     description: 'The record has been successfully updated.'
   })
   @ApiBody({ type: BodyUpdateItem })
+  @Roles(Role.super_admin)
   @Patch(':id')
   async update(
     @Body() body: BodyUpdateItem,

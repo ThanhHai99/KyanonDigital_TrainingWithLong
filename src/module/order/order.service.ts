@@ -118,7 +118,7 @@ export class OrderService {
     }
 
     // Create a invoice
-    const user = await this.userService.getById(userId);
+    const user = await this.userService.findById(userId);
     await this.invoiceService.create(
       user.name,
       user.phone,

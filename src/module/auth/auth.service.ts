@@ -28,7 +28,7 @@ export class AuthService {
   }
 
   async validateUser(username: string, password: string): Promise<any> {
-    const user = await this.userService.findOne(username);
+    const user = await this.userService.findByUsername(username);
     if (user && user.isPasswordValid(password)) {
       const { password, ...result } = user;
       return result;
@@ -37,7 +37,7 @@ export class AuthService {
   }
 
   async login(user: any): Promise<any> {
-    const _user: User = await this.userService.findOne(user.username);
+    const _user: User = await this.userService.findByUsername(user.username);
     const payload = {
       username: _user.username,
       id: _user.id

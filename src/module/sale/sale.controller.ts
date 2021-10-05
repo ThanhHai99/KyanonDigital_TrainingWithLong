@@ -19,14 +19,18 @@ import {
 import { BodyCreateSale, BodyUpdateSale } from './sale.dto';
 import { SaleService } from './sale.service';
 import { JwtAuthGuard } from '@module/auth/guard/jwt.guard';
+import { RolesGuard } from '@module/role/guards/role.guard';
+import { Roles } from 'decorator/role/role.decorator';
+import { EnumRole as Role } from '@constant/role/role.constant';
 
 @ApiTags('sale')
 @Controller('sale')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class SaleController {
   constructor(private readonly saleService: SaleService) {}
 
   @ApiOkResponse({ description: 'Get all sales' })
+  @Roles(Role.super_admin)
   @Get()
   async getAll(@Res() res): Promise<any> {
     return res.status(HttpStatus.OK).json({
@@ -36,6 +40,7 @@ export class SaleController {
   }
 
   @ApiOkResponse({ description: 'Get a sale by id' })
+  @Roles(Role.super_admin)
   @Get(':id')
   async getById(@Res() res, @Param('id') id: number): Promise<any> {
     return res.status(HttpStatus.OK).json({
@@ -89,6 +94,7 @@ export class SaleController {
     description: 'The record has been successfully updated.'
   })
   @ApiBody({ type: BodyUpdateSale })
+  @Roles(Role.super_admin)
   @Patch(':id')
   async update(
     @Body() body: BodyUpdateSale,

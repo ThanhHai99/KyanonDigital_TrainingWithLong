@@ -20,14 +20,18 @@ import {
 } from '@nestjs/swagger';
 import { BodyCreateUser, BodyUpdateUser } from './user.dto';
 import { JwtAuthGuard } from '@module/auth/guard/jwt.guard';
+import { RolesGuard } from '@module/role/guards/role.guard';
+import { Roles } from 'decorator/role/role.decorator';
+import { EnumRole as Role } from '@constant/role/role.constant';
 
 @ApiTags('user')
 @Controller('user')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class UserController {
   constructor(private userService: UserService) {}
 
   @ApiOkResponse({ description: 'Get all users' })
+  @Roles(Role.super_admin)
   @Get()
   async getAll(@Res() res, @Query() query): Promise<any> {
     return res.status(HttpStatus.OK).json({
@@ -37,6 +41,7 @@ export class UserController {
   }
 
   @ApiOkResponse({ description: 'Get user by id' })
+  @Roles(Role.super_admin)
   @Get(':id')
   async getById(@Res() res, @Param('id') id: number): Promise<any> {
     return res.status(HttpStatus.OK).json({
@@ -50,11 +55,12 @@ export class UserController {
     description: 'The record has been successfully created.'
   })
   @ApiBody({ type: BodyCreateUser })
-  @Post()
   @ApiCreatedResponse({
     description: '0',
     type: User
   })
+  @Roles(Role.super_admin)
+  @Post()
   async create(@Body() body: BodyCreateUser, @Res() res): Promise<any> {
     const { username, password, name, phone, address, is_locked, role_id } =
       body;
@@ -78,6 +84,7 @@ export class UserController {
     description: 'The record has been successfully updated.'
   })
   @ApiBody({ type: BodyUpdateUser })
+  @Roles(Role.super_admin)
   @Patch(':id')
   async update(
     @Body() body: BodyUpdateUser,
