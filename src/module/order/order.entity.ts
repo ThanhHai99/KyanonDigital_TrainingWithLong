@@ -50,8 +50,8 @@ export class Order extends BaseEntity {
   @JoinColumn({ name: 'created_by' })
   user: User;
 
-  @OneToMany((type) => ItemOrder, (itemorder) => itemorder.order)
-  itemorders: ItemOrder[];
+  @OneToMany((type) => ItemOrder, (item_order) => item_order.order)
+  item_orders: ItemOrder[];
 
   @OneToMany((type) => Invoice, (invoice) => invoice.order)
   invoices: Invoice[];

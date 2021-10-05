@@ -16,7 +16,7 @@ export class Invoice extends BaseEntity {
 
   @ManyToOne((type) => Order, (order) => order.invoices)
   @JoinColumn({ name: 'order_id' })
-  order: Order;
+  order: Order | number;
 
   @Column()
   name: string;

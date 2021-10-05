@@ -22,7 +22,7 @@ export class WarehouseLogService {
     status: string,
     price: number,
     warehouseId: number,
-    itemId: any,
+    itemId: number,
     amount: number,
     expirationDate: Date,
     userId: number

@@ -1,11 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  InsertResult,
-  Raw,
-  Repository,
-  UpdateResult
-} from 'typeorm';
+import { InsertResult, Raw, Repository, UpdateResult } from 'typeorm';
 import { SaleItem } from './sale_item.entity';
 
 @Injectable()
@@ -15,12 +10,18 @@ export class SaleItemService {
     private saleItemRepository: Repository<SaleItem>
   ) {}
 
-  async getAll(): Promise<SaleItem[]> {
-    return await this.saleItemRepository.find();
-  }
-
-  async getById(id: number): Promise<SaleItem> {
-    return await this.saleItemRepository.findOne(id);
+  async findItemAndAmountBySaleId(saleId: number): Promise<any> {
+    return await this.saleItemRepository.find({
+      where: {
+        sale: saleId
+      },
+      join: {
+        alias: 'sale_item',
+        leftJoinAndSelect: {
+          item: 'sale_item.item'
+        }
+      }
+    });
   }
 
   async create(
@@ -38,6 +39,7 @@ export class SaleItemService {
         'The sale item cannot create',
         HttpStatus.BAD_REQUEST
       );
+
     return result;
   }
 
@@ -45,7 +47,7 @@ export class SaleItemService {
     const saleItem = await this.saleItemRepository.findOne({
       where: {
         sale: saleId,
-        item_id: itemId,
+        item: itemId,
         amount: Raw((alias) => `${alias} IS NULL OR ${alias} > 0`)
       }
     });
@@ -61,7 +63,7 @@ export class SaleItemService {
     const saleItem = await this.saleItemRepository.findOne({
       where: {
         sale: saleId,
-        item_id: itemId
+        item: itemId
       }
     });
 

@@ -7,11 +7,11 @@ export class ItemOrder extends BaseEntity {
   @Column({ primary: true, generated: true })
   id: number;
 
-  @ManyToOne((type) => Item, (item) => item.itemorders)
+  @ManyToOne((type) => Item, (item) => item.item_orders)
   @JoinColumn({ name: 'item_id' })
   item: Item | number;
 
-  @ManyToOne((type) => Order, (order) => order.itemorders)
+  @ManyToOne((type) => Order, (order) => order.item_orders)
   @JoinColumn({ name: 'order_id' })
   order: Order;
 

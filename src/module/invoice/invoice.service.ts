@@ -22,9 +22,11 @@ export class InvoiceService {
     name: string,
     phone: string,
     cost: number,
-    userId: number
+    userId: number,
+    orderId: number
   ): Promise<InsertResult> {
     const newInvoice = new Invoice();
+    newInvoice.order = orderId;
     newInvoice.name = name;
     newInvoice.phone = phone;
     newInvoice.cost = cost;

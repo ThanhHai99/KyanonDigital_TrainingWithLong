@@ -17,7 +17,7 @@ export class Sale extends BaseEntity {
   @Column({ primary: true, generated: true })
   id: number;
 
-  @Column({ unique: true })
+  @Column()
   name: string;
 
   @Column({
@@ -56,7 +56,7 @@ export class Sale extends BaseEntity {
   updated_at: Date;
 
   @OneToMany((type) => SaleItem, (si) => si.sale)
-  sale_item: Sale[];
+  sale_items: Sale[];
 
   @OneToMany((type) => SaleLog, (log) => log.sale)
   sale_logs: SaleLog[];

@@ -19,6 +19,8 @@ export class BodyCreateSale {
   @ApiProperty({ description: 'Item list sale', type: Array })
   @IsArray()
   @ArrayMinSize(1)
+  @IsInt({ each: true })
+  @Min(1, { each: true })
   item_id: Array<number>;
 
   @ApiProperty({ description: 'Amount of item is reduced', type: Array })

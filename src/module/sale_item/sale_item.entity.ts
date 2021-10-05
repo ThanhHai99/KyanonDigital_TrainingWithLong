@@ -18,11 +18,8 @@ export class SaleItem extends BaseEntity {
   @ManyToOne((type) => Item, (item) => item.sale_items)
   @JoinColumn({ name: 'item_id' })
   item: Item | number;
-  
-  // @Column()
-  // item_id: number;
 
-  @ManyToOne((type) => Sale, (si) => si.sale_item)
+  @ManyToOne((type) => Sale, (si) => si.sale_items)
   @JoinColumn({ name: 'sale_id' })
   sale: Sale | number;
 

@@ -6,6 +6,7 @@ import { ItemOrder } from '@module/item_order/item_order.entity';
 import { WarehouseLogService } from '@module/warehouse_log/warehouse_log.service';
 import { ItemService } from '@module/item/item.service';
 import { isArraysSameLength } from '@shared/utils/array';
+import { Item } from '@module/item/item.entity';
 
 @Injectable()
 export class WarehouseService {
@@ -45,7 +46,7 @@ export class WarehouseService {
   async getInventory(): Promise<Warehouse[]> {
     return await this.warehouseRepository.find({
       expiration_date: Raw(
-        (alias) => `${alias} < DATE_SUB(DATE(NOW()), INTERVAL 1 MONTH)`
+        (alias) => `${alias} < DATE_ADD(DATE(NOW()), INTERVAL 1 MONTH)`
       )
     });
   }
@@ -57,7 +58,11 @@ export class WarehouseService {
     price: Array<number>,
     userId: number
   ): Promise<any> {
-    if (!isArraysSameLength(itemId, amount, expirationDate, price))
+    // Check data is valid
+    if (
+      itemId.length < 0 ||
+      !isArraysSameLength(itemId, amount, expirationDate, price)
+    )
       throw new HttpException('The data is invalid', HttpStatus.CONFLICT);
 
     for (let i = 0; i < itemId.length; i++) {
@@ -95,11 +100,14 @@ export class WarehouseService {
     const itemOrderManager = getManager();
     for (let i = 0; i < itemInOrder.length; i++) {
       const { item, amount } = itemInOrder[i];
+      let _item: Item = <Item>item;
+      const { id: itemId } = _item;
+
       const currentQuantityOfItem = await itemOrderManager.query(`
         SELECT SUM(amount) as sumAmount
         FROM warehouse
-        WHERE item_id = ${item}
-        AND expiration_date > DATE_SUB(DATE(NOW()), INTERVAL 1 MONTH)
+        WHERE item_id = ${itemId}
+        AND expiration_date > DATE_ADD(DATE(NOW()), INTERVAL 1 MONTH)
       `);
 
       if (currentQuantityOfItem[0].sumAmount < amount)
@@ -110,20 +118,23 @@ export class WarehouseService {
 
   async exportProduct(itemInOrder: ItemOrder[], userId: number): Promise<any> {
     for (let i = 0; i < itemInOrder.length; i++) {
-      const { item: itemId, amount } = itemInOrder[i];
+      const { item, amount } = itemInOrder[i];
+      let _item: Item = <Item>item;
+      const { id: itemId } = _item;
       let _amount = amount;
-      const warehouse = await this.warehouseRepository.find({
+
+      let warehouse = await this.warehouseRepository.find({
         where: {
-          item_id: itemId,
+          item: itemId,
           amount: MoreThan(0),
           expiration_date: Raw(
-            (e) => `${e} > DATE_SUB(DATE(NOW()), INTERVAL 1 MONTH)`
+            (e) => `${e} > DATE_ADD(DATE(NOW()), INTERVAL 1 MONTH)`
           )
         },
-        order: { expiration_date: 'ASC' }
+        order: { expiration_date: 'ASC' },
+        relations: ['item']
       });
 
-      // Update warehouse
       for (let j = 0; j < warehouse.length; j++) {
         let tmpAmount = warehouse[j].amount;
         warehouse[j].amount =
@@ -131,12 +142,12 @@ export class WarehouseService {
         await this.warehouseRepository.update(warehouse[j].id, warehouse[j]);
 
         // Create a warehouse log
-        const item = await this.itemService.findById(<number>warehouse[j].item);
+        const item = await this.itemService.findById(itemId);
         await this.warehouseLogService.create(
           '-',
           item.price,
           warehouse[j].id,
-          warehouse[j].item,
+          item.id,
           _amount,
           warehouse[j].expiration_date,
           userId

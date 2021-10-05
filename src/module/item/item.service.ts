@@ -30,7 +30,7 @@ export class ItemService {
         SELECT item.*, SUM(warehouse.amount) AS remaining
         FROM item
         LEFT JOIN warehouse
-        ON item.id = warehouse.item_id AND expiration_date > DATE_SUB(DATE(NOW()), INTERVAL 1 MONTH)
+        ON item.id = warehouse.item_id AND expiration_date > DATE_ADD(DATE(NOW()), INTERVAL 1 MONTH)
         WHERE item.name LIKE '%${name}%'
         GROUP BY item.name
     `);
@@ -38,7 +38,7 @@ export class ItemService {
         SELECT item.*, SUM(warehouse.amount) AS remaining
         FROM item
         LEFT JOIN warehouse
-        ON item.id = warehouse.item_id AND expiration_date > DATE_SUB(DATE(NOW()), INTERVAL 1 MONTH)
+        ON item.id = warehouse.item_id AND expiration_date > DATE_ADD(DATE(NOW()), INTERVAL 1 MONTH)
         GROUP BY item.name
     `);
   }
@@ -49,7 +49,7 @@ export class ItemService {
         SELECT item.*, SUM(warehouse.amount) AS remaining
         FROM item
         LEFT JOIN warehouse
-        ON item.id = warehouse.item_id AND expiration_date > DATE_SUB(DATE(NOW()), INTERVAL 1 MONTH)
+        ON item.id = warehouse.item_id AND expiration_date > DATE_ADD(DATE(NOW()), INTERVAL 1 MONTH)
         WHERE item.id = ${id}
         GROUP BY item.name
     `);

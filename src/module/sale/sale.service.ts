@@ -1,3 +1,4 @@
+import { Item } from '@module/item/item.entity';
 import { ItemService } from '@module/item/item.service';
 import { ItemOrder } from '@module/item_order/item_order.entity';
 import { SaleItem } from '@module/sale_item/sale_item.entity';
@@ -5,6 +6,7 @@ import { SaleItemService } from '@module/sale_item/sale_item.service';
 import { SaleLogService } from '@module/sale_log/sale_log.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { isArraysSameLength } from '@shared/utils/array';
 import { InsertResult, Raw, Repository, UpdateResult } from 'typeorm';
 import { Sale } from './sale.entity';
 
@@ -16,10 +18,7 @@ export class SaleService {
     private readonly itemService: ItemService,
 
     @InjectRepository(Sale)
-    private saleRepository: Repository<Sale>,
-
-    @InjectRepository(SaleItem)
-    private saleItemRepository: Repository<SaleItem>
+    private saleRepository: Repository<Sale>
   ) {}
 
   async findByCode(code: string): Promise<Sale> {
@@ -67,18 +66,16 @@ export class SaleService {
     amount: Array<number>
   ): Promise<InsertResult> {
     // Check sale code exists
-    const isSaleExists = await this.saleRepository.findOne({
-      where: { code: code }
-    });
+    const isSaleExists = await this.findByCode(code);
     if (isSaleExists)
-      throw new HttpException('The sale already in use', HttpStatus.CONFLICT);
-
-    // Validate item length vs amount length
-    if (itemId.length < 1 && itemId.length !== amount.length)
       throw new HttpException(
-        'Item or amount of item invalid',
+        'The sale code already in use',
         HttpStatus.CONFLICT
       );
+
+    // Validate item length vs amount length
+    if (itemId.length < 1 || !isArraysSameLength(itemId, amount))
+      throw new HttpException('The data is invalid', HttpStatus.CONFLICT);
 
     // Create a sale
     const newSale = new Sale();
@@ -96,7 +93,7 @@ export class SaleService {
         HttpStatus.INTERNAL_SERVER_ERROR
       );
 
-    // Create sale item
+    // Create item of sale
     for (let i = 0; i < itemId.length; i++) {
       await this.saleItemService.create(
         result.raw.insertId,
@@ -132,17 +129,15 @@ export class SaleService {
     code: string,
     userId: number
   ): Promise<UpdateResult> {
-    const sale = await this.saleRepository.findOne({ where: { id: id } });
+    const sale = await this.saleRepository.findOne(id);
     if (!sale)
       throw new HttpException('Sale is not found', HttpStatus.NOT_FOUND);
 
     if (sale.applied)
-      throw new HttpException('Sale is applied', HttpStatus.NO_CONTENT);
+      throw new HttpException('Sale is applied cannot update', HttpStatus.OK);
 
     if (code) {
-      const isCodeExists = await this.saleRepository.findOne({
-        where: { code: code }
-      });
+      const isCodeExists = await this.findByCode(code);
       if (isCodeExists)
         throw new HttpException('The code already in use', HttpStatus.CONFLICT);
     }
@@ -158,24 +153,19 @@ export class SaleService {
     const result = await this.saleRepository.update(id, sale);
 
     // Create a sale log
-    const t: SaleItem[] = await this.saleItemRepository.find({
-      select: ['item', 'amount'],
-      where: {
-        sale: sale.id
-      }
-    });
-    const sale_item: string = t.map((e) => e.item).toString();
+    const t = await this.saleItemService.findItemAndAmountBySaleId(id);
+    const sale_item: string = t.map((e) => e.item.id).toString();
     const amount: string = t.map((e) => e.amount).toString();
     await this.saleLogService.create(
-      name,
+      sale.name,
       id,
       sale_item.toString(),
-      startDate,
-      endDate,
+      sale.start_date,
+      sale.end_date,
       amount.toString(),
-      discount,
-      applied,
-      code,
+      sale.discount,
+      sale.applied,
+      sale.code,
       userId
     );
 
@@ -205,7 +195,9 @@ export class SaleService {
 
     let total = 0;
     for (let i = 0; i < itemInOrder.length; i++) {
-      const { item: itemId, amount } = itemInOrder[i];
+      const { item, amount } = itemInOrder[i];
+      let _item: Item = <Item>item;
+      const { id: itemId } = _item;
       const isItemStillOnSale = await this.saleItemService.isItemStillOnSale(
         sale.id,
         <number>itemId

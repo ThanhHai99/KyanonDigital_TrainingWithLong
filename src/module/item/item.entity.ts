@@ -54,10 +54,10 @@ export class Item extends BaseEntity {
   })
   updated_at: Date;
 
-  @OneToMany((type) => ItemOrder, (itemorder) => itemorder.item)
-  itemorders: ItemOrder[];
+  @OneToMany((type) => ItemOrder, (item_order) => item_order.item)
+  item_orders: ItemOrder[];
 
-  @OneToMany((type) => SaleItem, (saleitem) => saleitem.item)
+  @OneToMany((type) => SaleItem, (sale_item) => sale_item.item)
   sale_items: SaleItem[];
 
   @OneToMany((type) => Warehouse, (warehouse) => warehouse.item)

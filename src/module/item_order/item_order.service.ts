@@ -10,14 +10,6 @@ export class ItemOrderService {
     private itemOrderRepository: Repository<ItemOrder>
   ) {}
 
-  async findByOrderId(orderId: number): Promise<ItemOrder[]> {
-    return await this.itemOrderRepository.find({
-      where: {
-        order: orderId
-      }
-    });
-  }
-
   async getAll(): Promise<ItemOrder[]> {
     return await this.itemOrderRepository.find();
   }

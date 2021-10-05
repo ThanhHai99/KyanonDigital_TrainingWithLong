@@ -35,7 +35,7 @@ export class SaleController {
     });
   }
 
-  @ApiOkResponse({ description: "Get a sale by sale's id" })
+  @ApiOkResponse({ description: 'Get a sale by id' })
   @Get(':id')
   async getById(@Res() res, @Param('id') id: number): Promise<any> {
     return res.status(HttpStatus.OK).json({
