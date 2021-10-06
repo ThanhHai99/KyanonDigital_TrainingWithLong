@@ -15,9 +15,16 @@ export class UserService {
     private readonly userRepository: Repository<User>
   ) {}
 
-  async findAndSelectRole(username: string): Promise<User> {
+  async findByUsernameAndSelectRole(username: string): Promise<User> {
     return await this.userRepository.findOne({
       where: { username: username },
+      relations: ['role']
+    });
+  }
+
+  async findByIdAndSelectRole(id: number): Promise<User> {
+    return await this.userRepository.findOne({
+      where: { id: id },
       relations: ['role']
     });
   }
@@ -119,9 +126,10 @@ export class UserService {
   }
 
   async isEmployee(userId: number): Promise<boolean> {
-    const user = await this.userRepository.findOne(userId);
+    const user = await this.findByIdAndSelectRole(userId);
     const { role } = user;
     const _role = <Role>role;
+    if (!_role) return false;
     const { id: roleId } = _role;
 
     if (RoleIds.includes(roleId)) return true;

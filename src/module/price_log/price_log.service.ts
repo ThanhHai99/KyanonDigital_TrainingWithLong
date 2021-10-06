@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { PriceLog } from './price_log.entity';
 
 @Injectable()
@@ -19,6 +19,7 @@ export class PriceLogService {
   }
 
   async create(
+    transactionEntityManager: EntityManager,
     itemId: number,
     price: number,
     userId: number
@@ -27,7 +28,7 @@ export class PriceLogService {
     newPriceLog.item_id = itemId;
     newPriceLog.price = price;
     newPriceLog.created_by = userId;
-    const result = await this.priceLogRepository.save(newPriceLog);
+    const result = await transactionEntityManager.save(newPriceLog);
     if (!result)
       throw new HttpException(
         'The price log cannot create',

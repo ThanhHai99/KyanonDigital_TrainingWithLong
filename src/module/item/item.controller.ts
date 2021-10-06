@@ -24,6 +24,7 @@ import { JwtAuthGuard } from '@module/auth/guard/jwt.guard';
 import { Roles } from 'decorator/role/role.decorator';
 import { EnumRole as Role } from '@constant/role/role.constant';
 import { RolesGuard } from '@module/role/guards/role.guard';
+import { getConnection } from 'typeorm';
 
 @ApiTags('item')
 @Controller('item')
@@ -67,15 +68,18 @@ export class ItemController {
     @Res() res,
     @Req() req
   ): Promise<any> {
-    const { name, category_id, detail, user_manual, price } = body;
-    await this.itemService.create(
-      name,
-      category_id,
-      detail,
-      user_manual,
-      price,
-      req.user.id
-    );
+    await getConnection().transaction(async (transactionManager) => {
+      const { name, category_id, detail, user_manual, price } = body;
+      await this.itemService.create(
+        transactionManager,
+        name,
+        category_id,
+        detail,
+        user_manual,
+        price,
+        req.user.id
+      );
+    });
 
     return res.status(HttpStatus.CREATED).json({
       error: 0,
@@ -96,16 +100,19 @@ export class ItemController {
     @Req() req,
     @Param('id') id: number
   ): Promise<any> {
-    const { name, category_id, detail, user_manual, price } = body;
-    await this.itemService.update(
-      id,
-      name,
-      category_id,
-      detail,
-      user_manual,
-      price,
-      req.user.id
-    );
+    await getConnection().transaction(async (transactionManager) => {
+      const { name, category_id, detail, user_manual, price } = body;
+      await this.itemService.update(
+        transactionManager,
+        id,
+        name,
+        category_id,
+        detail,
+        user_manual,
+        price,
+        req.user.id
+      );
+    });
     return res.status(HttpStatus.OK).json({
       error: 0,
       data: 'Item is updated'

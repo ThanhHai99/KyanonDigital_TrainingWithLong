@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { getManager, MoreThan, Raw, Repository } from 'typeorm';
+import { EntityManager, getManager, MoreThan, Raw, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Warehouse } from './warehouse.entity';
 import { ItemOrder } from '@module/item_order/item_order.entity';
@@ -20,26 +20,13 @@ export class WarehouseService {
 
   async getAll(): Promise<Warehouse[]> {
     return await this.warehouseRepository.find({
-      join: {
-        alias: 'warehouse',
-        leftJoinAndSelect: {
-          item: 'warehouse.item'
-        }
-      }
+      relations: ['item']
     });
   }
 
   async getById(id: number): Promise<Warehouse> {
-    return await this.warehouseRepository.findOne({
-      where: {
-        id: id
-      },
-      join: {
-        alias: 'warehouse',
-        leftJoinAndSelect: {
-          item: 'warehouse.item'
-        }
-      }
+    return await this.warehouseRepository.findOne(id, {
+      relations: ['item']
     });
   }
 
@@ -52,6 +39,7 @@ export class WarehouseService {
   }
 
   async create(
+    transactionEntityManager: EntityManager,
     itemId: Array<number>,
     amount: Array<number>,
     expirationDate: Array<Date>,
@@ -71,7 +59,7 @@ export class WarehouseService {
       newWarehouse.item = itemId[i];
       newWarehouse.amount = amount[i];
       newWarehouse.expiration_date = expirationDate[i];
-      let result = await this.warehouseRepository.insert(newWarehouse);
+      let result = await transactionEntityManager.save(newWarehouse);
       if (!result) {
         throw new HttpException(
           'The warehouse cannot create',
@@ -81,9 +69,10 @@ export class WarehouseService {
 
       // Create a warehouse log
       await this.warehouseLogService.create(
+        transactionEntityManager,
         '+',
         price[i],
-        result.raw.insertId,
+        result.id,
         itemId[i],
         amount[i],
         expirationDate[i],
@@ -116,7 +105,11 @@ export class WarehouseService {
     return true;
   }
 
-  async exportProduct(itemInOrder: ItemOrder[], userId: number): Promise<any> {
+  async exportProduct(
+    transactionEntityManager: EntityManager,
+    itemInOrder: ItemOrder[],
+    userId: number
+  ): Promise<any> {
     for (let i = 0; i < itemInOrder.length; i++) {
       const { item, amount } = itemInOrder[i];
       let _item: Item = <Item>item;
@@ -139,11 +132,12 @@ export class WarehouseService {
         let tmpAmount = warehouse[j].amount;
         warehouse[j].amount =
           warehouse[j].amount <= _amount ? 0 : warehouse[j].amount - _amount;
-        await this.warehouseRepository.update(warehouse[j].id, warehouse[j]);
+        await transactionEntityManager.save(warehouse[j]);
 
         // Create a warehouse log
         const item = await this.itemService.findById(itemId);
         await this.warehouseLogService.create(
+          transactionEntityManager,
           '-',
           item.price,
           warehouse[j].id,

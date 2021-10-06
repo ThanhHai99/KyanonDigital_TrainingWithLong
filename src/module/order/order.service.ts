@@ -9,7 +9,7 @@ import { WarehouseService } from '@module/warehouse/warehouse.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isArraysSameLength } from '@shared/utils/array';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { Order } from './order.entity';
 
 @Injectable()
@@ -47,6 +47,7 @@ export class OrderService {
   }
 
   async create(
+    transactionEntityManager: EntityManager,
     paymentMethod: number,
     deliveryAddress: string,
     item: Array<number>,
@@ -58,7 +59,7 @@ export class OrderService {
     newOrder.payment_method = paymentMethod;
     newOrder.delivery_address = deliveryAddress;
     newOrder.created_by = userId;
-    const result = await this.orderRepository.save(newOrder);
+    const result = await transactionEntityManager.save(newOrder);
     if (!result) {
       throw new HttpException(
         'The order cannot create',
@@ -72,15 +73,25 @@ export class OrderService {
 
     // Create a item of order
     for (let i = 0; i < item.length; i++) {
-      await this.itemOrderService.create(item[i], amount[i], result.id);
+      await this.itemOrderService.create(
+        transactionEntityManager,
+        item[i],
+        amount[i],
+        result.id
+      );
     }
 
     return result;
   }
 
-  async update(id: number, saleCode: string, userId: number): Promise<Order> {
+  async update(
+    transactionEntityManager: EntityManager,
+    id: number,
+    saleCode: string,
+    userId: number
+  ): Promise<any> {
     // Check exists order
-    const order = await this.orderRepository.findOne({ where: { id: id } });
+    const order = await this.orderRepository.findOne(id);
     if (!order)
       throw new HttpException('The order not found', HttpStatus.NOT_FOUND);
 
@@ -94,7 +105,11 @@ export class OrderService {
     await this.warehouseService.isEnoughQuantityToExport(itemInOrder);
 
     // Exporting
-    await this.warehouseService.exportProduct(itemInOrder, userId);
+    await this.warehouseService.exportProduct(
+      transactionEntityManager,
+      itemInOrder,
+      userId
+    );
 
     //  Sum total order amount
     let costOrder = order.cost;
@@ -105,6 +120,7 @@ export class OrderService {
 
     // Decrease cost by sale code
     costOrder -= await this.saleService.totalDecreaseCostByCode(
+      transactionEntityManager,
       itemInOrder,
       saleCode
     );
@@ -120,6 +136,7 @@ export class OrderService {
     // Create a invoice
     const user = await this.userService.findById(userId);
     await this.invoiceService.create(
+      transactionEntityManager,
       user.name,
       user.phone,
       costOrder,
@@ -127,14 +144,7 @@ export class OrderService {
       id
     );
 
-    const result = await this.orderRepository.save(order); //khong can
-    if (!result)
-      throw new HttpException(
-        'The order cannot update',
-        HttpStatus.BAD_REQUEST
-      );
-
-    return result;
+    return;
   }
 
   async costTotal(itemInOrder: ItemOrder[]): Promise<number> {
@@ -150,13 +160,16 @@ export class OrderService {
     return total;
   }
 
-  async delete(id: number): Promise<Order> {
+  async delete(
+    transactionEntityManager: EntityManager,
+    id: number
+  ): Promise<Order> {
     // Check exists order
     const order = await this.orderRepository.findOne({ where: { id: id } });
     if (!order)
       throw new HttpException('The order not found', HttpStatus.NOT_FOUND);
     order.paid = true;
-    const result = await this.orderRepository.save(order);
+    const result = await transactionEntityManager.save(order);
     if (!result) {
       throw new HttpException(
         'The order cannot update',

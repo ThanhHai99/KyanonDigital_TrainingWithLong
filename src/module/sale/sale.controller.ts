@@ -22,6 +22,7 @@ import { JwtAuthGuard } from '@module/auth/guard/jwt.guard';
 import { RolesGuard } from '@module/role/guards/role.guard';
 import { Roles } from 'decorator/role/role.decorator';
 import { EnumRole as Role } from '@constant/role/role.constant';
+import { getConnection } from 'typeorm';
 
 @ApiTags('sale')
 @Controller('sale')
@@ -60,28 +61,31 @@ export class SaleController {
     @Res() res,
     @Req() req
   ): Promise<any> {
-    const {
-      name,
-      start_date,
-      end_date,
-      discount,
-      applied,
-      code,
-      item_id: sale_item,
-      amount
-    } = body;
+    await getConnection().transaction(async (transactionManager) => {
+      const {
+        name,
+        start_date,
+        end_date,
+        discount,
+        applied,
+        code,
+        item_id: sale_item,
+        amount
+      } = body;
 
-    await this.saleService.create(
-      name,
-      start_date,
-      end_date,
-      discount,
-      applied,
-      code,
-      req.user.id,
-      sale_item,
-      amount
-    );
+      await this.saleService.create(
+        transactionManager,
+        name,
+        start_date,
+        end_date,
+        discount,
+        applied,
+        code,
+        req.user.id,
+        sale_item,
+        amount
+      );
+    });
 
     return res.status(HttpStatus.CREATED).json({
       errors: 0,
@@ -102,17 +106,20 @@ export class SaleController {
     @Req() req,
     @Param('id') id: number
   ): Promise<any> {
-    const { name, start_date, end_date, discount, applied, code } = body;
-    await this.saleService.update(
-      id,
-      name,
-      start_date,
-      end_date,
-      discount,
-      applied,
-      code,
-      req.user.id
-    );
+    await getConnection().transaction(async (transactionManager) => {
+      const { name, start_date, end_date, discount, applied, code } = body;
+      await this.saleService.update(
+        transactionManager,
+        id,
+        name,
+        start_date,
+        end_date,
+        discount,
+        applied,
+        code,
+        req.user.id
+      );
+    });
 
     return res.status(HttpStatus.OK).json({
       errors: 0,

@@ -6,7 +6,7 @@ import { SaleLogService } from '@module/sale_log/sale_log.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isArraysSameLength } from '@shared/utils/array';
-import { Raw, Repository } from 'typeorm';
+import { EntityManager, getManager, Raw, Repository } from 'typeorm';
 import { Sale } from './sale.entity';
 
 @Injectable()
@@ -30,30 +30,18 @@ export class SaleService {
 
   async getAll(): Promise<Sale[]> {
     return this.saleRepository.find({
-      join: {
-        alias: 'sale',
-        leftJoinAndSelect: {
-          sale_item: 'sale.sale_item'
-        }
-      }
+      relations: ['sale_items', 'sale_items.item']
     });
   }
 
   async getById(id: number): Promise<Sale> {
-    return this.saleRepository.findOne({
-      where: {
-        id: id
-      },
-      join: {
-        alias: 'sale',
-        leftJoinAndSelect: {
-          sale_item: 'sale.sale_item'
-        }
-      }
+    return this.saleRepository.findOne(id, {
+      relations: ['sale_items', 'sale_items.item']
     });
   }
 
   async create(
+    transactionEntityManager: EntityManager,
     name: string,
     startDate: Date,
     endDate: Date,
@@ -85,7 +73,7 @@ export class SaleService {
     newSale.applied = applied;
     newSale.code = code;
     newSale.user = userId;
-    const result = await this.saleRepository.save(newSale);
+    const result = await transactionEntityManager.save(newSale);
     if (!result)
       throw new HttpException(
         'The sale cannot create',
@@ -94,11 +82,17 @@ export class SaleService {
 
     // Create item of sale
     for (let i = 0; i < itemId.length; i++) {
-      await this.saleItemService.create(result.id, itemId[i], amount[i]);
+      await this.saleItemService.create(
+        transactionEntityManager,
+        result.id,
+        itemId[i],
+        amount[i]
+      );
     }
 
     // Create a sale log
     await this.saleLogService.create(
+      transactionEntityManager,
       name,
       result.id,
       itemId.toString(),
@@ -115,6 +109,7 @@ export class SaleService {
   }
 
   async update(
+    transactionEntityManager: EntityManager,
     id: number,
     name: string,
     startDate: Date,
@@ -145,13 +140,14 @@ export class SaleService {
     sale.applied = applied || sale.applied;
     sale.code = code || sale.code;
     sale.user = userId;
-    const result = await this.saleRepository.save(sale);
+    const result = await transactionEntityManager.save(sale);
 
     // Create a sale log
     const t = await this.saleItemService.findItemAndAmountBySaleId(id);
     const sale_item: string = t.map((e) => e.item.id).toString();
     const amount: string = t.map((e) => e.amount).toString();
     await this.saleLogService.create(
+      transactionEntityManager,
       sale.name,
       id,
       sale_item.toString(),
@@ -168,19 +164,21 @@ export class SaleService {
   }
 
   async isSaleStillApply(code: string): Promise<boolean> {
-    const sale = await this.saleRepository.findOne({
-      where: {
-        applied: 1,
-        code: code,
-        start_date: Raw((alias) => `${alias} IS NULL OR ${alias} <= NOW()`),
-        end_date: Raw((alias) => `${alias} IS NULL OR ${alias} > NOW()`)
-      }
-    });
-    if (sale) return true;
+    const saleManager = getManager();
+    const sale = await saleManager.query(`
+      SELECT *
+      FROM sale
+      WHERE code = '${code}'
+      AND applied = 1
+      AND(start_date IS NULL OR start_date <= DATE(NOW()))
+      AND(end_date IS NULL OR end_date >= DATE(NOW()))
+    `);
+    if (sale.length) return true;
     return false;
   }
 
   async totalDecreaseCostByCode(
+    transactionEntityManager: EntityManager,
     itemInOrder: ItemOrder[],
     code: string
   ): Promise<number> {
@@ -201,6 +199,7 @@ export class SaleService {
         const item = await this.itemService.findById(<number>itemId);
         total += ((item.price * sale.discount) / 100) * amount;
         await this.saleItemService.updateAmount(
+          transactionEntityManager,
           sale.id,
           <number>itemId,
           amount

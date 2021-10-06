@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryLog } from './category_log.entity';
-import { Like, Repository } from 'typeorm';
+import { EntityManager, Like, Repository, Transaction } from 'typeorm';
 
 @Injectable()
 export class CategoryLogService {
@@ -23,6 +23,7 @@ export class CategoryLogService {
   }
 
   async create(
+    transactionEntityManager: EntityManager,
     categoryId: number,
     name: string,
     userId: number
@@ -31,7 +32,7 @@ export class CategoryLogService {
     newCategoryLog.category = categoryId;
     newCategoryLog.name = name;
     newCategoryLog.created_by = userId;
-    const result = await this.categoryLogRepository.save(newCategoryLog);
+    const result = await transactionEntityManager.save(newCategoryLog);
     if (!result)
       throw new HttpException(
         'The category log cannot create',

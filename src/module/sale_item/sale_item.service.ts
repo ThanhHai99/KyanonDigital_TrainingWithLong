@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Raw, Repository } from 'typeorm';
+import { EntityManager, Raw, Repository } from 'typeorm';
 import { SaleItem } from './sale_item.entity';
 
 @Injectable()
@@ -25,6 +25,7 @@ export class SaleItemService {
   }
 
   async create(
+    transactionEntityManager: EntityManager,
     saleId: number,
     itemId: number,
     amount: number
@@ -33,7 +34,7 @@ export class SaleItemService {
     newSaleItem.sale = saleId;
     newSaleItem.item = itemId;
     newSaleItem.amount = amount;
-    const result = await this.saleItemRepository.save(newSaleItem);
+    const result = await transactionEntityManager.save(newSaleItem);
     if (!result)
       throw new HttpException(
         'The sale item cannot create',
@@ -56,6 +57,7 @@ export class SaleItemService {
   }
 
   async updateAmount(
+    transactionEntityManager: EntityManager,
     saleId: number,
     itemId: number,
     amount: number
@@ -69,7 +71,7 @@ export class SaleItemService {
 
     if (!saleItem.amount) return null;
     saleItem.amount -= amount;
-    const result = await this.saleItemRepository.save(saleItem);
+    const result = await transactionEntityManager.save(saleItem);
     if (!result)
       throw new HttpException(
         'The sale item cannot update',

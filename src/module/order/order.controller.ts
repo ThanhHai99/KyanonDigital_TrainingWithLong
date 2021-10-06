@@ -25,6 +25,7 @@ import { JwtAuthGuard } from '@module/auth/guard/jwt.guard';
 import { RolesGuard } from '@module/role/guards/role.guard';
 import { Roles } from 'decorator/role/role.decorator';
 import { EnumRole as Role } from '@constant/role/role.constant';
+import { getConnection } from 'typeorm';
 
 @ApiTags('order')
 @Controller('order')
@@ -67,14 +68,17 @@ export class OrderController {
     @Res() res,
     @Req() req
   ): Promise<any> {
-    const { payment_method, delivery_address, item, amount } = body;
-    await this.orderService.create(
-      payment_method,
-      delivery_address,
-      item,
-      amount,
-      req.user.id
-    );
+    await getConnection().transaction(async (transactionManager) => {
+      const { payment_method, delivery_address, item, amount } = body;
+      await this.orderService.create(
+        transactionManager,
+        payment_method,
+        delivery_address,
+        item,
+        amount,
+        req.user.id
+      );
+    });
     return res.status(HttpStatus.CREATED).json({
       error: 0,
       data: 'The order is created'
@@ -93,7 +97,14 @@ export class OrderController {
     @Req() req,
     @Param('id') id: number
   ): Promise<any> {
-    await this.orderService.update(id, body.sale_code, req.user.id);
+    await getConnection().transaction(async (transactionManager) => {
+      await this.orderService.update(
+        transactionManager,
+        id,
+        body.sale_code,
+        req.user.id
+      );
+    });
 
     return res.status(HttpStatus.OK).json({
       error: 0,
@@ -105,7 +116,9 @@ export class OrderController {
   @Roles(Role.super_admin)
   @Delete(':id')
   async delete(@Res() res, @Param('id') id: number): Promise<any> {
-    await this.orderService.delete(id);
+    await getConnection().transaction(async (transactionManager) => {
+      await this.orderService.delete(transactionManager, id);
+    });
     return res.status(HttpStatus.OK).json({
       error: 0,
       message: 'This order is paid'

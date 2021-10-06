@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Item } from './item.entity';
-import { getManager, Repository } from 'typeorm';
+import { EntityManager, getManager, Repository } from 'typeorm';
 import { ItemLogService } from '@module/item_log/item_log.service';
 import { PriceLogService } from '@module/price_log/price_log.service';
 
@@ -56,6 +56,7 @@ export class ItemService {
   }
 
   async create(
+    transactionEntityManager: EntityManager,
     name: string,
     categoryId: number,
     detail: string,
@@ -76,7 +77,7 @@ export class ItemService {
     newItem.user_manual = userManual;
     newItem.price = price;
     newItem.user = userId;
-    const result = await this.itemRepository.save(newItem);
+    const result = await transactionEntityManager.save(newItem);
     if (!result) {
       throw new HttpException(
         'The item cannot create',
@@ -86,6 +87,7 @@ export class ItemService {
 
     // Create item log
     await this.itemLogService.create(
+      transactionEntityManager,
       result.id,
       name,
       categoryId,
@@ -95,12 +97,18 @@ export class ItemService {
     );
 
     // Create price log
-    await this.priceLogService.create(result.id, newItem.price, userId);
+    await this.priceLogService.create(
+      transactionEntityManager,
+      result.id,
+      newItem.price,
+      userId
+    );
 
     return result;
   }
 
   async update(
+    transactionEntityManager: EntityManager,
     id: number,
     name: string,
     categoryId: number,
@@ -134,6 +142,7 @@ export class ItemService {
 
     // Create item log
     await this.itemLogService.create(
+      transactionEntityManager,
       item.id,
       item.name,
       item.category,
@@ -143,7 +152,13 @@ export class ItemService {
     );
 
     // Create price log
-    if (price) await this.priceLogService.create(id, item.price, userId);
+    if (price)
+      await this.priceLogService.create(
+        transactionEntityManager,
+        id,
+        item.price,
+        userId
+      );
 
     return result;
   }

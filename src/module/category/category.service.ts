@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './category.entity';
-import { Like, Repository } from 'typeorm';
+import { EntityManager, Like, Repository } from 'typeorm';
 import { CategoryLogService } from '@module/category_log/category_log.service';
 
 @Injectable()
@@ -29,7 +29,11 @@ export class CategoryService {
     return await this.categoryRepository.findOne(id);
   }
 
-  async create(name: string, userId: number): Promise<Category> {
+  async create(
+    transactionEntityManager: EntityManager,
+    name: string,
+    userId: number
+  ): Promise<any> {
     // Check category exists
     const isCategoryExists = await this.findByName(name);
     if (isCategoryExists) {
@@ -43,7 +47,9 @@ export class CategoryService {
     let newCategory = new Category();
     newCategory.name = name;
     newCategory.user = userId;
-    const result = await this.categoryRepository.save(newCategory);
+    // const result = await this.categoryRepository.save(newCategory);
+    const result = await transactionEntityManager.save(newCategory);
+
     if (!result) {
       throw new HttpException(
         'The category cannot create',
@@ -52,12 +58,21 @@ export class CategoryService {
     }
 
     // Create category log
-    await this.categoryLogService.create(result.id, name, userId);
-
+    await this.categoryLogService.create(
+      transactionEntityManager,
+      result.id,
+      name,
+      userId
+    );
     return result;
   }
 
-  async update(id: number, name: string, userId: number): Promise<Category> {
+  async update(
+    transactionEntityManager: EntityManager,
+    id: number,
+    name: string,
+    userId: number
+  ): Promise<Category> {
     // Check category name exists
     const isCategoryExists = await this.findByName(name);
     if (isCategoryExists) {
@@ -68,16 +83,14 @@ export class CategoryService {
     }
 
     // Check category exists
-    const category = await this.categoryRepository.findOne({
-      where: { id: id }
-    });
+    const category = await this.categoryRepository.findOne(id);
     if (!category)
       throw new HttpException('Category is not found', HttpStatus.NOT_FOUND);
 
     // Update category
     category.name = name || category.name;
     category.user = userId;
-    const result = await this.categoryRepository.save(category);
+    const result = await transactionEntityManager.save(category);
     if (!result) {
       throw new HttpException(
         'The category cannot update',
@@ -86,8 +99,12 @@ export class CategoryService {
     }
 
     // Create category log
-    await this.categoryLogService.create(id, category.name, userId);
-
+    await this.categoryLogService.create(
+      transactionEntityManager,
+      id,
+      category.name,
+      userId
+    );
     return result;
   }
 }
