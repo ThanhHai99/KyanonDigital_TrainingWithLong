@@ -38,6 +38,12 @@ export class UserService {
     return await this.userRepository.findOne(id);
   }
 
+  async findByVerifyToken(token: string): Promise<User> {
+    return await this.userRepository.findOne({
+      where: { verify_token: token }
+    });
+  }
+
   async getAll(filter: any = {}): Promise<any> {
     const users: User[] = await this.userRepository.find(filter);
     return users.map((user) => {
@@ -74,7 +80,7 @@ export class UserService {
     newUser.name = name;
     newUser.phone = phone;
     newUser.address = address;
-    newUser.isActive = false;
+    newUser.is_active = false;
     newUser.verify_token = uuidv4();
     const result = await this.userRepository.save(newUser);
     if (!result)
@@ -117,7 +123,7 @@ export class UserService {
     newUser.address = address;
     newUser.role = roleId;
     newUser.is_locked = isLocked || false;
-    newUser.isActive = true;
+    newUser.is_active = true;
     const result = await this.userRepository.save(newUser);
     if (!result) {
       throw new HttpException(
@@ -146,7 +152,8 @@ export class UserService {
     phone: string,
     address: string,
     isLocked: boolean,
-    roleId: number
+    roleId: number,
+    isActive: boolean
   ): Promise<User> {
     // Check user exists
     const user = await this.userRepository.findOne(id);
@@ -167,6 +174,7 @@ export class UserService {
     user.address = address || user.address;
     user.is_locked = isLocked || user.is_locked;
     user.role = roleId || user.role;
+    user.is_active = isActive || user.is_active;
     const result = await this.userRepository.save(user);
     if (!result) {
       throw new HttpException(

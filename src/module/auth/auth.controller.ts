@@ -5,7 +5,9 @@ import {
   UseGuards,
   HttpStatus,
   Res,
-  Req
+  Req,
+  Get,
+  Param
 } from '@nestjs/common';
 import { BodyLogin, BodyRegister } from './auth.dto';
 import {
@@ -51,12 +53,21 @@ export class AuthController {
       name,
       phone,
       address,
-      req.headers.host
+      req.protocol + '://' + req.headers.host
     );
     return res.status(HttpStatus.CREATED).json({
       error: 0,
       message:
         'Sign up successfully, please check your mail to active this account'
+    });
+  }
+
+  @Get('verify/:token')
+  async verify(@Res() res, @Param('token') token: string): Promise<any> {
+    await this.authService.verifyEmail(token);
+    return res.status(HttpStatus.OK).json({
+      errors: 0,
+      message: 'The account is activated'
     });
   }
 }

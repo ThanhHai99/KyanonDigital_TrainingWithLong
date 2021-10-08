@@ -108,4 +108,11 @@ export class BodyUpdateUser {
   @Min(0)
   @IsOptional()
   role_id: number;
+
+  @ApiProperty({
+    description: 'Your account status',
+    type: Boolean
+  })
+  @IsOptional()
+  is_active: boolean;
 }

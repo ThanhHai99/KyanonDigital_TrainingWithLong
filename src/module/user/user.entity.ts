@@ -38,7 +38,7 @@ export class User extends BaseEntity {
   address: string;
 
   @Column({ default: false })
-  isActive: boolean;
+  is_active: boolean;
 
   @Column()
   verify_token: string;

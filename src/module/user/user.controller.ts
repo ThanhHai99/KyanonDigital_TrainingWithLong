@@ -91,7 +91,7 @@ export class UserController {
     @Res() res,
     @Param('id') id: number
   ): Promise<any> {
-    const { password, name, phone, address, is_locked, role_id } = body;
+    const { password, name, phone, address, is_locked, role_id, is_active } = body;
     await this.userService.update(
       id,
       password,
@@ -99,7 +99,8 @@ export class UserController {
       phone,
       address,
       is_locked,
-      role_id
+      role_id,
+      is_active
     );
     return res.status(HttpStatus.OK).json({
       error: 0,

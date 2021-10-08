@@ -22,7 +22,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       throw new HttpException('Account is locked', HttpStatus.UNAUTHORIZED);
     }
 
-    if (!user.isActive) {
+    if (!user.is_active) {
       throw new HttpException(
         'Account is not activated',
         HttpStatus.UNAUTHORIZED
