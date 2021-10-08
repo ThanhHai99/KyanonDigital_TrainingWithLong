@@ -1,10 +1,6 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { Connection } from 'typeorm';
 
-// middleware
-// import { checkJwt } from '@middleware/checkJwt';
-// import { checkRole } from '@middleware/checkRole';
-
 // module
 import { CoreModule } from '@module/core/core.module';
 
@@ -26,44 +22,27 @@ import { ItemOrderModule } from '@module/item_order/item_order.module';
 import { PriceLogModule } from '@module/price_log/price_log.module';
 
 @Module({
-    imports: [
-        // Core
-        CoreModule,
+  imports: [
+    // Core
+    CoreModule,
 
-        // Service
-        RoleModule,
-        UserModule,
-        AuthModule,
-        WarehouseModule,
-        SaleModule,
-        OrderModule,
-        CategoryModule,
-        ItemModule,
-        InvoiceModule,
-        SaleLogModule,
-        SaleItemModule,
-        WarehouseLogModule,
-        CategoryLogModule,
-        ItemLogModule,
-        ItemOrderModule,
-        PriceLogModule
-    ]
+    // Service
+    RoleModule,
+    UserModule,
+    AuthModule,
+    WarehouseModule,
+    SaleModule,
+    OrderModule,
+    CategoryModule,
+    ItemModule,
+    InvoiceModule,
+    SaleLogModule,
+    SaleItemModule,
+    WarehouseLogModule,
+    CategoryLogModule,
+    ItemLogModule,
+    ItemOrderModule,
+    PriceLogModule
+  ]
 })
-export class AppModule implements NestModule {
-    constructor(private connection: Connection) {}
-
-    configure(consumer: MiddlewareConsumer) {
-        // consumer.apply(checkJwt, checkRole([1])).forRoutes('role');
-        // consumer.apply(checkJwt, checkRole([1])).forRoutes('user');
-        // consumer.apply(checkJwt, checkRole([1])).forRoutes('category');
-        // consumer.apply(checkJwt, checkRole([1])).forRoutes('category_log');
-        // consumer.apply(checkJwt, checkRole([1, 2])).forRoutes('warehouse');
-        // consumer.apply(checkJwt, checkRole([1, 3])).forRoutes('sale');
-        // consumer.apply(checkJwt, checkRole([1, 3])).forRoutes('sale_log');
-        // consumer.apply(checkJwt).forRoutes('order');
-        // consumer.apply(checkJwt).forRoutes('invoice');
-        // consumer.apply(checkJwt, checkRole([1])).forRoutes('item');
-        // consumer.apply(checkJwt, checkRole([1])).forRoutes('item_log');
-        // consumer.apply(checkJwt, checkRole([1, 3])).forRoutes('price_log');
-    }
-}
+export class AppModule {}

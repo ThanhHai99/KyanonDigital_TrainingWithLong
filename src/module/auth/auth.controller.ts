@@ -4,7 +4,8 @@ import {
   Body,
   UseGuards,
   HttpStatus,
-  Res
+  Res,
+  Req
 } from '@nestjs/common';
 import { BodyLogin, BodyRegister } from './auth.dto';
 import {
@@ -38,12 +39,24 @@ export class AuthController {
     type: BodyRegister
   })
   @Post('register')
-  async register(@Body() body: BodyRegister, @Res() res): Promise<any> {
+  async register(
+    @Body() body: BodyRegister,
+    @Res() res,
+    @Req() req
+  ): Promise<any> {
     const { username, password, name, phone, address } = body;
-    await this.authService.create(username, password, name, phone, address);
+    await this.authService.create(
+      username,
+      password,
+      name,
+      phone,
+      address,
+      req.headers.host
+    );
     return res.status(HttpStatus.CREATED).json({
       error: 0,
-      message: 'Sign up successfully'
+      message:
+        'Sign up successfully, please check your mail to active this account'
     });
   }
 }

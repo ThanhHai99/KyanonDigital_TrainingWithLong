@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsEmail,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -14,6 +15,7 @@ export class BodyCreateUser {
     type: String
   })
   @IsNotEmpty()
+  @IsEmail()
   username: string;
 
   @ApiProperty({

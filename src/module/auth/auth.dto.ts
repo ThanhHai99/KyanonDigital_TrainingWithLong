@@ -1,9 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsIn, IsNotEmpty, IsPhoneNumber, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsPhoneNumber, MinLength } from 'class-validator';
 
 export class BodyLogin {
-  @ApiProperty({ description: 'Your account', type: String })
+  @ApiProperty({ description: 'Your email', type: String })
   @IsNotEmpty()
+  @IsEmail()
   username: string;
 
   @ApiProperty({ description: 'Your password', type: String })

@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { UserService } from '@module/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@module/user/user.entity';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly mailerService: MailerService
   ) {}
 
   async create(
@@ -15,7 +17,8 @@ export class AuthService {
     password: string,
     name: string,
     phone: string,
-    address: string
+    address: string,
+    hostname: string
   ): Promise<User> {
     const result = await this.userService.create(
       username,
@@ -24,6 +27,19 @@ export class AuthService {
       phone,
       address
     );
+
+    const url = `${hostname}/auth/verify/${result.verify_token}`;
+    this.mailerService.sendMail({
+      from: '"Support Team" <tranvietthanhhai2@gmail.com>',
+      to: result.username,
+      subject: 'Welcome to Shopping App! Confirm your Email',
+      template: './index', // `.hbs` extension is appended automatically
+      context: {
+        name: result.name,
+        url
+      }
+    });
+
     return result;
   }
 

@@ -17,6 +17,17 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     if (!user || user.is_locked) {
       throw new HttpException('Invalid credential', HttpStatus.UNAUTHORIZED);
     }
+
+    if (user.is_locked) {
+      throw new HttpException('Account is locked', HttpStatus.UNAUTHORIZED);
+    }
+
+    if (!user.isActive) {
+      throw new HttpException(
+        'Account is not activated',
+        HttpStatus.UNAUTHORIZED
+      );
+    }
     return user;
   }
 }

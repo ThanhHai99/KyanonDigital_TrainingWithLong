@@ -37,6 +37,12 @@ export class User extends BaseEntity {
   @Column()
   address: string;
 
+  @Column({ default: false })
+  isActive: boolean;
+
+  @Column()
+  verify_token: string;
+
   @ManyToOne((type) => Role, (role) => role.users)
   @JoinColumn({ name: 'role_id' })
   role: Role | number;

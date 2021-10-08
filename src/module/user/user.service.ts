@@ -5,6 +5,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UserService {
@@ -73,13 +74,14 @@ export class UserService {
     newUser.name = name;
     newUser.phone = phone;
     newUser.address = address;
+    newUser.isActive = false;
+    newUser.verify_token = uuidv4();
     const result = await this.userRepository.save(newUser);
-    if (!result) {
+    if (!result)
       throw new HttpException(
         'The account cannot create',
         HttpStatus.INTERNAL_SERVER_ERROR
       );
-    }
 
     return result;
   }
@@ -115,6 +117,7 @@ export class UserService {
     newUser.address = address;
     newUser.role = roleId;
     newUser.is_locked = isLocked || false;
+    newUser.isActive = true;
     const result = await this.userRepository.save(newUser);
     if (!result) {
       throw new HttpException(

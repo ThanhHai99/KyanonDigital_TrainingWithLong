@@ -1,7 +1,7 @@
 doc/De_bai.pdf
 
 # compiled output
-/.env
+env/.env
 txt.sql
 /dist
 /node_modules
