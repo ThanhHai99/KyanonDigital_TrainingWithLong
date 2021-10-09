@@ -6,8 +6,7 @@ import {
   Entity,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToOne,
-  AfterUpdate
+  ManyToOne
 } from 'typeorm';
 import { CategoryLog } from '@module/category_log/category_log.entity';
 import { Item } from '@module/item/item.entity';

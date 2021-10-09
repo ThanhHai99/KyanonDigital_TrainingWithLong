@@ -70,11 +70,7 @@ export class CategoryController {
     @Req() req
   ): Promise<any> {
     await getConnection().transaction(async (transactionManager) => {
-      await this.categoryService.create(
-        transactionManager,
-        body.name,
-        req.user.id
-      );
+      await this.categoryService.create(transactionManager, body, req.user.id);
     });
 
     return res.status(HttpStatus.CREATED).json({
@@ -101,7 +97,7 @@ export class CategoryController {
       await this.categoryService.update(
         transactionManager,
         id,
-        body.name,
+        body,
         req.user.id
       );
     });
