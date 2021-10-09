@@ -1,7 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryLog } from './category_log.entity';
-import { EntityManager, Like, Repository, Transaction } from 'typeorm';
+import { EntityManager, InsertResult, Like, Repository } from 'typeorm';
+import { BodyCreateCategoryLog } from './category_log.dto';
 
 @Injectable()
 export class CategoryLogService {
@@ -24,16 +25,10 @@ export class CategoryLogService {
 
   async create(
     transactionEntityManager: EntityManager,
-    categoryId: number,
-    name: string,
-    userId: number
-  ): Promise<CategoryLog> {
-    const newCategoryLog = new CategoryLog();
-    newCategoryLog.category = categoryId;
-    newCategoryLog.name = name;
-    newCategoryLog.created_by = userId;
-    const result = await transactionEntityManager.save(newCategoryLog);
-    if (!result)
+    data: BodyCreateCategoryLog
+  ): Promise<InsertResult> {
+    const result = await transactionEntityManager.insert(CategoryLog, data);
+    if (!result.raw.affectedRows)
       throw new HttpException(
         'The category log cannot create',
         HttpStatus.INTERNAL_SERVER_ERROR

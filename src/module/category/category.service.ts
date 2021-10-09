@@ -61,12 +61,11 @@ export class CategoryService {
     }
 
     // Create category log
-    await this.categoryLogService.create(
-      transactionEntityManager,
-      result.raw.insertId,
-      data.name,
-      userId
-    );
+    await this.categoryLogService.create(transactionEntityManager, {
+      name: data.name,
+      created_by: userId,
+      category: result.raw.insertId
+    });
     return result;
   }
 
@@ -104,12 +103,11 @@ export class CategoryService {
       );
 
     // Create category log
-    await this.categoryLogService.create(
-      transactionEntityManager,
-      id,
-      category.name,
-      userId
-    );
+    await this.categoryLogService.create(transactionEntityManager, {
+      name: category.name,
+      created_by: userId,
+      category: id
+    });
     return result;
   }
 }
