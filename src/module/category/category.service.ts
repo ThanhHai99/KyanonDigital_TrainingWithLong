@@ -1,13 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './category.entity';
-import {
-  EntityManager,
-  InsertResult,
-  Like,
-  Repository,
-  UpdateResult
-} from 'typeorm';
+import { EntityManager, Like, Repository } from 'typeorm';
 import { CategoryLogService } from '@module/category_log/category_log.service';
 import { BodyCreateCategory, BodyUpdateCategory } from './category.dto';
 
@@ -38,9 +32,8 @@ export class CategoryService {
 
   async create(
     transactionEntityManager: EntityManager,
-    data: BodyCreateCategory,
-    userId: number
-  ): Promise<InsertResult> {
+    data: BodyCreateCategory
+  ): Promise<any> {
     // Check category exists
     const isCategoryExists = await this.findByName(data.name);
     if (isCategoryExists) {
@@ -51,30 +44,29 @@ export class CategoryService {
     }
 
     // Create category
-    data.user = userId;
-    const result = await transactionEntityManager.insert(Category, data);
-    if (!result.raw.affectedRows) {
-      throw new HttpException(
-        'The category cannot create',
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
-
-    // Create category log
-    await this.categoryLogService.create(transactionEntityManager, {
-      name: data.name,
-      created_by: userId,
-      category: result.raw.insertId
-    });
-    return result;
+    await transactionEntityManager
+      .insert(Category, data)
+      .then(async (resolve) => {
+        // Create category log
+        await this.categoryLogService.create(transactionEntityManager, {
+          name: data.name,
+          created_by: data.user,
+          category: resolve.raw.insertId
+        });
+      })
+      .catch((reject) => {
+        throw new HttpException(
+          'The category cannot create',
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      });
   }
 
   async update(
     transactionEntityManager: EntityManager,
     id: number,
-    data: Partial<BodyUpdateCategory>,
-    userId: number
-  ): Promise<UpdateResult> {
+    data: Partial<BodyUpdateCategory>
+  ): Promise<any> {
     // Check category name exists
     const isCategoryExists = await this.findByName(data.name);
     if (isCategoryExists) {
@@ -90,24 +82,22 @@ export class CategoryService {
       throw new HttpException('Category is not found', HttpStatus.NOT_FOUND);
 
     // Update category
-    data.user = userId;
-    const result = await transactionEntityManager.update(
-      Category,
-      { id: id },
-      data
-    );
-    if (!result.affected)
-      throw new HttpException(
-        'The category cannot update',
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-
-    // Create category log
-    await this.categoryLogService.create(transactionEntityManager, {
-      name: category.name,
-      created_by: userId,
-      category: id
-    });
-    return result;
+    await transactionEntityManager
+      .update(Category, id, data)
+      .then(async (resolve) => {
+        // Create category log
+        const _category = await transactionEntityManager.findOne(Category, id);
+        await this.categoryLogService.create(transactionEntityManager, {
+          name: _category.name,
+          created_by: data.user,
+          category: id
+        });
+      })
+      .catch((reject) => {
+        throw new HttpException(
+          'The category cannot update',
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      });
   }
 }

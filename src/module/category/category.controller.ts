@@ -24,17 +24,14 @@ import { JwtAuthGuard } from '@module/auth/guard/jwt.guard';
 import { RolesGuard } from '@module/role/guards/role.guard';
 import { Roles } from 'decorator/role/role.decorator';
 import { EnumRole as Role } from '@constant/role/role.constant';
-import { Connection, getConnection } from 'typeorm';
+import { getConnection } from 'typeorm';
 
 @ApiTags('category')
 @Controller('category')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth('JWT-auth')
 export class CategoryController {
-  constructor(
-    private readonly connection: Connection,
-    private readonly categoryService: CategoryService
-  ) {}
+  constructor(private readonly categoryService: CategoryService) {}
 
   @ApiOkResponse({ description: 'Get all categories' })
   @Roles(Role.super_admin)
@@ -70,7 +67,8 @@ export class CategoryController {
     @Req() req
   ): Promise<any> {
     await getConnection().transaction(async (transactionManager) => {
-      await this.categoryService.create(transactionManager, body, req.user.id);
+      body.user = req.user.id;
+      await this.categoryService.create(transactionManager, body);
     });
 
     return res.status(HttpStatus.CREATED).json({
@@ -94,13 +92,10 @@ export class CategoryController {
     @Param('id') id: number
   ): Promise<any> {
     await getConnection().transaction(async (transactionManager) => {
-      await this.categoryService.update(
-        transactionManager,
-        id,
-        body,
-        req.user.id
-      );
+      body.user = req.user.id;
+      await this.categoryService.update(transactionManager, id, body);
     });
+
     return res.status(HttpStatus.OK).json({
       error: 0,
       data: 'Category is updated'
