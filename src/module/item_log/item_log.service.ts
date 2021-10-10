@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
+import { BodyCreateItemLog } from './item_log.dto';
 import { ItemLog } from './item_log.entity';
 
 @Injectable()
@@ -20,26 +21,13 @@ export class ItemLogService {
 
   async create(
     transactionEntityManager: EntityManager,
-    itemId: number,
-    name: string,
-    categoryId: any,
-    detail: string,
-    userManual: string,
-    userId: number
-  ): Promise<ItemLog> {
-    const newItemLog = new ItemLog();
-    newItemLog.item = itemId;
-    newItemLog.name = name;
-    newItemLog.category = categoryId;
-    newItemLog.detail = detail;
-    newItemLog.user_manual = userManual;
-    newItemLog.created_by = userId;
-    const result = await transactionEntityManager.save(newItemLog);
-    if (!result)
+    data: BodyCreateItemLog
+  ): Promise<any> {
+    await transactionEntityManager.insert(ItemLog, data).catch((reject) => {
       throw new HttpException(
         'The item log cannot create',
         HttpStatus.INTERNAL_SERVER_ERROR
       );
-    return result;
+    });
   }
 }
