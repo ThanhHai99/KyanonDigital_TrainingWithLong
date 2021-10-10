@@ -69,16 +69,8 @@ export class ItemController {
     @Req() req
   ): Promise<any> {
     await getConnection().transaction(async (transactionManager) => {
-      const { name, category_id, detail, user_manual, price } = body;
-      await this.itemService.create(
-        transactionManager,
-        name,
-        category_id,
-        detail,
-        user_manual,
-        price,
-        req.user.id
-      );
+      body.user = req.user.id;
+      await this.itemService.create(transactionManager, body);
     });
 
     return res.status(HttpStatus.CREATED).json({
@@ -101,18 +93,10 @@ export class ItemController {
     @Param('id') id: number
   ): Promise<any> {
     await getConnection().transaction(async (transactionManager) => {
-      const { name, category_id, detail, user_manual, price } = body;
-      await this.itemService.update(
-        transactionManager,
-        id,
-        name,
-        category_id,
-        detail,
-        user_manual,
-        price,
-        req.user.id
-      );
+      body.user = req.user.id;
+      await this.itemService.update(transactionManager, id, body);
     });
+
     return res.status(HttpStatus.OK).json({
       error: 0,
       data: 'Item is updated'

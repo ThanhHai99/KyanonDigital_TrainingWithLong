@@ -15,7 +15,7 @@ export class BodyCreateItem {
   })
   @IsInt()
   @Min(1)
-  category_id: number;
+  category: number;
 
   @ApiProperty({
     description: 'Item detail',
@@ -38,6 +38,8 @@ export class BodyCreateItem {
   @IsInt()
   @Min(0)
   price: number;
+
+  user: number;
 }
 
 export class BodyUpdateItem {
@@ -55,7 +57,7 @@ export class BodyUpdateItem {
   @IsOptional()
   @IsInt()
   @Min(1)
-  category_id: number;
+  category: number;
 
   @ApiProperty({
     description: 'Item detail',
@@ -79,4 +81,6 @@ export class BodyUpdateItem {
   @IsInt()
   @Min(0)
   price: number;
+
+  user: number;
 }

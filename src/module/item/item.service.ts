@@ -4,6 +4,7 @@ import { Item } from './item.entity';
 import { EntityManager, getManager, Repository } from 'typeorm';
 import { ItemLogService } from '@module/item_log/item_log.service';
 import { PriceLogService } from '@module/price_log/price_log.service';
+import { BodyCreateItem, BodyUpdateItem } from './item.dto';
 
 @Injectable()
 export class ItemService {
@@ -57,68 +58,48 @@ export class ItemService {
 
   async create(
     transactionEntityManager: EntityManager,
-    name: string,
-    categoryId: number,
-    detail: string,
-    userManual: string,
-    price: number,
-    userId: number
-  ): Promise<Item> {
+    data: BodyCreateItem
+  ): Promise<any> {
     // Check item name exists
-    const isItemExists = await this.findOneByName(name);
+    const isItemExists = await this.findOneByName(data.name);
     if (isItemExists)
       throw new HttpException('The item already in use', HttpStatus.CONFLICT);
 
     // Create item
-    const newItem = new Item();
-    newItem.name = name;
-    newItem.category = categoryId;
-    newItem.detail = detail;
-    newItem.user_manual = userManual;
-    newItem.price = price;
-    newItem.user = userId;
-    const result = await transactionEntityManager.save(newItem);
-    if (!result) {
-      throw new HttpException(
-        'The item cannot create',
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
-
-    // Create item log
-    await this.itemLogService.create(
-      transactionEntityManager,
-      result.id,
-      name,
-      categoryId,
-      detail,
-      userManual,
-      userId
-    );
-
-    // Create price log
-    await this.priceLogService.create(
-      transactionEntityManager,
-      result.id,
-      newItem.price,
-      userId
-    );
-
-    return result;
+    await transactionEntityManager
+      .insert(Item, data)
+      .then(async (resolve) => {
+        // Create item log
+        await this.itemLogService.create(transactionEntityManager, {
+          item: resolve.raw.insertId,
+          name: data.name,
+          category: data.category,
+          detail: data.detail,
+          user_manual: data.user_manual,
+          created_by: data.user
+        });
+        // Create price log
+        await this.priceLogService.create(transactionEntityManager, {
+          item_id: resolve.raw.insertId,
+          price: data.price,
+          created_by: data.user
+        });
+      })
+      .catch((reject) => {
+        throw new HttpException(
+          'The item cannot create',
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      });
   }
 
   async update(
     transactionEntityManager: EntityManager,
     id: number,
-    name: string,
-    categoryId: number,
-    detail: string,
-    userManual: string,
-    price: number,
-    userId: number
-  ): Promise<Item> {
+    data: Partial<BodyUpdateItem>
+  ): Promise<any> {
     // Check item exists
-    const isItemExists = await this.findOneByName(name);
+    const isItemExists = await this.findOneByName(data.name);
     if (isItemExists)
       throw new HttpException('The item already in use', HttpStatus.CONFLICT);
 
@@ -127,39 +108,34 @@ export class ItemService {
     if (!item)
       throw new HttpException('The item is not found', HttpStatus.NOT_FOUND);
 
-    item.name = name || item.name;
-    item.category = categoryId || item.category;
-    item.detail = detail || item.detail;
-    item.user_manual = userManual || item.user_manual;
-    item.price = price || item.price;
-    item.user = userId;
-    const result = await this.itemRepository.save(item);
-    if (!result)
-      throw new HttpException(
-        'The item cannot update',
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
+    await transactionEntityManager
+      .update(Item, id, data)
+      .then(async (resolve) => {
+        const _item = await transactionEntityManager.findOne(Item, id);
 
-    // Create item log
-    await this.itemLogService.create(
-      transactionEntityManager,
-      item.id,
-      item.name,
-      item.category,
-      item.detail,
-      item.user_manual,
-      userId
-    );
+        // Create item log
+        await this.itemLogService.create(transactionEntityManager, {
+          item: _item.id,
+          name: _item.name,
+          category: <number>_item.category,
+          detail: _item.detail,
+          user_manual: _item.user_manual,
+          created_by: data.user
+        });
 
-    // Create price log
-    if (price)
-      await this.priceLogService.create(
-        transactionEntityManager,
-        id,
-        item.price,
-        userId
-      );
-
-    return result;
+        // Create price log
+        if (data.price)
+          await this.priceLogService.create(transactionEntityManager, {
+            item_id: id,
+            price: _item.price,
+            created_by: data.user
+          });
+      })
+      .catch((reject) => {
+        throw new HttpException(
+          'The item cannot update',
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      });
   }
 }
