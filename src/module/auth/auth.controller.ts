@@ -46,15 +46,11 @@ export class AuthController {
     @Res() res,
     @Req() req
   ): Promise<any> {
-    const { username, password, name, phone, address } = body;
     await this.authService.create(
-      username,
-      password,
-      name,
-      phone,
-      address,
+      body,
       req.protocol + '://' + req.headers.host
     );
+
     return res.status(HttpStatus.CREATED).json({
       error: 0,
       message:
@@ -65,6 +61,7 @@ export class AuthController {
   @Get('verify/:token')
   async verify(@Res() res, @Param('token') token: string): Promise<any> {
     await this.authService.verifyEmail(token);
+
     return res.status(HttpStatus.OK).json({
       errors: 0,
       message: 'The account is activated'

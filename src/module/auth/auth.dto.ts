@@ -24,4 +24,6 @@ export class BodyRegister extends BodyLogin {
   @ApiProperty({ description: 'Your address', type: String })
   @IsNotEmpty()
   address: string;
+
+  verify_token: string;
 }

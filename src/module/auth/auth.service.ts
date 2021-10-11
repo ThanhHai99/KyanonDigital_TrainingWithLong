@@ -2,47 +2,17 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserService } from '@module/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@module/user/user.entity';
-import { MailerService } from '@nestjs-modules/mailer';
+import { BodyRegister } from './auth.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
-    private readonly jwtService: JwtService,
-    private readonly mailerService: MailerService
+    private readonly jwtService: JwtService
   ) {}
 
-  async create(
-    username: string,
-    password: string,
-    name: string,
-    phone: string,
-    address: string,
-    hostname: string
-  ): Promise<User> {
-    const result = await this.userService.create(
-      username,
-      password,
-      name,
-      phone,
-      address
-    );
-
-    const url = `${hostname}/auth/verify/${result.verify_token}`;
-    console.log('url verify');
-    console.log(url);
-    await this.mailerService.sendMail({
-      from: '"Support Team" <tranvietthanhhai2@gmail.com>',
-      to: result.username,
-      subject: 'Welcome to Shopping App! Confirm your Email',
-      template: './index', // `.hbs` extension is appended automatically
-      context: {
-        name: result.name,
-        url
-      }
-    });
-
-    return result;
+  async create(data: BodyRegister, hostname: string): Promise<any> {
+    await this.userService.create(data, hostname);
   }
 
   async validateUser(username: string, password: string): Promise<any> {
@@ -62,17 +32,9 @@ export class AuthService {
         HttpStatus.NOT_FOUND
       );
 
-    user.is_active = true;
-    await this.userService.update(
-      user.id,
-      user.password,
-      user.name,
-      user.phone,
-      user.address,
-      user.is_locked,
-      <number>user.role,
-      user.is_active
-    );
+    await this.userService.update(user.id, {
+      is_active: true
+    });
   }
 
   async login(user: any): Promise<any> {
