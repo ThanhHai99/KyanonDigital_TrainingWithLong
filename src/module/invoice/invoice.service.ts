@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
+import { BodyCreateInvoice } from './invoice.dto';
 import { Invoice } from './invoice.entity';
 
 @Injectable()
@@ -20,24 +21,13 @@ export class InvoiceService {
 
   async create(
     transactionEntityManager: EntityManager,
-    name: string,
-    phone: string,
-    cost: number,
-    userId: number,
-    orderId: number
-  ): Promise<Invoice> {
-    const newInvoice = new Invoice();
-    newInvoice.order = orderId;
-    newInvoice.name = name;
-    newInvoice.phone = phone;
-    newInvoice.cost = cost;
-    newInvoice.created_by = userId;
-    const result = await transactionEntityManager.save(newInvoice);
-    if (!result)
+    data: BodyCreateInvoice
+  ): Promise<any> {
+    await transactionEntityManager.save(data).catch((reject) => {
       throw new HttpException(
         'The invoice cannot create',
         HttpStatus.INTERNAL_SERVER_ERROR
       );
-    return result;
+    });
   }
 }
