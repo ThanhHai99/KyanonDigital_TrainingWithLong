@@ -6,8 +6,6 @@ import {
   UpdateDateColumn,
   JoinColumn,
   OneToMany,
-  BeforeInsert,
-  BeforeUpdate,
   ManyToOne
 } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
@@ -74,12 +72,6 @@ export class User extends BaseEntity {
 
   @OneToMany((type) => Item, (item) => item.user)
   items: Item[];
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  hashPassword() {
-    this.password = bcrypt.hashSync(this.password, 8);
-  }
 
   isPasswordValid(password: string): boolean {
     return bcrypt.compareSync(password, this.password);

@@ -62,17 +62,8 @@ export class UserController {
   @Roles(Role.super_admin)
   @Post()
   async create(@Body() body: BodyCreateUser, @Res() res): Promise<any> {
-    const { username, password, name, phone, address, is_locked, role_id } =
-      body;
-    await this.userService.createEmployee(
-      username,
-      password,
-      name,
-      phone,
-      address,
-      is_locked,
-      role_id
-    );
+    await this.userService.createEmployee(body);
+
     return res.status(HttpStatus.CREATED).json({
       error: 0,
       message: 'User is created'
@@ -91,16 +82,19 @@ export class UserController {
     @Res() res,
     @Param('id') id: number
   ): Promise<any> {
-    const { password, name, phone, address, is_locked, role_id, is_active } = body;
+    // const { password, name, phone, address, is_locked, role_id, is_active } =
+    //   body;
     await this.userService.update(
       id,
-      password,
-      name,
-      phone,
-      address,
-      is_locked,
-      role_id,
-      is_active
+      body
+      // id,
+      // password,
+      // name,
+      // phone,
+      // address,
+      // is_locked,
+      // role_id,
+      // is_active
     );
     return res.status(HttpStatus.OK).json({
       error: 0,

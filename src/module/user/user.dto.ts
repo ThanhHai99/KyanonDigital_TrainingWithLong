@@ -48,18 +48,24 @@ export class BodyCreateUser {
 
   @ApiProperty({
     description: 'Your account status',
-    type: Boolean
+    type: Boolean,
+    default: false
   })
   @IsOptional()
   is_locked: boolean;
 
   @ApiProperty({
     description: 'Role of account',
-    type: Number
+    type: Number,
+    default: null
   })
   @IsInt()
   @Min(0)
-  role_id: number;
+  role: number;
+
+  verify_token: string;
+
+  is_active: boolean;
 }
 
 export class BodyUpdateUser {
@@ -107,7 +113,7 @@ export class BodyUpdateUser {
   @IsInt()
   @Min(0)
   @IsOptional()
-  role_id: number;
+  role: number;
 
   @ApiProperty({
     description: 'Your account status',
@@ -115,4 +121,6 @@ export class BodyUpdateUser {
   })
   @IsOptional()
   is_active: boolean;
+
+  verify_token: string;
 }

@@ -6,11 +6,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { v4 as uuidv4 } from 'uuid';
-
+import { BodyCreateUser, BodyUpdateUser } from './user.dto';
+import { BodyRegister } from '@module/auth/auth.dto';
+import { MailerService } from '@nestjs-modules/mailer';
+import * as bcrypt from 'bcryptjs';
 @Injectable()
 export class UserService {
   constructor(
     private readonly roleService: RoleService,
+    private readonly mailerService: MailerService,
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>
@@ -58,15 +62,9 @@ export class UserService {
     return user;
   }
 
-  async create(
-    username: string,
-    password: string,
-    name: string,
-    phone: string,
-    address: string
-  ): Promise<User> {
+  async create(data: BodyRegister, hostname: string): Promise<any> {
     // Check username exists
-    const isUserExists = await this.findByUsername(username);
+    const isUserExists = await this.findByUsername(data.username);
     if (isUserExists)
       throw new HttpException(
         'The account already in use',
@@ -74,35 +72,34 @@ export class UserService {
       );
 
     // Create user
-    const newUser = new User();
-    newUser.username = username;
-    newUser.password = password;
-    newUser.name = name;
-    newUser.phone = phone;
-    newUser.address = address;
-    newUser.is_active = false;
-    newUser.verify_token = uuidv4();
-    const result = await this.userRepository.save(newUser);
-    if (!result)
-      throw new HttpException(
-        'The account cannot create',
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-
-    return result;
+    data.password = bcrypt.hashSync(data.password, 8);
+    data.verify_token = uuidv4();
+    await this.userRepository
+      .save(data)
+      .then((resolve) => {
+        const url = `${hostname}/auth/verify/${data.verify_token}`;
+        this.mailerService.sendMail({
+          from: '"Support Team" <tranvietthanhhai2@gmail.com>',
+          to: data.username,
+          subject: 'Welcome to Shopping App! Confirm your Email',
+          template: './index', // `.hbs` extension is appended automatically
+          context: {
+            name: data.name,
+            url
+          }
+        });
+      })
+      .catch((reject) => {
+        throw new HttpException(
+          'The account cannot create',
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      });
   }
 
-  async createEmployee(
-    username: string,
-    password: string,
-    name: string,
-    phone: string,
-    address: string,
-    isLocked: boolean,
-    roleId: number
-  ): Promise<User> {
+  async createEmployee(data: BodyCreateUser): Promise<any> {
     // Check user name exists
-    const isUserExists = await this.findByUsername(username);
+    const isUserExists = await this.findByUsername(data.username);
     if (isUserExists)
       throw new HttpException(
         'The account already in use',
@@ -110,28 +107,20 @@ export class UserService {
       );
 
     // Check role valid
-    const thisRole = await this.roleService.findById(roleId);
+    const thisRole = await this.roleService.findById(data.role);
     if (!thisRole || thisRole.id === 1)
       throw new HttpException('Role is incorrect', HttpStatus.NOT_FOUND);
 
     // Create user
-    const newUser = new User();
-    newUser.username = username;
-    newUser.password = password;
-    newUser.name = name;
-    newUser.phone = phone;
-    newUser.address = address;
-    newUser.role = roleId;
-    newUser.is_locked = isLocked || false;
-    newUser.is_active = true;
-    const result = await this.userRepository.save(newUser);
-    if (!result) {
+    data.is_active = true;
+    data.password = bcrypt.hashSync(data.password, 8);
+    data.verify_token = uuidv4();
+    await this.userRepository.save(data).catch((reject) => {
       throw new HttpException(
         'The account cannot create',
         HttpStatus.INTERNAL_SERVER_ERROR
       );
-    }
-    return result;
+    });
   }
 
   async isEmployee(userId: number): Promise<boolean> {
@@ -145,44 +134,24 @@ export class UserService {
     return false;
   }
 
-  async update(
-    id: number,
-    password: string,
-    name: string,
-    phone: string,
-    address: string,
-    isLocked: boolean,
-    roleId: number,
-    isActive: boolean
-  ): Promise<User> {
+  async update(id: number, data: Partial<BodyUpdateUser>): Promise<any> {
     // Check user exists
     const user = await this.userRepository.findOne(id);
     if (!user)
       throw new HttpException('User is not found', HttpStatus.NOT_FOUND);
 
     // Check role
-    if (roleId) {
-      const thisRole = await this.roleService.findById(roleId);
+    if (data.role) {
+      const thisRole = await this.roleService.findById(data.role);
       if (!thisRole || id === 1)
         throw new HttpException('Role is incorrect', HttpStatus.NOT_FOUND);
     }
 
-    // Update user
-    user.password = password || user.password;
-    user.name = name || user.name;
-    user.phone = phone || user.phone;
-    user.address = address || user.address;
-    user.is_locked = isLocked || user.is_locked;
-    user.role = roleId || user.role;
-    user.is_active = isActive || user.is_active;
-    const result = await this.userRepository.save(user);
-    if (!result) {
+    await this.userRepository.update(id, data).catch((reject) => {
       throw new HttpException(
         'The account cannot update',
         HttpStatus.INTERNAL_SERVER_ERROR
       );
-    }
-
-    return result;
+    });
   }
 }
