@@ -34,6 +34,8 @@ export class BodyImporting {
   @IsInt({ each: true })
   @Min(1, { each: true })
   item_id: Array<number>;
+
+  user: number;
 }
 
 export class BodyExporting {

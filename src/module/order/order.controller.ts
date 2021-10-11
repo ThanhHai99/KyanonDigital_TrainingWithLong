@@ -26,6 +26,7 @@ import { RolesGuard } from '@module/role/guards/role.guard';
 import { Roles } from 'decorator/role/role.decorator';
 import { EnumRole as Role } from '@constant/role/role.constant';
 import { getConnection } from 'typeorm';
+import { BodyCreateItemOrder } from '@module/item_order/item_order.dto';
 
 @ApiTags('order')
 @Controller('order')
@@ -64,21 +65,20 @@ export class OrderController {
     type: Order
   })
   async create(
-    @Body() body: BodyCreateOrder,
+    @Body() bodyCreateOrder: BodyCreateOrder,
+    @Body() bodyCreateItemOrder: BodyCreateItemOrder,
     @Res() res,
     @Req() req
   ): Promise<any> {
     await getConnection().transaction(async (transactionManager) => {
-      const { payment_method, delivery_address, item, amount } = body;
+      bodyCreateOrder.created_by = req.user.id;
       await this.orderService.create(
         transactionManager,
-        payment_method,
-        delivery_address,
-        item,
-        amount,
-        req.user.id
+        bodyCreateOrder,
+        bodyCreateItemOrder
       );
     });
+
     return res.status(HttpStatus.CREATED).json({
       error: 0,
       data: 'The order is created'
@@ -98,12 +98,8 @@ export class OrderController {
     @Param('id') id: number
   ): Promise<any> {
     await getConnection().transaction(async (transactionManager) => {
-      await this.orderService.update(
-        transactionManager,
-        id,
-        body.sale_code,
-        req.user.id
-      );
+      body.user = req.user.id;
+      await this.orderService.update(transactionManager, id, body);
     });
 
     return res.status(HttpStatus.OK).json({

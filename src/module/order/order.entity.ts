@@ -48,7 +48,7 @@ export class Order extends BaseEntity {
 
   @ManyToOne((type) => User, (user) => user.orders)
   @JoinColumn({ name: 'created_by' })
-  user: User;
+  user: User | number;
 
   @OneToMany((type) => ItemOrder, (item_order) => item_order.order)
   item_orders: ItemOrder[];

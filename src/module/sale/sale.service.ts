@@ -1,12 +1,14 @@
 import { Item } from '@module/item/item.entity';
 import { ItemService } from '@module/item/item.service';
 import { ItemOrder } from '@module/item_order/item_order.entity';
+import { BodyCreateSaleItem } from '@module/sale_item/sale_item.dto';
 import { SaleItemService } from '@module/sale_item/sale_item.service';
 import { SaleLogService } from '@module/sale_log/sale_log.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isArraysSameLength } from '@shared/utils/array';
-import { EntityManager, getManager, Raw, Repository } from 'typeorm';
+import { EntityManager, getManager, Repository } from 'typeorm';
+import { BodyCreateSale, BodyUpdateSale } from './sale.dto';
 import { Sale } from './sale.entity';
 
 @Injectable()
@@ -42,18 +44,11 @@ export class SaleService {
 
   async create(
     transactionEntityManager: EntityManager,
-    name: string,
-    startDate: Date,
-    endDate: Date,
-    discount: number,
-    applied: boolean,
-    code: string,
-    userId: number,
-    itemId: Array<number>,
-    amount: Array<number>
-  ): Promise<Sale> {
+    dataCreateSale: BodyCreateSale,
+    dataCreateSaleItem: BodyCreateSaleItem
+  ): Promise<any> {
     // Check sale code exists
-    const isSaleExists = await this.findByCode(code);
+    const isSaleExists = await this.findByCode(dataCreateSale.code);
     if (isSaleExists)
       throw new HttpException(
         'The sale code already in use',
@@ -61,64 +56,50 @@ export class SaleService {
       );
 
     // Validate item length vs amount length
-    if (itemId.length < 1 || !isArraysSameLength(itemId, amount))
+    if (
+      dataCreateSaleItem.item_id.length < 1 ||
+      !isArraysSameLength(dataCreateSaleItem.item_id, dataCreateSaleItem.amount)
+    )
       throw new HttpException('The data is invalid', HttpStatus.CONFLICT);
 
     // Create a sale
-    const newSale = new Sale();
-    newSale.name = name;
-    newSale.start_date = startDate;
-    newSale.end_date = endDate;
-    newSale.discount = discount;
-    newSale.applied = applied;
-    newSale.code = code;
-    newSale.user = userId;
-    const result = await transactionEntityManager.save(newSale);
-    if (!result)
-      throw new HttpException(
-        'The sale cannot create',
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
+    await transactionEntityManager
+      .insert(Sale, dataCreateSale)
+      .then(async (resolve) => {
+        // Create item of sale
+        dataCreateSaleItem.sale = resolve.raw.insertId;
+        await this.saleItemService.create(
+          transactionEntityManager,
+          dataCreateSaleItem
+        );
 
-    // Create item of sale
-    for (let i = 0; i < itemId.length; i++) {
-      await this.saleItemService.create(
-        transactionEntityManager,
-        result.id,
-        itemId[i],
-        amount[i]
-      );
-    }
-
-    // Create a sale log
-    await this.saleLogService.create(
-      transactionEntityManager,
-      name,
-      result.id,
-      itemId.toString(),
-      startDate,
-      endDate,
-      amount.toString(),
-      discount,
-      applied,
-      code,
-      userId
-    );
-
-    return result;
+        // Create a sale log
+        await this.saleLogService.create(transactionEntityManager, {
+          name: dataCreateSale.name,
+          sale: resolve.raw.insertId,
+          sale_item: dataCreateSaleItem.item_id.toString(),
+          start_date: dataCreateSale.start_date,
+          end_date: dataCreateSale.end_date,
+          amount: dataCreateSaleItem.amount.toString(),
+          discount: dataCreateSale.discount,
+          applied: dataCreateSale.applied,
+          code: dataCreateSale.code,
+          created_by: dataCreateSale.user
+        });
+      })
+      .catch((reject) => {
+        throw new HttpException(
+          'The sale cannot create',
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      });
   }
 
   async update(
     transactionEntityManager: EntityManager,
     id: number,
-    name: string,
-    startDate: Date,
-    endDate: Date,
-    discount: number,
-    applied: boolean,
-    code: string,
-    userId: number
-  ): Promise<Sale> {
+    data: BodyUpdateSale
+  ): Promise<any> {
     const sale = await this.saleRepository.findOne(id);
     if (!sale)
       throw new HttpException('Sale is not found', HttpStatus.NOT_FOUND);
@@ -126,41 +107,34 @@ export class SaleService {
     if (sale.applied)
       throw new HttpException('Sale is applied cannot update', HttpStatus.OK);
 
-    if (code) {
-      const isCodeExists = await this.findByCode(code);
+    if (data.code) {
+      const isCodeExists = await this.findByCode(data.code);
       if (isCodeExists)
         throw new HttpException('The code already in use', HttpStatus.CONFLICT);
     }
 
     // Update a sale
-    sale.name = name || sale.name;
-    sale.start_date = startDate || sale.start_date;
-    sale.end_date = endDate || sale.end_date;
-    sale.discount = discount || sale.discount;
-    sale.applied = applied || sale.applied;
-    sale.code = code || sale.code;
-    sale.user = userId;
-    const result = await transactionEntityManager.save(sale);
-
-    // Create a sale log
-    const t = await this.saleItemService.findItemAndAmountBySaleId(id);
-    const sale_item: string = t.map((e) => e.item.id).toString();
-    const amount: string = t.map((e) => e.amount).toString();
-    await this.saleLogService.create(
-      transactionEntityManager,
-      sale.name,
-      id,
-      sale_item.toString(),
-      sale.start_date,
-      sale.end_date,
-      amount.toString(),
-      sale.discount,
-      sale.applied,
-      sale.code,
-      userId
-    );
-
-    return result;
+    await transactionEntityManager
+      .update(Sale, id, data)
+      .then(async (resolve) => {
+        const _sale = await transactionEntityManager.findOne(Sale, id);
+        // Create a sale log
+        const t = await this.saleItemService.findItemAndAmountBySaleId(id);
+        const sale_item: string = t.map((e) => e.item.id).toString();
+        const amount: string = t.map((e) => e.amount).toString();
+        await this.saleLogService.create(transactionEntityManager, {
+          name: _sale.name,
+          sale: id,
+          sale_item: sale_item.toString(),
+          start_date: _sale.start_date,
+          end_date: _sale.end_date,
+          amount: amount.toString(),
+          discount: _sale.discount,
+          applied: _sale.applied,
+          code: _sale.code,
+          created_by: data.user
+        });
+      });
   }
 
   async isSaleStillApply(code: string): Promise<boolean> {

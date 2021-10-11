@@ -78,24 +78,11 @@ export class UserController {
   @Roles(Role.super_admin)
   @Patch(':id')
   async update(
-    @Body() body: BodyUpdateUser,
+    @Body() body: Partial<BodyUpdateUser>,
     @Res() res,
     @Param('id') id: number
   ): Promise<any> {
-    // const { password, name, phone, address, is_locked, role_id, is_active } =
-    //   body;
-    await this.userService.update(
-      id,
-      body
-      // id,
-      // password,
-      // name,
-      // phone,
-      // address,
-      // is_locked,
-      // role_id,
-      // is_active
-    );
+    await this.userService.update(id, body);
     return res.status(HttpStatus.OK).json({
       error: 0,
       message: 'User is updated'

@@ -23,6 +23,7 @@ import { RolesGuard } from '@module/role/guards/role.guard';
 import { Roles } from 'decorator/role/role.decorator';
 import { EnumRole as Role } from '@constant/role/role.constant';
 import { getConnection } from 'typeorm';
+import { BodyCreateSaleItem } from '@module/sale_item/sale_item.dto';
 
 @ApiTags('sale')
 @Controller('sale')
@@ -57,33 +58,17 @@ export class SaleController {
   @ApiBody({ type: BodyCreateSale })
   @Post()
   async create(
-    @Body() body: BodyCreateSale,
+    @Body() bodyCreateSale: BodyCreateSale,
+    @Body() bodyCreateSaleItem: BodyCreateSaleItem,
     @Res() res,
     @Req() req
   ): Promise<any> {
     await getConnection().transaction(async (transactionManager) => {
-      const {
-        name,
-        start_date,
-        end_date,
-        discount,
-        applied,
-        code,
-        item_id: sale_item,
-        amount
-      } = body;
-
+      bodyCreateSale.user = req.user.id;
       await this.saleService.create(
         transactionManager,
-        name,
-        start_date,
-        end_date,
-        discount,
-        applied,
-        code,
-        req.user.id,
-        sale_item,
-        amount
+        bodyCreateSale,
+        bodyCreateSaleItem
       );
     });
 
@@ -107,18 +92,9 @@ export class SaleController {
     @Param('id') id: number
   ): Promise<any> {
     await getConnection().transaction(async (transactionManager) => {
-      const { name, start_date, end_date, discount, applied, code } = body;
-      await this.saleService.update(
-        transactionManager,
-        id,
-        name,
-        start_date,
-        end_date,
-        discount,
-        applied,
-        code,
-        req.user.id
-      );
+      // const { name, start_date, end_date, discount, applied, code } = body;
+      body.user = req.user.id;
+      await this.saleService.update(transactionManager, id, body);
     });
 
     return res.status(HttpStatus.OK).json({

@@ -7,6 +7,7 @@ import { WarehouseLogService } from '@module/warehouse_log/warehouse_log.service
 import { ItemService } from '@module/item/item.service';
 import { isArraysSameLength } from '@shared/utils/array';
 import { Item } from '@module/item/item.entity';
+import { BodyImporting } from './warehouse.dto';
 
 @Injectable()
 export class WarehouseService {
@@ -40,44 +41,46 @@ export class WarehouseService {
 
   async create(
     transactionEntityManager: EntityManager,
-    itemId: Array<number>,
-    amount: Array<number>,
-    expirationDate: Array<Date>,
-    price: Array<number>,
-    userId: number
+    data: BodyImporting
   ): Promise<any> {
     // Check data is valid
     if (
-      itemId.length < 0 ||
-      !isArraysSameLength(itemId, amount, expirationDate, price)
-    )
+      data.item_id.length < 0 ||
+      !isArraysSameLength(
+        data.item_id,
+        data.amount,
+        data.expiration_date,
+        data.price
+      )
+    ) {
       throw new HttpException('The data is invalid', HttpStatus.CONFLICT);
+    }
 
-    for (let i = 0; i < itemId.length; i++) {
-      // Create a warehouse
-      const newWarehouse = new Warehouse();
-      newWarehouse.item = itemId[i];
-      newWarehouse.amount = amount[i];
-      newWarehouse.expiration_date = expirationDate[i];
-      let result = await transactionEntityManager.save(newWarehouse);
-      if (!result) {
-        throw new HttpException(
-          'The warehouse cannot create',
-          HttpStatus.INTERNAL_SERVER_ERROR
-        );
-      }
-
-      // Create a warehouse log
-      await this.warehouseLogService.create(
-        transactionEntityManager,
-        '+',
-        price[i],
-        result.id,
-        itemId[i],
-        amount[i],
-        expirationDate[i],
-        userId
-      );
+    for (let i = 0; i < data.item_id.length; i++) {
+      await transactionEntityManager
+        .insert(Warehouse, {
+          item: data.item_id[i],
+          amount: data.amount[i],
+          expiration_date: data.expiration_date[i]
+        })
+        .then(async (resolve) => {
+          // Create a warehouse log
+          await this.warehouseLogService.create(transactionEntityManager, {
+            status: '+',
+            price: data.price[i],
+            warehouse: resolve.raw.insertId,
+            item: data.item_id[i],
+            amount: data.amount[i],
+            expiration_date: data.expiration_date[i],
+            created_by: data.user
+          });
+        })
+        .catch((reject) => {
+          throw new HttpException(
+            'The warehouse cannot create',
+            HttpStatus.INTERNAL_SERVER_ERROR
+          );
+        });
     }
   }
 
@@ -136,21 +139,19 @@ export class WarehouseService {
 
         // Create a warehouse log
         const item = await this.itemService.findById(itemId);
-        await this.warehouseLogService.create(
-          transactionEntityManager,
-          '-',
-          item.price,
-          warehouse[j].id,
-          item.id,
-          _amount,
-          warehouse[j].expiration_date,
-          userId
-        );
+        await this.warehouseLogService.create(transactionEntityManager, {
+          status: '-',
+          price: item.price,
+          warehouse: warehouse[j].id,
+          item: item.id,
+          amount: _amount,
+          expiration_date: warehouse[j].expiration_date,
+          created_by: userId
+        });
 
         _amount -= tmpAmount;
         if (_amount <= 0) break;
       }
     }
-    return;
   }
 }

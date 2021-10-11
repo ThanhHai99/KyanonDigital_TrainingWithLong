@@ -1,6 +1,7 @@
 import { InvoiceService } from '@module/invoice/invoice.service';
 import { Item } from '@module/item/item.entity';
 import { ItemService } from '@module/item/item.service';
+import { BodyCreateItemOrder } from '@module/item_order/item_order.dto';
 import { ItemOrder } from '@module/item_order/item_order.entity';
 import { ItemOrderService } from '@module/item_order/item_order.service';
 import { SaleService } from '@module/sale/sale.service';
@@ -8,8 +9,8 @@ import { UserService } from '@module/user/user.service';
 import { WarehouseService } from '@module/warehouse/warehouse.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { isArraysSameLength } from '@shared/utils/array';
 import { EntityManager, Repository } from 'typeorm';
+import { BodyCreateOrder, BodyPayment } from './order.dto';
 import { Order } from './order.entity';
 
 @Injectable()
@@ -48,47 +49,31 @@ export class OrderService {
 
   async create(
     transactionEntityManager: EntityManager,
-    paymentMethod: number,
-    deliveryAddress: string,
-    item: Array<number>,
-    amount: Array<number>,
-    userId: number
-  ): Promise<Order> {
-    // Create order
-    const newOrder = new Order();
-    newOrder.payment_method = paymentMethod;
-    newOrder.delivery_address = deliveryAddress;
-    newOrder.created_by = userId;
-    const result = await transactionEntityManager.save(newOrder);
-    if (!result) {
-      throw new HttpException(
-        'The order cannot create',
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
-
-    // Check data is valid
-    if (item.length < 1 || !isArraysSameLength(item, amount))
-      throw new HttpException('The data is invalid', HttpStatus.BAD_REQUEST);
-
-    // Create a item of order
-    for (let i = 0; i < item.length; i++) {
-      await this.itemOrderService.create(
-        transactionEntityManager,
-        item[i],
-        amount[i],
-        result.id
-      );
-    }
-
-    return result;
+    dataCreateOrder: BodyCreateOrder,
+    dataCreateItemOrder: BodyCreateItemOrder
+  ): Promise<any> {
+    await transactionEntityManager
+      .insert(Order, dataCreateOrder)
+      .then(async (resolve) => {
+        // Create item of order
+        dataCreateItemOrder.order = resolve.raw.insertId;
+        await this.itemOrderService.create(
+          transactionEntityManager,
+          dataCreateItemOrder
+        );
+      })
+      .catch((reject) => {
+        throw new HttpException(
+          'The order cannot create',
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      });
   }
 
   async update(
     transactionEntityManager: EntityManager,
     id: number,
-    saleCode: string,
-    userId: number
+    data: Partial<BodyPayment>
   ): Promise<any> {
     // Check exists order
     const order = await this.orderRepository.findOne(id);
@@ -108,7 +93,7 @@ export class OrderService {
     await this.warehouseService.exportProduct(
       transactionEntityManager,
       itemInOrder,
-      userId
+      data.user
     );
 
     //  Sum total order amount
@@ -122,29 +107,26 @@ export class OrderService {
     costOrder -= await this.saleService.totalDecreaseCostByCode(
       transactionEntityManager,
       itemInOrder,
-      saleCode
+      data.sale_code
     );
     console.log('Discounted by sale code: ' + costOrder);
 
     // Check employee
-    const isEmployee = await this.userService.isEmployee(userId);
+    const isEmployee = await this.userService.isEmployee(data.user);
     if (isEmployee) {
       costOrder -= (costOrder * 20) / 100;
       console.log('Discounted by employee: ' + costOrder);
     }
 
     // Create a invoice
-    const user = await this.userService.findById(userId);
-    await this.invoiceService.create(
-      transactionEntityManager,
-      user.name,
-      user.phone,
-      costOrder,
-      userId,
-      id
-    );
-
-    return;
+    const user = await this.userService.findById(data.user);
+    await this.invoiceService.create(transactionEntityManager, {
+      name: user.name,
+      phone: user.phone,
+      cost: costOrder,
+      created_by: data.user,
+      order: id
+    });
   }
 
   async costTotal(itemInOrder: ItemOrder[]): Promise<number> {
@@ -163,7 +145,7 @@ export class OrderService {
   async delete(
     transactionEntityManager: EntityManager,
     id: number
-  ): Promise<Order> {
+  ): Promise<any> {
     // Check exists order
     const order = await this.orderRepository.findOne({ where: { id: id } });
     if (!order)
@@ -176,6 +158,5 @@ export class OrderService {
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
-    return result;
   }
 }

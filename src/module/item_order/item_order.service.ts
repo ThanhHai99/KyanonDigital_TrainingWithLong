@@ -1,6 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { isArraysSameLength } from '@shared/utils/array';
 import { EntityManager, Repository } from 'typeorm';
+import { BodyCreateItemOrder } from './item_order.dto';
 import { ItemOrder } from './item_order.entity';
 
 @Injectable()
@@ -20,20 +22,25 @@ export class ItemOrderService {
 
   async create(
     transactionEntityManager: EntityManager,
-    itemId: number,
-    amount: number,
-    orderId: number
-  ): Promise<ItemOrder> {
-    const newItemOrder = new ItemOrder();
-    newItemOrder.item = itemId;
-    newItemOrder.amount = amount;
-    newItemOrder.order_id = orderId;
-    const result = await transactionEntityManager.save(newItemOrder);
-    if (!result)
-      throw new HttpException(
-        'The order cannot create',
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    return result;
+    data: BodyCreateItemOrder
+  ): Promise<any> {
+    // Check data is valid
+    if (data.item.length < 1 || !isArraysSameLength(data.item, data.amount))
+      throw new HttpException('The data is invalid', HttpStatus.BAD_REQUEST);
+
+    for (let i = 0; i < data.item.length; i++) {
+      await transactionEntityManager
+        .insert(ItemOrder, {
+          item: data.item[i],
+          amount: data.amount[i],
+          order: data.order
+        })
+        .catch((reject) => {
+          throw new HttpException(
+            'The order cannot create',
+            HttpStatus.INTERNAL_SERVER_ERROR
+          );
+        });
+    }
   }
 }

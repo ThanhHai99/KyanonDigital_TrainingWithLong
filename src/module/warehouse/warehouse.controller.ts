@@ -74,15 +74,8 @@ export class WarehouseController {
     @Req() req
   ): Promise<any> {
     await getConnection().transaction(async (transactionManager) => {
-      const { item_id, amount, expiration_date, price } = body;
-      await this.warehouseService.create(
-        transactionManager,
-        item_id,
-        amount,
-        expiration_date,
-        price,
-        req.user.id
-      );
+      body.user = req.user.id;
+      await this.warehouseService.create(transactionManager, body);
     });
 
     return res.status(HttpStatus.CREATED).json({

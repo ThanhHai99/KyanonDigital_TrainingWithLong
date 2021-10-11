@@ -23,7 +23,8 @@ export class InvoiceService {
     transactionEntityManager: EntityManager,
     data: BodyCreateInvoice
   ): Promise<any> {
-    await transactionEntityManager.save(data).catch((reject) => {
+    await transactionEntityManager.insert(Invoice, data).catch((reject) => {
+      console.log(reject);
       throw new HttpException(
         'The invoice cannot create',
         HttpStatus.INTERNAL_SERVER_ERROR

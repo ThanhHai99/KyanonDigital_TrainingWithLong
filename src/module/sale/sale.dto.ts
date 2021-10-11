@@ -1,7 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  ArrayMinSize,
-  IsArray,
   IsBoolean,
   IsDateString,
   IsInt,
@@ -15,18 +13,6 @@ export class BodyCreateSale {
   @ApiProperty({ description: 'Sale name', type: String })
   @IsNotEmpty()
   name: string;
-
-  @ApiProperty({ description: 'Item list sale', type: Array })
-  @IsArray()
-  @ArrayMinSize(1)
-  @IsInt({ each: true })
-  @Min(1, { each: true })
-  item_id: Array<number>;
-
-  @ApiProperty({ description: 'Amount of item is reduced', type: Array })
-  @IsArray()
-  @ArrayMinSize(1)
-  amount: Array<number>;
 
   @ApiProperty({ description: 'Percent is reduced', type: Number })
   @IsInt()
@@ -55,6 +41,8 @@ export class BodyCreateSale {
   @ApiProperty({ description: 'Sale code', type: String })
   @IsNotEmpty()
   code: string;
+
+  user: number;
 }
 
 export class BodyUpdateSale {
@@ -91,4 +79,6 @@ export class BodyUpdateSale {
   @ApiProperty({ description: 'Sale code', type: String })
   @IsOptional()
   code: string;
+
+  user: number;
 }

@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
+import { BodyCreateWarehouseLog } from './warehouse_log.dto';
 import { WarehouseLog } from './warehouse_log.entity';
 
 @Injectable()
@@ -20,30 +21,15 @@ export class WarehouseLogService {
 
   async create(
     transactionEntityManager: EntityManager,
-    status: string,
-    price: number,
-    warehouseId: number,
-    itemId: number,
-    amount: number,
-    expirationDate: Date,
-    userId: number
-  ): Promise<WarehouseLog> {
-    const newWarehouseLog = new WarehouseLog();
-    newWarehouseLog.status = status;
-    newWarehouseLog.price = price;
-    newWarehouseLog.warehouse = warehouseId;
-    newWarehouseLog.item = itemId;
-    newWarehouseLog.amount = amount;
-    newWarehouseLog.expiration_date = expirationDate;
-    newWarehouseLog.created_by = userId;
-    const result = await transactionEntityManager.save(newWarehouseLog);
-    if (!result) {
-      throw new HttpException(
-        'The warehouse log cannot create',
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
-
-    return result;
+    data: BodyCreateWarehouseLog
+  ): Promise<any> {
+    await transactionEntityManager
+      .insert(WarehouseLog, data)
+      .catch((reject) => {
+        throw new HttpException(
+          'The warehouse log cannot create',
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      });
   }
 }

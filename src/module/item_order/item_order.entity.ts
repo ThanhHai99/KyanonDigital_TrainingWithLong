@@ -13,10 +13,7 @@ export class ItemOrder extends BaseEntity {
 
   @ManyToOne((type) => Order, (order) => order.item_orders)
   @JoinColumn({ name: 'order_id' })
-  order: Order;
-
-  @Column()
-  order_id: number;
+  order: Order | number;
 
   @Column()
   amount: number;
