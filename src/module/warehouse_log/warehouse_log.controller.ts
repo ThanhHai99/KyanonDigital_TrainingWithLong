@@ -13,8 +13,8 @@ import { Roles } from 'decorator/role/role.decorator';
 import { EnumRole as Role } from '@constant/role/role.constant';
 import { RolesGuard } from '@module/role/guards/role.guard';
 
-@ApiTags('warehouse')
-@Controller('warehouse')
+@ApiTags('warehouse_log')
+@Controller('warehouse_log')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class WarehouseLogController {
   constructor(private readonly warehouseLogService: WarehouseLogService) {}
