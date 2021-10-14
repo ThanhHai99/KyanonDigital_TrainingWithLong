@@ -2,6 +2,7 @@ doc/De_bai.pdf
 
 # compiled output
 env/.env
+env/.dev.env
 txt.sql
 /dist
 /node_modules

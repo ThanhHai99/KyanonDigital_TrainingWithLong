@@ -1,5 +1,4 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { Connection } from 'typeorm';
+import { Module } from '@nestjs/common';
 
 // module
 import { CoreModule } from '@module/core/core.module';
