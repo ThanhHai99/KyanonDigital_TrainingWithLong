@@ -1,28 +1,20 @@
-import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsBoolean,
-  IsDateString,
-  IsInt,
-  IsNotEmpty,
-  IsOptional,
-  Max,
-  Min
-} from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger'
+import { IsBoolean, IsDateString, IsInt, IsNotEmpty, IsOptional, Max, Min } from 'class-validator'
 
 export class BodyCreateSale {
   @ApiProperty({ description: 'Sale name', type: String })
   @IsNotEmpty()
-  name: string;
+  name: string
 
   @ApiProperty({ description: 'Percent is reduced', type: Number })
   @IsInt()
   @Min(0)
   @Max(100)
-  discount: number;
+  discount: number
 
   @ApiProperty({ description: 'Sale start date', type: Date })
   @IsDateString()
-  start_date: Date;
+  start_date: Date
 
   @ApiProperty({
     description: 'End start date',
@@ -31,36 +23,36 @@ export class BodyCreateSale {
   })
   @IsOptional()
   @IsDateString()
-  end_date: Date;
+  end_date: Date
 
   @ApiProperty({ description: 'Sale status', type: Boolean, default: false })
   @IsOptional()
   @IsBoolean()
-  applied: boolean;
+  applied: boolean
 
   @ApiProperty({ description: 'Sale code', type: String })
   @IsNotEmpty()
-  code: string;
+  code: string
 
-  user: number;
+  user: number
 }
 
 export class BodyUpdateSale {
   @ApiProperty({ description: 'Sale name', type: String })
   @IsOptional()
-  name: string;
+  name: string
 
   @ApiProperty({ description: 'Percent is reduced', type: Number })
   @IsOptional()
   @IsInt()
   @Min(0)
   @Max(100)
-  discount: number;
+  discount: number
 
   @ApiProperty({ description: 'Sale start date', type: Date })
   @IsOptional()
   @IsDateString()
-  start_date: Date;
+  start_date: Date
 
   @ApiProperty({
     description: 'Sale end date',
@@ -69,16 +61,16 @@ export class BodyUpdateSale {
   })
   @IsOptional()
   @IsDateString()
-  end_date: Date;
+  end_date: Date
 
   @ApiProperty({ description: 'Sale status', type: Boolean, default: false })
   @IsOptional()
   @IsBoolean()
-  applied: boolean;
+  applied: boolean
 
   @ApiProperty({ description: 'Sale code', type: String })
   @IsOptional()
-  code: string;
+  code: string
 
-  user: number;
+  user: number
 }

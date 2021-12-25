@@ -1,17 +1,10 @@
-import { JwtAuthGuard } from '@module/auth/guard/jwt.guard';
-import {
-  Controller,
-  Get,
-  Res,
-  Param,
-  HttpStatus,
-  UseGuards
-} from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { InvoiceService } from './invoice.service';
-import { Roles } from 'decorator/role/role.decorator';
-import { EnumRole as Role } from '@constant/role/role.constant';
-import { RolesGuard } from '@module/role/guards/role.guard';
+import { JwtAuthGuard } from '@module/auth/guard/jwt.guard'
+import { Controller, Get, Res, Param, HttpStatus, UseGuards } from '@nestjs/common'
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger'
+import { InvoiceService } from './invoice.service'
+import { Roles } from 'decorator/role/role.decorator'
+import { EnumRole as Role } from '@constant/role/role.constant'
+import { RolesGuard } from '@module/role/guards/role.guard'
 
 @ApiTags('invoice')
 @Controller('invoice')
@@ -26,7 +19,7 @@ export class InvoiceController {
     return res.status(HttpStatus.OK).json({
       errors: 0,
       data: await this.invoiceService.getAll()
-    });
+    })
   }
 
   @ApiOkResponse({ description: 'Get a invoice by id' })
@@ -36,6 +29,6 @@ export class InvoiceController {
     return res.status(HttpStatus.OK).json({
       errors: 0,
       data: await this.invoiceService.getById(id)
-    });
+    })
   }
 }

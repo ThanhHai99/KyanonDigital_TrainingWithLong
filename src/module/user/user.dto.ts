@@ -1,13 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsEmail,
-  IsInt,
-  IsNotEmpty,
-  IsOptional,
-  IsPhoneNumber,
-  Min,
-  MinLength
-} from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger'
+import { IsEmail, IsInt, IsNotEmpty, IsOptional, IsPhoneNumber, Min, MinLength } from 'class-validator'
 
 export class BodyCreateUser {
   @ApiProperty({
@@ -16,35 +8,35 @@ export class BodyCreateUser {
   })
   @IsNotEmpty()
   @IsEmail()
-  username: string;
+  username: string
 
   @ApiProperty({
     description: 'Password used to login the application',
     type: String
   })
   @MinLength(8)
-  password: string;
+  password: string
 
   @ApiProperty({
     description: 'Your name',
     type: String
   })
   @IsNotEmpty()
-  name: string;
+  name: string
 
   @ApiProperty({
     description: 'Your phone',
     type: String
   })
   @IsPhoneNumber('VN')
-  phone: string;
+  phone: string
 
   @ApiProperty({
     description: 'Your address',
     type: String
   })
   @IsNotEmpty()
-  address: string;
+  address: string
 
   @ApiProperty({
     description: 'Your account status',
@@ -52,7 +44,7 @@ export class BodyCreateUser {
     default: false
   })
   @IsOptional()
-  is_locked: boolean;
+  is_locked: boolean
 
   @ApiProperty({
     description: 'Role of account',
@@ -61,11 +53,11 @@ export class BodyCreateUser {
   })
   @IsInt()
   @Min(0)
-  role: number;
+  role: number
 
-  verify_token: string;
+  verify_token: string
 
-  is_active: boolean;
+  is_active: boolean
 }
 
 export class BodyUpdateUser {
@@ -74,14 +66,14 @@ export class BodyUpdateUser {
     type: String
   })
   @IsOptional()
-  password: string;
+  password: string
 
   @ApiProperty({
     description: 'Your name',
     type: String
   })
   @IsOptional()
-  name: string;
+  name: string
 
   @ApiProperty({
     description: 'Your phone',
@@ -89,7 +81,7 @@ export class BodyUpdateUser {
   })
   @IsOptional()
   @IsPhoneNumber('VN')
-  phone: string;
+  phone: string
 
   @ApiProperty({
     description: 'Your address',
@@ -97,14 +89,14 @@ export class BodyUpdateUser {
   })
   @IsOptional()
   @IsNotEmpty()
-  address: string;
+  address: string
 
   @ApiProperty({
     description: 'Your account status',
     type: Boolean
   })
   @IsOptional()
-  is_locked: boolean;
+  is_locked: boolean
 
   @ApiProperty({
     description: 'Role of account',
@@ -113,14 +105,14 @@ export class BodyUpdateUser {
   @IsInt()
   @Min(0)
   @IsOptional()
-  role: number;
+  role: number
 
   @ApiProperty({
     description: 'Your account status',
     type: Boolean
   })
   @IsOptional()
-  is_active: boolean;
+  is_active: boolean
 
-  verify_token: string;
+  verify_token: string
 }

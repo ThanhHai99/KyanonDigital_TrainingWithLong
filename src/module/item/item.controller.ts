@@ -1,30 +1,13 @@
-import {
-  Controller,
-  Get,
-  Res,
-  Param,
-  Post,
-  Body,
-  Query,
-  HttpStatus,
-  UseGuards,
-  Req,
-  Patch
-} from '@nestjs/common';
-import {
-  ApiBody,
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiTags
-} from '@nestjs/swagger';
-import { BodyCreateItem, BodyUpdateItem } from './item.dto';
-import { Item } from './item.entity';
-import { ItemService } from './item.service';
-import { JwtAuthGuard } from '@module/auth/guard/jwt.guard';
-import { Roles } from 'decorator/role/role.decorator';
-import { EnumRole as Role } from '@constant/role/role.constant';
-import { RolesGuard } from '@module/role/guards/role.guard';
-import { getConnection } from 'typeorm';
+import { Controller, Get, Res, Param, Post, Body, Query, HttpStatus, UseGuards, Req, Patch } from '@nestjs/common'
+import { ApiBody, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
+import { BodyCreateItem, BodyUpdateItem } from './item.dto'
+import { Item } from './item.entity'
+import { ItemService } from './item.service'
+import { JwtAuthGuard } from '@module/auth/guard/jwt.guard'
+import { Roles } from 'decorator/role/role.decorator'
+import { EnumRole as Role } from '@constant/role/role.constant'
+import { RolesGuard } from '@module/role/guards/role.guard'
+import { getConnection } from 'typeorm'
 
 @ApiTags('item')
 @Controller('item')
@@ -39,7 +22,7 @@ export class ItemController {
     return res.status(HttpStatus.OK).json({
       errors: 0,
       data: await this.itemService.getAll(query.name)
-    });
+    })
   }
 
   @ApiOkResponse({ description: 'Get a item by id' })
@@ -49,7 +32,7 @@ export class ItemController {
     return res.status(HttpStatus.OK).json({
       errors: 0,
       data: await this.itemService.getById(id)
-    });
+    })
   }
 
   @ApiCreatedResponse({
@@ -63,20 +46,16 @@ export class ItemController {
     description: '0',
     type: Item
   })
-  async create(
-    @Body() body: BodyCreateItem,
-    @Res() res,
-    @Req() req
-  ): Promise<any> {
+  async create(@Body() body: BodyCreateItem, @Res() res, @Req() req): Promise<any> {
     await getConnection().transaction(async (transactionManager) => {
-      body.user = req.user.id;
-      await this.itemService.create(transactionManager, body);
-    });
+      body.user = req.user.id
+      await this.itemService.create(transactionManager, body)
+    })
 
     return res.status(HttpStatus.CREATED).json({
       error: 0,
       data: 'Item is created'
-    });
+    })
   }
 
   @ApiCreatedResponse({
@@ -86,20 +65,15 @@ export class ItemController {
   @ApiBody({ type: BodyUpdateItem })
   @Roles(Role.super_admin)
   @Patch(':id')
-  async update(
-    @Body() body: BodyUpdateItem,
-    @Res() res,
-    @Req() req,
-    @Param('id') id: number
-  ): Promise<any> {
+  async update(@Body() body: BodyUpdateItem, @Res() res, @Req() req, @Param('id') id: number): Promise<any> {
     await getConnection().transaction(async (transactionManager) => {
-      body.user = req.user.id;
-      await this.itemService.update(transactionManager, id, body);
-    });
+      body.user = req.user.id
+      await this.itemService.update(transactionManager, id, body)
+    })
 
     return res.status(HttpStatus.OK).json({
       error: 0,
       data: 'Item is updated'
-    });
+    })
   }
 }

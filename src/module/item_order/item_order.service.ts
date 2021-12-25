@@ -1,9 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { isArraysSameLength } from '@shared/utils/array';
-import { EntityManager, Repository } from 'typeorm';
-import { BodyCreateItemOrder } from './item_order.dto';
-import { ItemOrder } from './item_order.entity';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { isArraysSameLength } from '@shared/utils/array'
+import { EntityManager, Repository } from 'typeorm'
+import { BodyCreateItemOrder } from './item_order.dto'
+import { ItemOrder } from './item_order.entity'
 
 @Injectable()
 export class ItemOrderService {
@@ -13,20 +13,17 @@ export class ItemOrderService {
   ) {}
 
   async getAll(): Promise<ItemOrder[]> {
-    return await this.itemOrderRepository.find();
+    return await this.itemOrderRepository.find()
   }
 
   async getById(id: number): Promise<ItemOrder> {
-    return await this.itemOrderRepository.findOne(id);
+    return await this.itemOrderRepository.findOne(id)
   }
 
-  async create(
-    transactionEntityManager: EntityManager,
-    data: BodyCreateItemOrder
-  ): Promise<any> {
+  async create(transactionEntityManager: EntityManager, data: BodyCreateItemOrder): Promise<any> {
     // Check data is valid
     if (data.item.length < 1 || !isArraysSameLength(data.item, data.amount))
-      throw new HttpException('The data is invalid', HttpStatus.BAD_REQUEST);
+      throw new HttpException('The data is invalid', HttpStatus.BAD_REQUEST)
 
     for (let i = 0; i < data.item.length; i++) {
       await transactionEntityManager
@@ -36,11 +33,8 @@ export class ItemOrderService {
           order: data.order
         })
         .catch((reject) => {
-          throw new HttpException(
-            'The order cannot create',
-            HttpStatus.INTERNAL_SERVER_ERROR
-          );
-        });
+          throw new HttpException('The order cannot create', HttpStatus.INTERNAL_SERVER_ERROR)
+        })
     }
   }
 }

@@ -1,17 +1,10 @@
-import { JwtAuthGuard } from '@module/auth/guard/jwt.guard';
-import { RolesGuard } from '@module/role/guards/role.guard';
-import {
-  Controller,
-  Get,
-  Res,
-  Param,
-  HttpStatus,
-  UseGuards
-} from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { ItemLogService } from './item_log.service';
-import { Roles } from 'decorator/role/role.decorator';
-import { EnumRole as Role } from '@constant/role/role.constant';
+import { JwtAuthGuard } from '@module/auth/guard/jwt.guard'
+import { RolesGuard } from '@module/role/guards/role.guard'
+import { Controller, Get, Res, Param, HttpStatus, UseGuards } from '@nestjs/common'
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger'
+import { ItemLogService } from './item_log.service'
+import { Roles } from 'decorator/role/role.decorator'
+import { EnumRole as Role } from '@constant/role/role.constant'
 
 @ApiTags('item_log')
 @Controller('item_log')
@@ -26,7 +19,7 @@ export class ItemLogController {
     return res.status(HttpStatus.OK).json({
       errors: 0,
       data: await this.itemLogService.getAll()
-    });
+    })
   }
 
   @ApiOkResponse({ description: 'Get a item log by id' })
@@ -36,6 +29,6 @@ export class ItemLogController {
     return res.status(HttpStatus.OK).json({
       errors: 0,
       data: await this.itemLogService.getById(id)
-    });
+    })
   }
 }

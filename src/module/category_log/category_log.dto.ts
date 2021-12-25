@@ -1,5 +1,5 @@
 export class BodyCreateCategoryLog {
-  name: string;
-  category: number;
-  created_by: number;
+  name: string
+  category: number
+  created_by: number
 }

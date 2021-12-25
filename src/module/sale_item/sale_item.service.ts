@@ -1,8 +1,8 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Raw, Repository } from 'typeorm';
-import { BodyCreateSaleItem } from './sale_item.dto';
-import { SaleItem } from './sale_item.entity';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { EntityManager, Raw, Repository } from 'typeorm'
+import { BodyCreateSaleItem } from './sale_item.dto'
+import { SaleItem } from './sale_item.entity'
 
 @Injectable()
 export class SaleItemService {
@@ -22,13 +22,10 @@ export class SaleItemService {
           item: 'sale_item.item'
         }
       }
-    });
+    })
   }
 
-  async create(
-    transactionEntityManager: EntityManager,
-    data: BodyCreateSaleItem
-  ): Promise<any> {
+  async create(transactionEntityManager: EntityManager, data: BodyCreateSaleItem): Promise<any> {
     for (let i = 0; i < data.item_id.length; i++) {
       await transactionEntityManager
         .insert(SaleItem, {
@@ -37,11 +34,8 @@ export class SaleItemService {
           amount: data.amount[i]
         })
         .catch((reject) => {
-          throw new HttpException(
-            'The sale item cannot create',
-            HttpStatus.BAD_REQUEST
-          );
-        });
+          throw new HttpException('The sale item cannot create', HttpStatus.BAD_REQUEST)
+        })
     }
   }
 
@@ -52,32 +46,24 @@ export class SaleItemService {
         item: itemId,
         amount: Raw((alias) => `${alias} IS NULL OR ${alias} > 0`)
       }
-    });
-    if (saleItem) return true;
-    return false;
+    })
+    if (saleItem) return true
+    return false
   }
 
-  async updateAmount(
-    transactionEntityManager: EntityManager,
-    saleId: number,
-    itemId: number,
-    amount: number
-  ): Promise<any> {
+  async updateAmount(transactionEntityManager: EntityManager, saleId: number, itemId: number, amount: number): Promise<any> {
     const saleItem = await this.saleItemRepository.findOne({
       where: {
         sale: saleId,
         item: itemId
       }
-    });
+    })
 
-    if (!saleItem.amount) return null;
+    if (!saleItem.amount) return null
 
-    saleItem.amount -= amount;
+    saleItem.amount -= amount
     await transactionEntityManager.save(saleItem).catch((reject) => {
-      throw new HttpException(
-        'The sale item cannot update',
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    });
+      throw new HttpException('The sale item cannot update', HttpStatus.INTERNAL_SERVER_ERROR)
+    })
   }
 }

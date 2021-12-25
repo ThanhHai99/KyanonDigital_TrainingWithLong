@@ -21,5 +21,5 @@ export default () => {
       account: process.env.MAIL_ACCOUNT || 'tranvietthanhhai2@gmail.com',
       password: process.env.MAIL_PASSWORD || 'Th@nhH@i2303'
     }
-  };
-};
+  }
+}

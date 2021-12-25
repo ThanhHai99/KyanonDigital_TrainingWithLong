@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsOptional, Min } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger'
+import { IsInt, IsNotEmpty, IsOptional, Min } from 'class-validator'
 
 export class BodyCreateItem {
   @ApiProperty({
@@ -7,7 +7,7 @@ export class BodyCreateItem {
     type: String
   })
   @IsNotEmpty()
-  name: string;
+  name: string
 
   @ApiProperty({
     description: 'Category Id',
@@ -15,21 +15,21 @@ export class BodyCreateItem {
   })
   @IsInt()
   @Min(1)
-  category: number;
+  category: number
 
   @ApiProperty({
     description: 'Item detail',
     type: String
   })
   @IsNotEmpty()
-  detail: string;
+  detail: string
 
   @ApiProperty({
     description: 'Item user manual',
     type: String
   })
   @IsNotEmpty()
-  user_manual: string;
+  user_manual: string
 
   @ApiProperty({
     description: 'Item price',
@@ -37,9 +37,9 @@ export class BodyCreateItem {
   })
   @IsInt()
   @Min(0)
-  price: number;
+  price: number
 
-  user: number;
+  user: number
 }
 
 export class BodyUpdateItem {
@@ -48,7 +48,7 @@ export class BodyUpdateItem {
     type: String
   })
   @IsOptional()
-  name: string;
+  name: string
 
   @ApiProperty({
     description: 'Category Id',
@@ -57,21 +57,21 @@ export class BodyUpdateItem {
   @IsOptional()
   @IsInt()
   @Min(1)
-  category: number;
+  category: number
 
   @ApiProperty({
     description: 'Item detail',
     type: String
   })
   @IsOptional()
-  detail: string;
+  detail: string
 
   @ApiProperty({
     description: 'Item user manual',
     type: String
   })
   @IsOptional()
-  user_manual: string;
+  user_manual: string
 
   @ApiProperty({
     description: 'Item price',
@@ -80,7 +80,7 @@ export class BodyUpdateItem {
   @IsOptional()
   @IsInt()
   @Min(0)
-  price: number;
+  price: number
 
-  user: number;
+  user: number
 }

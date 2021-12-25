@@ -1,17 +1,10 @@
-import { JwtAuthGuard } from '@module/auth/guard/jwt.guard';
-import {
-  Controller,
-  Get,
-  HttpStatus,
-  Param,
-  Res,
-  UseGuards
-} from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { RoleService } from './role.service';
-import { Roles } from 'decorator/role/role.decorator';
-import { EnumRole as Role } from '@constant/role/role.constant';
-import { RolesGuard } from './guards/role.guard';
+import { JwtAuthGuard } from '@module/auth/guard/jwt.guard'
+import { Controller, Get, HttpStatus, Param, Res, UseGuards } from '@nestjs/common'
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger'
+import { RoleService } from './role.service'
+import { Roles } from 'decorator/role/role.decorator'
+import { EnumRole as Role } from '@constant/role/role.constant'
+import { RolesGuard } from './guards/role.guard'
 
 @ApiTags('role')
 @Controller('role')
@@ -26,7 +19,7 @@ export class RoleController {
     return res.status(HttpStatus.OK).json({
       errors: 0,
       data: await this.roleService.getAll()
-    });
+    })
   }
 
   @ApiOkResponse({ description: 'Get role by id' })
@@ -36,6 +29,6 @@ export class RoleController {
     return res.status(HttpStatus.OK).json({
       errors: 0,
       data: await this.roleService.getById(id)
-    });
+    })
   }
 }

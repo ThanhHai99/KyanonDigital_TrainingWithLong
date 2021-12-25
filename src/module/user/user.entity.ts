@@ -1,79 +1,70 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  CreateDateColumn,
-  UpdateDateColumn,
-  JoinColumn,
-  OneToMany,
-  ManyToOne
-} from 'typeorm';
-import * as bcrypt from 'bcryptjs';
-import { Category } from '@module/category/category.entity';
-import { Sale } from '@module/sale/sale.entity';
-import { Item } from '@module/item/item.entity';
-import { Order } from '@module/order/order.entity';
-import { Role } from '@module/role/role.entity';
+import { BaseEntity, Column, Entity, CreateDateColumn, UpdateDateColumn, JoinColumn, OneToMany, ManyToOne } from 'typeorm'
+import * as bcrypt from 'bcryptjs'
+import { Category } from '@module/category/category.entity'
+import { Sale } from '@module/sale/sale.entity'
+import { Item } from '@module/item/item.entity'
+import { Order } from '@module/order/order.entity'
+import { Role } from '@module/role/role.entity'
 
 @Entity({ name: 'user' })
 export class User extends BaseEntity {
   @Column({ primary: true, generated: true })
-  id: number;
+  id: number
 
   @Column({ unique: true })
-  username: string;
+  username: string
 
   @Column()
-  password: string;
+  password: string
 
   @Column()
-  name: string;
+  name: string
 
   @Column()
-  phone: string;
+  phone: string
 
   @Column()
-  address: string;
+  address: string
 
   @Column({ default: false })
-  is_active: boolean;
+  is_active: boolean
 
   @Column()
-  verify_token: string;
+  verify_token: string
 
   @ManyToOne((type) => Role, (role) => role.users)
   @JoinColumn({ name: 'role_id' })
-  role: Role | number;
+  role: Role | number
 
   @Column({ default: false })
-  is_locked: boolean;
+  is_locked: boolean
 
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)'
   })
-  created_at: Date;
+  created_at: Date
 
   @UpdateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
     onUpdate: 'CURRENT_TIMESTAMP(6)'
   })
-  updated_at: Date;
+  updated_at: Date
 
   @OneToMany((type) => Category, (category) => category.user)
-  categories: Category[];
+  categories: Category[]
 
   @OneToMany((type) => Sale, (sale) => sale.user)
-  sales: Sale[];
+  sales: Sale[]
 
   @OneToMany((type) => Order, (order) => order.user)
-  orders: Order[];
+  orders: Order[]
 
   @OneToMany((type) => Item, (item) => item.user)
-  items: Item[];
+  items: Item[]
 
   isPasswordValid(password: string): boolean {
-    return bcrypt.compareSync(password, this.password);
+    return bcrypt.compareSync(password, this.password)
   }
 }

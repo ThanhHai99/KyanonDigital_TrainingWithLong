@@ -1,33 +1,30 @@
-import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { ConfigService } from '@nestjs/config';
-import { AppModule } from './app.module';
-import { Logger } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common'
+import { NestFactory } from '@nestjs/core'
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
+import { ConfigService } from '@nestjs/config'
+import { AppModule } from './app.module'
+import { Logger } from '@nestjs/common'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService);
-  const port = configService.get<number>('port');
+  const app = await NestFactory.create(AppModule)
+  const configService = app.get(ConfigService)
+  const port = configService.get<number>('port')
 
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe())
   const config = new DocumentBuilder()
     .setTitle('Shopping Online')
     .setDescription('The API Description')
     .setVersion('1.0.0')
     .addTag('v1.0.0')
-    .addBearerAuth(
-      { in: 'header', type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
-      'JWT-auth'
-    )
-    .build();
+    .addBearerAuth({ in: 'header', type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'JWT-auth')
+    .build()
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('/', app, document);
+  const document = SwaggerModule.createDocument(app, config)
+  SwaggerModule.setup('/', app, document)
 
-  app.enableCors();
+  app.enableCors()
   await app.listen(port).then(() => {
-    Logger.log(`Server is listening on ${port}`);
-  });
+    Logger.log(`Server is listening on ${port}`)
+  })
 }
-bootstrap();
+bootstrap()

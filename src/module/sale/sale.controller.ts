@@ -1,29 +1,13 @@
-import {
-  Controller,
-  Get,
-  Res,
-  Param,
-  Post,
-  Body,
-  Patch,
-  HttpStatus,
-  UseGuards,
-  Req
-} from '@nestjs/common';
-import {
-  ApiBody,
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiTags
-} from '@nestjs/swagger';
-import { BodyCreateSale, BodyUpdateSale } from './sale.dto';
-import { SaleService } from './sale.service';
-import { JwtAuthGuard } from '@module/auth/guard/jwt.guard';
-import { RolesGuard } from '@module/role/guards/role.guard';
-import { Roles } from 'decorator/role/role.decorator';
-import { EnumRole as Role } from '@constant/role/role.constant';
-import { getConnection } from 'typeorm';
-import { BodyCreateSaleItem } from '@module/sale_item/sale_item.dto';
+import { Controller, Get, Res, Param, Post, Body, Patch, HttpStatus, UseGuards, Req } from '@nestjs/common'
+import { ApiBody, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
+import { BodyCreateSale, BodyUpdateSale } from './sale.dto'
+import { SaleService } from './sale.service'
+import { JwtAuthGuard } from '@module/auth/guard/jwt.guard'
+import { RolesGuard } from '@module/role/guards/role.guard'
+import { Roles } from 'decorator/role/role.decorator'
+import { EnumRole as Role } from '@constant/role/role.constant'
+import { getConnection } from 'typeorm'
+import { BodyCreateSaleItem } from '@module/sale_item/sale_item.dto'
 
 @ApiTags('sale')
 @Controller('sale')
@@ -38,7 +22,7 @@ export class SaleController {
     return res.status(HttpStatus.OK).json({
       errors: 0,
       data: await this.saleService.getAll()
-    });
+    })
   }
 
   @ApiOkResponse({ description: 'Get a sale by id' })
@@ -48,7 +32,7 @@ export class SaleController {
     return res.status(HttpStatus.OK).json({
       errors: 0,
       data: await this.saleService.getById(id)
-    });
+    })
   }
 
   @ApiCreatedResponse({
@@ -64,18 +48,14 @@ export class SaleController {
     @Req() req
   ): Promise<any> {
     await getConnection().transaction(async (transactionManager) => {
-      bodyCreateSale.user = req.user.id;
-      await this.saleService.create(
-        transactionManager,
-        bodyCreateSale,
-        bodyCreateSaleItem
-      );
-    });
+      bodyCreateSale.user = req.user.id
+      await this.saleService.create(transactionManager, bodyCreateSale, bodyCreateSaleItem)
+    })
 
     return res.status(HttpStatus.CREATED).json({
       errors: 0,
       message: 'Sale is created'
-    });
+    })
   }
 
   @ApiCreatedResponse({
@@ -85,21 +65,16 @@ export class SaleController {
   @ApiBody({ type: BodyUpdateSale })
   @Roles(Role.super_admin)
   @Patch(':id')
-  async update(
-    @Body() body: BodyUpdateSale,
-    @Res() res,
-    @Req() req,
-    @Param('id') id: number
-  ): Promise<any> {
+  async update(@Body() body: BodyUpdateSale, @Res() res, @Req() req, @Param('id') id: number): Promise<any> {
     await getConnection().transaction(async (transactionManager) => {
       // const { name, start_date, end_date, discount, applied, code } = body;
-      body.user = req.user.id;
-      await this.saleService.update(transactionManager, id, body);
-    });
+      body.user = req.user.id
+      await this.saleService.update(transactionManager, id, body)
+    })
 
     return res.status(HttpStatus.OK).json({
       errors: 0,
       message: 'Sale is updated'
-    });
+    })
   }
 }

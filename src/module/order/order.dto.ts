@@ -1,6 +1,6 @@
-import { PaymentMethodIds } from '@constant/payment/method.constant';
-import { ApiProperty } from '@nestjs/swagger';
-import { IsIn, IsNotEmpty, IsOptional } from 'class-validator';
+import { PaymentMethodIds } from '@constant/payment/method.constant'
+import { ApiProperty } from '@nestjs/swagger'
+import { IsIn, IsNotEmpty, IsOptional } from 'class-validator'
 
 export class BodyCreateOrder {
   @ApiProperty({
@@ -8,7 +8,7 @@ export class BodyCreateOrder {
     type: String
   })
   @IsNotEmpty()
-  delivery_address: string;
+  delivery_address: string
 
   @ApiProperty({
     description: 'The payment method',
@@ -16,13 +16,13 @@ export class BodyCreateOrder {
   })
   @IsOptional()
   @IsIn(PaymentMethodIds)
-  payment_method: number;
+  payment_method: number
 
-  paid: boolean;
+  paid: boolean
 
-  cost: number;
+  cost: number
 
-  created_by: number;
+  created_by: number
 }
 
 export class BodyPayment {
@@ -31,7 +31,7 @@ export class BodyPayment {
     type: String
   })
   @IsOptional()
-  sale_code: string;
+  sale_code: string
 
-  user: number;
+  user: number
 }

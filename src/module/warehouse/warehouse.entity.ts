@@ -1,43 +1,36 @@
-import {
-  JoinColumn,
-  ManyToOne,
-  BaseEntity,
-  Column,
-  Entity,
-  OneToMany
-} from 'typeorm';
-import { UpdateDateColumn, CreateDateColumn } from 'typeorm';
-import { Item } from '@module/item/item.entity';
-import { WarehouseLog } from '@module/warehouse_log/warehouse_log.entity';
+import { JoinColumn, ManyToOne, BaseEntity, Column, Entity, OneToMany } from 'typeorm'
+import { UpdateDateColumn, CreateDateColumn } from 'typeorm'
+import { Item } from '@module/item/item.entity'
+import { WarehouseLog } from '@module/warehouse_log/warehouse_log.entity'
 
 @Entity({ name: 'warehouse' })
 export class Warehouse extends BaseEntity {
   @Column({ primary: true, generated: true })
-  id: number;
+  id: number
 
   @ManyToOne((type) => Item, (item) => item.warehouses)
   @JoinColumn({ name: 'item_id' })
-  item: Item | number;
+  item: Item | number
 
   @Column({ type: 'date' })
-  expiration_date: Date;
+  expiration_date: Date
 
   @Column({ default: 0 })
-  amount: number;
+  amount: number
 
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)'
   })
-  created_at: Date;
+  created_at: Date
 
   @UpdateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
     onUpdate: 'CURRENT_TIMESTAMP(6)'
   })
-  updated_at: Date;
+  updated_at: Date
 
   @OneToMany((type) => WarehouseLog, (log) => log.warehouse)
-  warehouse_logs: WarehouseLog[];
+  warehouse_logs: WarehouseLog[]
 }

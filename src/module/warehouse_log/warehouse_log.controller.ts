@@ -1,17 +1,10 @@
-import {
-  Controller,
-  Get,
-  HttpStatus,
-  Param,
-  Res,
-  UseGuards
-} from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { WarehouseLogService } from '@module/warehouse_log/warehouse_log.service';
-import { JwtAuthGuard } from '@module/auth/guard/jwt.guard';
-import { Roles } from 'decorator/role/role.decorator';
-import { EnumRole as Role } from '@constant/role/role.constant';
-import { RolesGuard } from '@module/role/guards/role.guard';
+import { Controller, Get, HttpStatus, Param, Res, UseGuards } from '@nestjs/common'
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger'
+import { WarehouseLogService } from '@module/warehouse_log/warehouse_log.service'
+import { JwtAuthGuard } from '@module/auth/guard/jwt.guard'
+import { Roles } from 'decorator/role/role.decorator'
+import { EnumRole as Role } from '@constant/role/role.constant'
+import { RolesGuard } from '@module/role/guards/role.guard'
 
 @ApiTags('warehouse_log')
 @Controller('warehouse_log')
@@ -26,7 +19,7 @@ export class WarehouseLogController {
     return res.status(HttpStatus.OK).json({
       errors: 0,
       data: await this.warehouseLogService.getAll()
-    });
+    })
   }
 
   @ApiOkResponse({ description: 'Get a warehouse log by id' })
@@ -36,6 +29,6 @@ export class WarehouseLogController {
     return res.status(HttpStatus.OK).json({
       errors: 0,
       data: await this.warehouseLogService.getById(id)
-    });
+    })
   }
 }
